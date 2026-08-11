@@ -6,11 +6,9 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Secure Session Config
 app.use(session({
   secret: 'texus_secret_key_987',
   resave: false,
@@ -18,14 +16,12 @@ app.use(session({
   cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// Databases
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
 const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
 
-// --- AUTHENTICATION ROUTES ---
+// --- AUTH API ROUTES ---
 
-// 1. Signup Route
 app.post('/api/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -43,11 +39,9 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-// 2. Login Route
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const user = await usersDb.findOne({ username });
     if (!user) return res.status(400).json({ error: 'Invalid username or password.' });
 
@@ -61,15 +55,24 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 3. Logout Route
 app.post('/api/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.json({ success: true, message: 'Logged out.' });
-  });
+  req.session.destroy(() => res.json({ success: true }));
 });
 
-// --- MAIN APP ROUTE ---
+// Route to fetch active community members
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await usersDb.find({}, { password: 0 }); // Hide passwords
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: 'Error loading users.' });
+  }
+});
+
+// --- MAIN HTML ROUTE ---
 app.get('/', (req, res) => {
+  const currentUser = req.session.user ? req.session.user.username : null;
+
   res.send(`
 <!DOCTYPE html>
 <html lang="en">
@@ -81,52 +84,80 @@ app.get('/', (req, res) => {
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #fafafa; color: #262626; display: flex; justify-content: center; }
-        .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; padding-bottom: 60px; }
+        .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; }
+        
+        /* Full Page Auth Screen */
+        .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 30px; text-align: center; background: #fff; }
+        .auth-screen h1 { font-size: 36px; color: #e1306c; margin-bottom: 10px; font-weight: 800; }
+        .auth-screen p { color: #8e8e8e; margin-bottom: 25px; font-size: 14px; }
+        .auth-screen input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dbdbdb; border-radius: 6px; background: #fafafa; font-size: 14px; }
+        .auth-screen button { width: 100%; padding: 12px; background-color: #0095f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 14px; }
+        .auth-screen .toggle-btn { background: transparent; color: #0095f6; margin-top: 15px; font-size: 13px; text-decoration: underline; }
+
+        /* Main App Interface */
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #dbdbdb; background: #fff; position: sticky; top: 0; z-index: 10; }
         .logo { font-size: 24px; font-weight: bold; color: #e1306c; }
-        .auth-container { padding: 15px; border-bottom: 1px solid #dbdbdb; background: #f9f9f9; text-align: center; }
-        .auth-container input { width: 80%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; }
-        .auth-container button { padding: 8px 15px; background-color: #0095f6; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        .create-post { padding: 15px; border-bottom: 1px solid #dbdbdb; }
-        .create-post textarea { width: 100%; padding: 10px; border: 1px solid #dbdbdb; border-radius: 8px; resize: none; margin-top: 10px; }
-        .create-post button { background: #0095f6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; }
+        .user-list { padding: 15px; border-bottom: 1px solid #dbdbdb; }
+        .user-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 35px; height: 35px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .chat-btn { background: #0095f6; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; }
         nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; }
     </style>
 </head>
 <body>
     <div class="main-wrapper">
+
+    ${!currentUser ? `
+        <div class="auth-screen" id="loginView">
+            <h1>TexUs</h1>
+            <p>Connect and text with people instantly.</p>
+            <input type="text" id="login-u" placeholder="Username">
+            <input type="password" id="login-p" placeholder="Password">
+            <button onclick="login()">Log In</button>
+            <button class="toggle-btn" onclick="toggleAuth('signup')">Don't have an account? Sign Up</button>
+        </div>
+
+        <div class="auth-screen" id="signupView" style="display: none;">
+            <h1>TexUs</h1>
+            <p>Join the TexUs community today.</p>
+            <input type="text" id="signup-u" placeholder="Choose a Username">
+            <input type="password" id="signup-p" placeholder="Choose a Password">
+            <button onclick="signup()" style="background-color: #3897f0;">Create Account</button>
+            <button class="toggle-btn" onclick="toggleAuth('login')">Already have an account? Log In</button>
+        </div>
+    ` : `
         <header>
             <div class="logo">TexUs</div>
             <div>
-                <i class="far fa-heart" style="margin-right: 15px;"></i>
-                <i class="far fa-paper-plane"></i>
+                <span style="font-size: 13px; margin-right: 10px;">@${currentUser}</span>
+                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor: pointer;" title="Logout"></i>
             </div>
         </header>
 
-        <div class="auth-container">
-            <h3>Login / Create Account</h3>
-            <input type="text" id="auth-username" placeholder="Username"><br>
-            <input type="password" id="auth-password" placeholder="Password"><br>
-            <button onclick="login()">Log In</button>
-            <button onclick="signup()" style="background-color: #3897f0;">Sign Up</button>
-        </div>
-
-        <div class="create-post">
-            <textarea id="postText" rows="3" placeholder="What's on your mind?"></textarea>
-            <button onclick="alert('Logged in features coming live!')">Post</button>
+        <div class="user-list">
+            <h4 style="margin-bottom: 10px;">People on TexUs</h4>
+            <div id="usersContainer">Loading members...</div>
         </div>
 
         <nav>
             <i class="fas fa-home"></i>
-            <i class="fas fa-film"></i>
-            <i class="far fa-comment"></i>
+            <i class="far fa-paper-plane" onclick="alert('Direct messages opening!')"></i>
+            <i class="far fa-user"></i>
         </nav>
+    `}
+
     </div>
 
     <script>
+        function toggleAuth(type) {
+            document.getElementById('loginView').style.display = type === 'signup' ? 'none' : 'flex';
+            document.getElementById('signupView').style.display = type === 'signup' ? 'flex' : 'none';
+        }
+
         async function signup() {
-            const u = document.getElementById('auth-username').value;
-            const p = document.getElementById('auth-password').value;
+            const u = document.getElementById('signup-u').value;
+            const p = document.getElementById('signup-p').value;
             const res = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -134,18 +165,52 @@ app.get('/', (req, res) => {
             });
             const data = await res.json();
             alert(data.message || data.error);
+            if (data.success) toggleAuth('login');
         }
 
         async function login() {
-            const u = document.getElementById('auth-username').value;
-            const p = document.getElementById('auth-password').value;
+            const u = document.getElementById('login-u').value;
+            const p = document.getElementById('login-p').value;
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ username: u, password: p })
             });
             const data = await res.json();
-            alert(data.message || data.error);
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            location.reload();
+        }
+
+        // Fetch users if logged in
+        if (${JSON.stringify(!!currentUser)}) {
+            fetch('/api/users')
+                .then(res => res.json())
+                .then(users => {
+                    const container = document.getElementById('usersContainer');
+                    if (users.length <= 1) {
+                        container.innerHTML = '<p style="font-size: 13px; color: #8e8e8e;">No other members registered yet.</p>';
+                        return;
+                    }
+                    container.innerHTML = users
+                        .filter(u => u.username !== '${currentUser}')
+                        .map(u => \`
+                            <div class="user-card">
+                                <div class="user-info">
+                                    <div class="avatar">\${u.username.charAt(0).toUpperCase()}</div>
+                                    <span>\${u.username}</span>
+                                </div>
+                                <button class="chat-btn" onclick="alert('Opening chat with ' + '\${u.username}')">Chat</button>
+                            </div>
+                        \`).join('');
+                });
         }
     </script>
 </body>
