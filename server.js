@@ -6,7 +6,7 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware (Increased limit to allow base64 image uploads)
+// Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -24,7 +24,6 @@ app.use(session({
 
 // Databases
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
-const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
 const friendsDb = Datastore.create({ filename: './friends.db', autoload: true });
 
@@ -163,6 +162,70 @@ app.post('/api/add-friend', async (req, res) => {
   }
 });
 
+// --- MESSAGING ROUTES ---
+
+app.get('/api/friends-chats', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  const currentUser = req.session.user.username;
+
+  try {
+    const userFriends = await friendsDb.find({
+      $or: [
+        { requester: currentUser },
+        { recipient: currentUser }
+      ],
+      status: 'accepted'
+    });
+
+    const friendUsernames = userFriends.map(f => f.requester === currentUser ? f.recipient : f.requester);
+    const friendsProfiles = await usersDb.find({ username: { $in: friendUsernames } }, { password: 0 });
+
+    res.json(friendsProfiles);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching chat friends.' });
+  }
+});
+
+app.get('/api/messages/:friendUsername', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  const currentUser = req.session.user.username;
+  const { friendUsername } = req.params;
+
+  try {
+    const messages = await chatDb.find({
+      $or: [
+        { sender: currentUser, receiver: friendUsername },
+        { sender: friendUsername, receiver: currentUser }
+      ]
+    }).sort({ createdAt: 1 });
+
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: 'Error loading messages.' });
+  }
+});
+
+app.post('/api/messages/send', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  const sender = req.session.user.username;
+  const { receiver, text } = req.body;
+
+  if (!text || !text.trim()) return res.status(400).json({ error: 'Message cannot be empty.' });
+
+  try {
+    const newMsg = {
+      sender,
+      receiver,
+      text: text.trim(),
+      createdAt: new Date()
+    };
+    await chatDb.insert(newMsg);
+    res.json({ success: true, message: newMsg });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to send message.' });
+  }
+});
+
 // --- MAIN FRONTEND ROUTE ---
 app.get('/', (req, res) => {
   const currentUser = req.session.user ? req.session.user.username : null;
@@ -203,7 +266,6 @@ app.get('/', (req, res) => {
         .profile-username { font-size: 20px; font-weight: bold; }
         .profile-location { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
         
-        /* Profile Custom Actions */
         .profile-actions { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
         .action-btn { padding: 8px 14px; background: #0095f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
         .action-btn-secondary { background: #efefef; color: #262626; border: 1px solid #dbdbdb; }
@@ -219,13 +281,27 @@ app.get('/', (req, res) => {
         #imgModal img { max-width: 90%; max-height: 90%; border-radius: 8px; }
         #imgModal span { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 30px; cursor: pointer; }
 
-        /* Messages & Invite Box */
-        .messages-container { padding: 20px; text-align: center; }
-        .invite-box { background: #f0f8ff; border: 1px solid #b0e0e6; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
-        .invite-box h4 { color: #0077cc; margin-bottom: 8px; }
-        .invite-box p { font-size: 13px; color: #555; margin-bottom: 12px; }
-        .invite-link-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; background: #fff; margin-bottom: 10px; }
-        .invite-btn { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        /* Messages & Chats View */
+        .messages-container { padding: 15px; }
+        .invite-box { background: #f0f8ff; border: 1px solid #b0e0e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: left; }
+        .invite-box h4 { color: #0077cc; margin-bottom: 6px; font-size: 14px; }
+        .invite-box p { font-size: 12px; color: #555; margin-bottom: 8px; }
+        .invite-link-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fff; margin-bottom: 8px; }
+        .invite-btn { width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+
+        .chat-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; cursor: pointer; }
+        .chat-user-info { display: flex; align-items: center; gap: 10px; }
+        
+        /* Active Chat Box */
+        #activeChatView { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 20; display: flex; flex-direction: column; }
+        .chat-header { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid #dbdbdb; background: #fff; font-weight: bold; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 8px; }
+        .msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; word-break: break-word; }
+        .msg-sent { background: #0095f6; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-received { background: #efefef; color: #262626; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .chat-input-area { display: flex; padding: 12px; border-top: 1px solid #dbdbdb; background: #fff; gap: 8px; }
+        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #dbdbdb; border-radius: 20px; outline: none; font-size: 13px; }
+        .chat-input-area button { background: #0095f6; color: #fff; border: none; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
 
         /* Members Directory */
         .user-list { padding: 15px; }
@@ -279,14 +355,26 @@ app.get('/', (req, res) => {
             <div class="messages-container">
                 <div class="invite-box">
                     <h4><i class="fas fa-user-plus"></i> Invite Friends to TexUs</h4>
-                    <p>Share this link with your friends so they can join you on TexUs:</p>
+                    <p>Share this link with your friends:</p>
                     <input type="text" class="invite-link-input" id="inviteLinkText" value="https://beyou-app.onrender.com" readonly>
-                    <button class="invite-btn" onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copy Invite Link</button>
+                    <button class="invite-btn" onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copy Link</button>
                 </div>
-                <div style="color: #8e8e8e; font-size: 13px; margin-top: 30px;">
-                    <i class="far fa-paper-plane" style="font-size: 30px; margin-bottom: 10px; display: block;"></i>
-                    Your direct messaging inbox is ready for chats!
-                </div>
+
+                <h3 style="font-size: 15px; margin-bottom: 10px;">Chats with Friends</h3>
+                <div id="friendsChatsContainer">Loading chats...</div>
+            </div>
+        </div>
+
+        <div id="activeChatView" class="hidden">
+            <div class="chat-header">
+                <i class="fas fa-arrow-left" onclick="closeActiveChat()" style="cursor: pointer;"></i>
+                <div class="avatar" id="activeChatAvatar" style="width: 32px; height: 32px; font-size: 14px;"></div>
+                <span id="activeChatUsername"></span>
+            </div>
+            <div class="chat-messages" id="chatMessagesContainer"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chatMessageInput" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)">
+                <button onclick="sendChatMessage()">Send</button>
             </div>
         </div>
 
@@ -324,8 +412,8 @@ app.get('/', (req, res) => {
         </div>
 
         <nav>
-            <i class="fas fa-users" onclick="showTab('membersTab')" title="Members"></i>
-            <i class="far fa-paper-plane" onclick="showTab('messagesTab')" title="Messages"></i>
+            <i class="fas fa-users" onclick="showTab('membersTab'); loadMembers();" title="Members"></i>
+            <i class="far fa-paper-plane" onclick="showTab('messagesTab'); loadFriendsChats();" title="Messages"></i>
             <i class="far fa-user" onclick="showTab('profileTab')" title="Profile"></i>
         </nav>
     `}
@@ -349,7 +437,6 @@ app.get('/', (req, res) => {
             const data = await res.json();
             alert(data.message || data.error);
             if (data.success) {
-                // Switch back to login and prepopulate saved values if browser allows
                 toggleAuth('login');
                 document.getElementById('login-u').value = u;
             }
@@ -388,7 +475,7 @@ app.get('/', (req, res) => {
             linkInput.select();
             linkInput.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(linkInput.value);
-            alert('Invite link copied to clipboard! Share it with your friends.');
+            alert('Invite link copied to clipboard!');
         }
 
         let currentUserAvatarUrl = '';
@@ -471,6 +558,7 @@ app.get('/', (req, res) => {
             const data = await res.json();
             alert(data.message);
             loadMembers();
+            loadFriendsChats();
         }
 
         function loadMembers() {
@@ -502,8 +590,95 @@ app.get('/', (req, res) => {
                 });
         }
 
+        // --- MESSAGING LOGIC ---
+        let activeChatFriend = null;
+
+        function loadFriendsChats() {
+            if (!${JSON.stringify(!!currentUser)}) return;
+            fetch('/api/friends-chats')
+                .then(res => res.json())
+                .then(friends => {
+                    const container = document.getElementById('friendsChatsContainer');
+                    if (friends.length === 0) {
+                        container.innerHTML = '<p style="font-size: 13px; color: #8e8e8e;">No friends yet. Go to the Members tab to add friends and start chatting!</p>';
+                        return;
+                    }
+                    container.innerHTML = friends.map(f => \`
+                        <div class="chat-list-item" onclick="openActiveChat('\${f.username}', '\${f.avatarUrl || ''}')">
+                            <div class="chat-user-info">
+                                <div class="avatar" style="width: 40px; height: 40px; font-size: 16px;">
+                                    \${f.avatarUrl ? \`<img src="\${f.avatarUrl}" alt="Avatar">\` : f.username.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <strong style="font-size: 14px;">\${f.username}</strong>
+                                    <p style="font-size: 11px; color: #8e8e8e;">Tap to open chat</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: #c7c7c7; font-size: 12px;"></i>
+                        </div>
+                    \`).join('');
+                });
+        }
+
+        function openActiveChat(username, avatarUrl) {
+            activeChatFriend = username;
+            document.getElementById('activeChatUsername').innerText = username;
+            const avatarContainer = document.getElementById('activeChatAvatar');
+            if (avatarUrl) {
+                avatarContainer.innerHTML = \`<img src="\${avatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">\`;
+            } else {
+                avatarContainer.innerText = username.charAt(0).toUpperCase();
+            }
+
+            document.getElementById('activeChatView').classList.remove('hidden');
+            fetchMessages();
+        }
+
+        function closeActiveChat() {
+            document.getElementById('activeChatView').classList.add('hidden');
+            activeChatFriend = null;
+        }
+
+        async function fetchMessages() {
+            if (!activeChatFriend) return;
+            const res = await fetch(\`/api/messages/\${activeChatFriend}\`);
+            const messages = await res.json();
+
+            const container = document.getElementById('chatMessagesContainer');
+            container.innerHTML = messages.map(m => \`
+                <div class="msg-bubble \${m.sender === '${currentUser}' ? 'msg-sent' : 'msg-received'}">
+                    \${m.text}
+                </div>
+            \`).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatMessageInput');
+            const text = input.value;
+            if (!text.trim() || !activeChatFriend) return;
+
+            const res = await fetch('/api/messages/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ receiver: activeChatFriend, text })
+            });
+            const data = await res.json();
+            if (data.success) {
+                input.value = '';
+                fetchMessages();
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
         loadProfile();
         loadMembers();
+        loadFriendsChats();
     </script>
 </body>
 </html>
