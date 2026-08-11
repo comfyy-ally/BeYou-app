@@ -18,7 +18,7 @@ app.use(session({
   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 Days in milliseconds
 }));
 
-// Databases (users.db permanently saves accounts)
+// Databases (users.db permanently saves accounts and profile info)
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
 const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
@@ -32,23 +32,27 @@ app.post('/api/signup', async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
 
-    // Check if account already exists
     const existingUser = await usersDb.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ error: 'This account already exists! Please log in instead.' });
+      return res.status(400).json({ error: 'This account already exists! Log in with your details.' });
     }
 
-    // Hash password and permanently save user
     const hashedPassword = await bcrypt.hash(password, 10);
-    await usersDb.insert({ username, password: hashedPassword, createdAt: new Date() });
+    await usersDb.insert({ 
+      username, 
+      password: hashedPassword, 
+      bio: 'Hey there! I am using TexUs.',
+      location: 'Not specified',
+      createdAt: new Date() 
+    });
 
-    res.json({ success: true, message: 'Account created successfully! You can now log in.' });
+    res.json({ success: true, message: 'Account created! You can now log in.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error during signup.' });
   }
 });
 
-// 2. Login Route (For Existing Accounts)
+// 2. Login Route (Log in with existing details anytime)
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -70,7 +74,36 @@ app.post('/api/logout', (req, res) => {
   req.session.destroy(() => res.json({ success: true }));
 });
 
-// --- FRIENDS & USERS API ROUTES ---
+// --- PROFILE & SETTINGS ROUTES ---
+
+// Get User Profile Data
+app.get('/api/profile', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const user = await usersDb.findOne({ username: req.session.user.username }, { password: 0 });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching profile.' });
+  }
+});
+
+// Update Profile Bio & Settings
+app.post('/api/profile/update', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  const { bio, location } = req.body;
+
+  try {
+    await usersDb.update(
+      { username: req.session.user.username },
+      { $set: { bio, location } }
+    );
+    res.json({ success: true, message: 'Profile updated successfully!' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update profile.' });
+  }
+});
+
+// --- FRIENDS & MEMBERS ROUTES ---
 
 app.get('/api/members', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
@@ -115,13 +148,7 @@ app.post('/api/add-friend', async (req, res) => {
       return res.json({ success: true, message: 'Friend request already sent or connected!' });
     }
 
-    await friendsDb.insert({
-      requester,
-      recipient,
-      status: 'accepted',
-      createdAt: new Date()
-    });
-
+    await friendsDb.insert({ requester, recipient, status: 'accepted', createdAt: new Date() });
     res.json({ success: true, message: `You are now friends with ${recipient}!` });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add friend.' });
@@ -161,14 +188,19 @@ app.get('/', (req, res) => {
         .view-section { display: block; }
         .hidden { display: none !important; }
 
-        /* Profile Section */
+        /* Profile & Settings Card */
         .profile-card { text-align: center; padding: 25px 20px; border-bottom: 1px solid #dbdbdb; background: #fafafa; }
-        .profile-avatar { width: 70px; height: 70px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 10px; }
-        .profile-username { font-size: 18px; font-weight: bold; }
-        .profile-badge { font-size: 12px; color: #8e8e8e; margin-top: 4px; }
-        .logout-btn { margin-top: 15px; padding: 6px 15px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .profile-avatar { width: 75px; height: 75px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; margin: 0 auto 10px; }
+        .profile-username { font-size: 20px; font-weight: bold; }
+        .profile-bio { font-size: 13px; color: #555; margin: 10px 0; padding: 0 10px; }
+        
+        .settings-form { padding: 20px; text-align: left; }
+        .settings-form label { font-size: 12px; font-weight: bold; color: #8e8e8e; display: block; margin-top: 10px; }
+        .settings-form input, .settings-form textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #dbdbdb; border-radius: 6px; font-size: 14px; }
+        .save-btn { width: 100%; margin-top: 15px; padding: 10px; background: #0095f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .logout-btn { width: 100%; margin-top: 20px; padding: 10px; background: #ed4956; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* Members / Friends Feed */
+        /* Members Directory */
         .user-list { padding: 15px; }
         .user-card { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; }
         .user-info { display: flex; align-items: center; gap: 10px; }
@@ -187,7 +219,7 @@ app.get('/', (req, res) => {
     ${!currentUser ? `
         <div class="auth-screen" id="loginView">
             <h1>TexUs</h1>
-            <p>Log in to your account</p>
+            <p>Log in with your existing account</p>
             <input type="text" id="login-u" placeholder="Username">
             <input type="password" id="login-p" placeholder="Password">
             <button onclick="login()">Log In</button>
@@ -205,7 +237,7 @@ app.get('/', (req, res) => {
     ` : `
         <header>
             <div class="logo">TexUs</div>
-            <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor: pointer; font-size: 18px;" title="Logout"></i>
+            <i class="fas fa-cog" onclick="showTab('settingsTab')" style="cursor: pointer; font-size: 18px;" title="Settings"></i>
         </header>
 
         <div id="membersTab" class="view-section">
@@ -219,8 +251,22 @@ app.get('/', (req, res) => {
             <div class="profile-card">
                 <div class="profile-avatar">${currentUser.charAt(0).toUpperCase()}</div>
                 <div class="profile-username">@${currentUser}</div>
-                <div class="profile-badge">Active TexUs Member</div>
-                <button class="logout-btn" onclick="logout()">Log Out</button>
+                <div class="profile-bio" id="displayBio">Loading bio...</div>
+                <button onclick="showTab('settingsTab')" style="padding: 6px 15px; background: #0095f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Edit Profile & Settings</button>
+            </div>
+        </div>
+
+        <div id="settingsTab" class="view-section hidden">
+            <div class="settings-form">
+                <h3>Account Settings</h3>
+                <label>ABOUT ME / BIO</label>
+                <textarea id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                
+                <label>LOCATION</label>
+                <input type="text" id="editLocation" placeholder="e.g. New York, USA">
+
+                <button class="save-btn" onclick="updateProfile()">Save Changes</button>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out of TexUs</button>
             </div>
         </div>
 
@@ -228,6 +274,7 @@ app.get('/', (req, res) => {
             <i class="fas fa-users" onclick="showTab('membersTab')" title="Members"></i>
             <i class="far fa-paper-plane" onclick="alert('Inbox coming next!')" title="Messages"></i>
             <i class="far fa-user" onclick="showTab('profileTab')" title="Profile"></i>
+            <i class="fas fa-cog" onclick="showTab('settingsTab')" title="Settings"></i>
         </nav>
     `}
 
@@ -276,7 +323,33 @@ app.get('/', (req, res) => {
         function showTab(tabId) {
             document.getElementById('membersTab').classList.add('hidden');
             document.getElementById('profileTab').classList.add('hidden');
+            document.getElementById('settingsTab').classList.add('hidden');
             document.getElementById(tabId).classList.remove('hidden');
+        }
+
+        async function loadProfile() {
+            if (!${JSON.stringify(!!currentUser)}) return;
+            const res = await fetch('/api/profile');
+            const user = await res.json();
+            
+            document.getElementById('displayBio').innerText = user.bio || 'No bio added yet.';
+            document.getElementById('editBio').value = user.bio || '';
+            document.getElementById('editLocation').value = user.location || '';
+        }
+
+        async function updateProfile() {
+            const bio = document.getElementById('editBio').value;
+            const locationVal = document.getElementById('editLocation').value;
+
+            const res = await fetch('/api/profile/update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ bio, location: locationVal })
+            });
+            const data = await res.json();
+            alert(data.message);
+            loadProfile();
+            showTab('profileTab');
         }
 
         async function addFriend(targetUsername) {
@@ -317,6 +390,7 @@ app.get('/', (req, res) => {
                 });
         }
 
+        loadProfile();
         loadMembers();
     </script>
 </body>
