@@ -16,13 +16,13 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: { 
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days duration
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: false // Set to true if using HTTPS in production environments
+    secure: false
   }
 }));
 
-// Databases (Permanently stores data locally)
+// Databases
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
 const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
@@ -30,7 +30,6 @@ const friendsDb = Datastore.create({ filename: './friends.db', autoload: true })
 
 // --- AUTHENTICATION API ROUTES ---
 
-// 1. Signup Route (Create Account ONCE)
 app.post('/api/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -47,6 +46,7 @@ app.post('/api/signup', async (req, res) => {
       password: hashedPassword, 
       bio: 'Hey there! I am using TexUs.',
       location: 'Not specified',
+      avatarUrl: '',
       createdAt: new Date() 
     });
 
@@ -56,7 +56,6 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-// 2. Login Route (Log in with existing details anytime)
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -73,7 +72,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 3. Logout Route
 app.post('/api/logout', (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('connect.sid');
@@ -95,12 +93,12 @@ app.get('/api/profile', async (req, res) => {
 
 app.post('/api/profile/update', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const { bio, location } = req.body;
+  const { bio, location, avatarUrl } = req.body;
 
   try {
     await usersDb.update(
       { username: req.session.user.username },
-      { $set: { bio, location } }
+      { $set: { bio, location, avatarUrl } }
     );
     res.json({ success: true, message: 'Profile updated successfully!' });
   } catch (err) {
@@ -175,7 +173,7 @@ app.get('/', (req, res) => {
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #fafafa; color: #262626; display: flex; justify-content: center; }
-        .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; padding-bottom: 60px; }
+        .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; padding-bottom: 70px; }
         
         /* Auth Screen Styling */
         .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 30px; text-align: center; background: #fff; }
@@ -193,23 +191,35 @@ app.get('/', (req, res) => {
         .view-section { display: block; }
         .hidden { display: none !important; }
 
-        /* Profile & Settings Card */
+        /* Profile Card */
         .profile-card { text-align: center; padding: 25px 20px; border-bottom: 1px solid #dbdbdb; background: #fafafa; }
-        .profile-avatar { width: 75px; height: 75px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; margin: 0 auto 10px; }
+        .profile-avatar-container { width: 80px; height: 80px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 10px; overflow: hidden; border: 2px solid #dbdbdb; }
+        .profile-avatar-container img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 20px; font-weight: bold; }
-        .profile-bio { font-size: 13px; color: #555; margin: 10px 0; padding: 0 10px; }
+        .profile-location { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
+        .profile-bio { font-size: 14px; color: #333; margin: 12px 0; padding: 0 15px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #eee; text-align: left; }
         
+        /* Settings Form */
         .settings-form { padding: 20px; text-align: left; }
         .settings-form label { font-size: 12px; font-weight: bold; color: #8e8e8e; display: block; margin-top: 10px; }
         .settings-form input, .settings-form textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #dbdbdb; border-radius: 6px; font-size: 14px; }
         .save-btn { width: 100%; margin-top: 15px; padding: 10px; background: #0095f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .logout-btn { width: 100%; margin-top: 20px; padding: 10px; background: #ed4956; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
+        /* Messages & Invite Box */
+        .messages-container { padding: 20px; text-align: center; }
+        .invite-box { background: #f0f8ff; border: 1px solid #b0e0e6; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
+        .invite-box h4 { color: #0077cc; margin-bottom: 8px; }
+        .invite-box p { font-size: 13px; color: #555; margin-bottom: 12px; }
+        .invite-link-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; background: #fff; margin-bottom: 10px; }
+        .invite-btn { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
         /* Members Directory */
         .user-list { padding: 15px; }
         .user-card { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; }
         .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3897f0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3897f0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .add-btn { background: #0095f6; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
         .friend-badge { background: #eef7ee; color: #2e7d32; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
 
@@ -252,18 +262,40 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
+        <div id="messagesTab" class="view-section hidden">
+            <div class="messages-container">
+                <div class="invite-box">
+                    <h4><i class="fas fa-user-plus"></i> Invite Friends to TexUs</h4>
+                    <p>Share this link with your friends so they can join you on TexUs:</p>
+                    <input type="text" class="invite-link-input" id="inviteLinkText" value="https://beyou-app.onrender.com" readonly>
+                    <button class="invite-btn" onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copy Invite Link</button>
+                </div>
+                <div style="color: #8e8e8e; font-size: 13px; margin-top: 30px;">
+                    <i class="far fa-paper-plane" style="font-size: 30px; margin-bottom: 10px; display: block;"></i>
+                    Your direct messaging inbox is ready for chats!
+                </div>
+            </div>
+        </div>
+
         <div id="profileTab" class="view-section hidden">
             <div class="profile-card">
-                <div class="profile-avatar">${currentUser.charAt(0).toUpperCase()}</div>
+                <div class="profile-avatar-container" id="profileAvatarDisplay">
+                    ${currentUser.charAt(0).toUpperCase()}
+                </div>
                 <div class="profile-username">@${currentUser}</div>
+                <div class="profile-location" id="displayLocation">Location not set</div>
                 <div class="profile-bio" id="displayBio">Loading bio...</div>
-                <button onclick="showTab('settingsTab')" style="padding: 6px 15px; background: #0095f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Edit Profile & Settings</button>
+                <button onclick="showTab('settingsTab')" style="padding: 8px 18px; background: #0095f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">Edit Profile & Bio</button>
             </div>
         </div>
 
         <div id="settingsTab" class="view-section hidden">
             <div class="settings-form">
-                <h3>Account Settings</h3>
+                <h3>Edit Profile & Settings</h3>
+                
+                <label>PROFILE PICTURE (IMAGE URL)</label>
+                <input type="text" id="editAvatar" placeholder="Paste image web address (URL)">
+
                 <label>ABOUT ME / BIO</label>
                 <textarea id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
                 
@@ -277,7 +309,7 @@ app.get('/', (req, res) => {
 
         <nav>
             <i class="fas fa-users" onclick="showTab('membersTab')" title="Members"></i>
-            <i class="far fa-paper-plane" onclick="alert('Inbox coming next!')" title="Messages"></i>
+            <i class="far fa-paper-plane" onclick="showTab('messagesTab')" title="Messages"></i>
             <i class="far fa-user" onclick="showTab('profileTab')" title="Profile"></i>
             <i class="fas fa-cog" onclick="showTab('settingsTab')" title="Settings"></i>
         </nav>
@@ -327,9 +359,18 @@ app.get('/', (req, res) => {
 
         function showTab(tabId) {
             document.getElementById('membersTab').classList.add('hidden');
+            document.getElementById('messagesTab').classList.add('hidden');
             document.getElementById('profileTab').classList.add('hidden');
             document.getElementById('settingsTab').classList.add('hidden');
             document.getElementById(tabId).classList.remove('hidden');
+        }
+
+        function copyInviteLink() {
+            const linkInput = document.getElementById('inviteLinkText');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(linkInput.value);
+            alert('Invite link copied to clipboard! Share it with your friends.');
         }
 
         async function loadProfile() {
@@ -338,18 +379,27 @@ app.get('/', (req, res) => {
             const user = await res.json();
             
             document.getElementById('displayBio').innerText = user.bio || 'No bio added yet.';
+            document.getElementById('displayLocation').innerText = user.location || 'Location not set';
+            
             document.getElementById('editBio').value = user.bio || '';
             document.getElementById('editLocation').value = user.location || '';
+            document.getElementById('editAvatar').value = user.avatarUrl || '';
+
+            if (user.avatarUrl) {
+                document.getElementById('profileAvatarDisplay.innerHTML') || 
+                (document.getElementById('profileAvatarDisplay').innerHTML = \`<img src="\${user.avatarUrl}" alt="Avatar">\`);
+            }
         }
 
         async function updateProfile() {
             const bio = document.getElementById('editBio').value;
             const locationVal = document.getElementById('editLocation').value;
+            const avatarUrl = document.getElementById('editAvatar').value;
 
             const res = await fetch('/api/profile/update', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ bio, location: locationVal })
+                body: JSON.stringify({ bio, location: locationVal, avatarUrl })
             });
             const data = await res.json();
             alert(data.message);
@@ -381,7 +431,9 @@ app.get('/', (req, res) => {
                     container.innerHTML = members.map(m => \`
                         <div class="user-card">
                             <div class="user-info">
-                                <div class="avatar">\${m.username.charAt(0).toUpperCase()}</div>
+                                <div class="avatar">
+                                    \${m.avatarUrl ? \`<img src="\${m.avatarUrl}" alt="Avatar">\` : m.username.charAt(0).toUpperCase()}
+                                </div>
                                 <div>
                                     <strong style="font-size: 14px;">\${m.username}</strong>
                                 </div>
