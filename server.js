@@ -15,13 +15,14 @@ app.use(session({
   secret: 'texus_secret_key_987',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 Days in milliseconds
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
 }));
 
 // Databases
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
 const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
+const friendsDb = Datastore.create({ filename: './friends.db', autoload: true });
 
 // --- AUTHENTICATION API ROUTES ---
 
@@ -65,13 +66,63 @@ app.post('/api/logout', (req, res) => {
   req.session.destroy(() => res.json({ success: true }));
 });
 
-// 4. Fetch All Users Route
-app.get('/api/users', async (req, res) => {
+// --- FRIENDS & USERS API ROUTES ---
+
+// Fetch All Users & Friend Statuses
+app.get('/api/members', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  const currentUser = req.session.user.username;
+
   try {
-    const users = await usersDb.find({}, { password: 0 }); // Exclude passwords
-    res.json(users);
+    const allUsers = await usersDb.find({ username: { $ne: currentUser } }, { password: 0 });
+    const userFriends = await friendsDb.find({
+      $or: [
+        { requester: currentUser },
+        { recipient: currentUser }
+      ]
+    });
+
+    const membersWithStatus = allUsers.map(u => {
+      const isFriend = userFriends.some(
+        f => (f.requester === u.username || f.recipient === u.username) && f.status === 'accepted'
+      );
+      return { ...u, isFriend };
+    });
+
+    res.json(membersWithStatus);
   } catch (err) {
-    res.status(500).json({ error: 'Error loading users.' });
+    res.status(500).json({ error: 'Error fetching members.' });
+  }
+});
+
+// Add Friend Route
+app.post('/api/add-friend', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  const requester = req.session.user.username;
+  const { recipient } = req.body;
+
+  try {
+    const existing = await friendsDb.findOne({
+      $or: [
+        { requester, recipient },
+        { requester: recipient, recipient: requester }
+      ]
+    });
+
+    if (existing) {
+      return res.json({ success: true, message: 'Friend request already sent or connected!' });
+    }
+
+    await friendsDb.insert({
+      requester,
+      recipient,
+      status: 'accepted',
+      createdAt: new Date()
+    });
+
+    res.json({ success: true, message: `You are now friends with ${recipient}!` });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add friend.' });
   }
 });
 
@@ -115,12 +166,13 @@ app.get('/', (req, res) => {
         .profile-badge { font-size: 12px; color: #8e8e8e; margin-top: 4px; }
         .logout-btn { margin-top: 15px; padding: 6px 15px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
 
-        /* User List / Feed */
-        .user-list { padding: 15px; border-bottom: 1px solid #dbdbdb; }
-        .user-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+        /* Members / Friends Feed */
+        .user-list { padding: 15px; }
+        .user-card { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; }
         .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 35px; height: 35px; border-radius: 50%; background: #3897f0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
-        .chat-btn { background: #0095f6; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3897f0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
+        .add-btn { background: #0095f6; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .friend-badge { background: #eef7ee; color: #2e7d32; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
 
         /* Bottom Navigation */
         nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; }
@@ -154,10 +206,10 @@ app.get('/', (req, res) => {
             <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor: pointer; font-size: 18px;" title="Logout"></i>
         </header>
 
-        <div id="feedTab" class="view-section">
+        <div id="membersTab" class="view-section">
             <div class="user-list">
-                <h4 style="margin-bottom: 10px;">TexUs Community</h4>
-                <div id="usersContainer">Loading members...</div>
+                <h3 style="margin-bottom: 12px;">Find Friends on TexUs</h3>
+                <div id="membersContainer">Loading members...</div>
             </div>
         </div>
 
@@ -171,9 +223,9 @@ app.get('/', (req, res) => {
         </div>
 
         <nav>
-            <i class="fas fa-home" onclick="showTab('feedTab')"></i>
-            <i class="far fa-paper-plane" onclick="alert('Inbox coming next!')"></i>
-            <i class="far fa-user" onclick="showTab('profileTab')"></i>
+            <i class="fas fa-users" onclick="showTab('membersTab')" title="Members"></i>
+            <i class="far fa-paper-plane" onclick="alert('Inbox coming next!')" title="Messages"></i>
+            <i class="far fa-user" onclick="showTab('profileTab')" title="Profile"></i>
         </nav>
     `}
 
@@ -220,34 +272,50 @@ app.get('/', (req, res) => {
         }
 
         function showTab(tabId) {
-            document.getElementById('feedTab').classList.add('hidden');
+            document.getElementById('membersTab').classList.add('hidden');
             document.getElementById('profileTab').classList.add('hidden');
             document.getElementById(tabId).classList.remove('hidden');
         }
 
-        // Load active users list
-        if (${JSON.stringify(!!currentUser)}) {
-            fetch('/api/users')
+        async function addFriend(targetUsername) {
+            const res = await fetch('/api/add-friend', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ recipient: targetUsername })
+            });
+            const data = await res.json();
+            alert(data.message);
+            loadMembers();
+        }
+
+        function loadMembers() {
+            if (!${JSON.stringify(!!currentUser)}) return;
+            fetch('/api/members')
                 .then(res => res.json())
-                .then(users => {
-                    const container = document.getElementById('usersContainer');
-                    if (users.length <= 1) {
-                        container.innerHTML = '<p style="font-size: 13px; color: #8e8e8e;">No other members registered yet.</p>';
+                .then(members => {
+                    const container = document.getElementById('membersContainer');
+                    if (members.length === 0) {
+                        container.innerHTML = '<p style="font-size: 13px; color: #8e8e8e;">No other members on TexUs yet.</p>';
                         return;
                     }
-                    container.innerHTML = users
-                        .filter(u => u.username !== '${currentUser}')
-                        .map(u => \`
-                            <div class="user-card">
-                                <div class="user-info">
-                                    <div class="avatar">\${u.username.charAt(0).toUpperCase()}</div>
-                                    <span>\${u.username}</span>
+                    container.innerHTML = members.map(m => \`
+                        <div class="user-card">
+                            <div class="user-info">
+                                <div class="avatar">\${m.username.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <strong style="font-size: 14px;">\${m.username}</strong>
                                 </div>
-                                <button class="chat-btn" onclick="alert('Opening chat with ' + '\${u.username}')">Chat</button>
                             </div>
-                        \`).join('');
+                            \${m.isFriend 
+                                ? '<span class="friend-badge"><i class="fas fa-check"></i> Friends</span>' 
+                                : \`<button class="add-btn" onclick="addFriend('\${m.username}')">+ Add Friend</button>\`
+                            }
+                        </div>
+                    \`).join('');
                 });
         }
+
+        loadMembers();
     </script>
 </body>
 </html>
