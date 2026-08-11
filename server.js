@@ -10,15 +10,19 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session Setup: Keeps users logged in for 1 WEEK (7 Days)
+// Session Setup: Keeps users logged in Facebook-style for 1 WEEK (7 Days)
 app.use(session({
   secret: 'texus_secret_key_987',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 Days in milliseconds
+  cookie: { 
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days duration
+    httpOnly: true,
+    secure: false // Set to true if using HTTPS in production environments
+  }
 }));
 
-// Databases (users.db permanently saves accounts and profile info)
+// Databases (Permanently stores data locally)
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
 const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
@@ -34,7 +38,7 @@ app.post('/api/signup', async (req, res) => {
 
     const existingUser = await usersDb.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ error: 'This account already exists! Log in with your details.' });
+      return res.status(400).json({ error: 'This account already exists! Please log in instead.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,7 +50,7 @@ app.post('/api/signup', async (req, res) => {
       createdAt: new Date() 
     });
 
-    res.json({ success: true, message: 'Account created! You can now log in.' });
+    res.json({ success: true, message: 'Account created successfully! You can now log in.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error during signup.' });
   }
@@ -71,12 +75,14 @@ app.post('/api/login', async (req, res) => {
 
 // 3. Logout Route
 app.post('/api/logout', (req, res) => {
-  req.session.destroy(() => res.json({ success: true }));
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid');
+    res.json({ success: true });
+  });
 });
 
 // --- PROFILE & SETTINGS ROUTES ---
 
-// Get User Profile Data
 app.get('/api/profile', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   try {
@@ -87,7 +93,6 @@ app.get('/api/profile', async (req, res) => {
   }
 });
 
-// Update Profile Bio & Settings
 app.post('/api/profile/update', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   const { bio, location } = req.body;
