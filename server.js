@@ -1,5 +1,5 @@
 const express = require('express');
-const Datastore = require('nedb-promises');
+const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 
@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Session Setup: Keeps users logged in Facebook-style for 1 WEEK (7 Days)
+// Session Setup: Keeps users logged in for 1 week
 app.use(session({
   secret: 'texus_secret_key_987',
   resave: false,
@@ -22,10 +22,40 @@ app.use(session({
   }
 }));
 
-// Databases
-const usersDb = Datastore.create({ filename: './users.db', autoload: true });
-const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
-const friendsDb = Datastore.create({ filename: './friends.db', autoload: true });
+// --- PERMANENT CLOUD DATABASE CONNECTION (MONGODB ATLAS) ---
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://lenkoekarabo16_db_user:s9VX@Zn7z9o6c9fP@cluster0.youbf6r.mongodb.net/?appName=Cluster0';
+
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('Connected to permanent cloud database (MongoDB Atlas)!'))
+  .catch(err => console.error('Database connection error:', err));
+
+// --- MONGODB SCHEMAS & MODELS ---
+const userSchema = new mongoose.Schema({
+  username: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
+  bio: { type: String, default: 'Hey there! I am using TexUs.' },
+  location: { type: String, default: 'Not specified' },
+  avatarUrl: { type: String, default: '' },
+  createdAt: { type: Date, default: Date.now }
+});
+const User = mongoose.model('User', userSchema);
+
+const friendSchema = new mongoose.Schema({
+  requester: String,
+  recipient: String,
+  status: { type: String, default: 'accepted' },
+  createdAt: { type: Date, default: Date.now }
+});
+const Friend = mongoose.model('Friend', friendSchema);
+
+const chatSchema = new mongoose.Schema({
+  sender: String,
+  receiver: String,
+  text: String,
+  createdAt: { type: Date, default: Date.now }
+});
+const Chat = mongoose.model('Chat', chatSchema);
+
 
 // --- AUTHENTICATION API ROUTES ---
 
@@ -34,19 +64,15 @@ app.post('/api/signup', async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
 
-    const existingUser = await usersDb.findOne({ username });
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ error: 'This account already exists! Please log in instead.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await usersDb.insert({ 
+    await User.create({ 
       username, 
-      password: hashedPassword, 
-      bio: 'Hey there! I am using TexUs.',
-      location: 'Not specified',
-      avatarUrl: '',
-      createdAt: new Date() 
+      password: hashedPassword 
     });
 
     res.json({ success: true, message: 'Account created successfully! You can now log in.' });
@@ -58,7 +84,7 @@ app.post('/api/signup', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await usersDb.findOne({ username });
+    const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ error: 'Account not found. Check your username or sign up.' });
 
     const match = await bcrypt.compare(password, user.password);
@@ -83,7 +109,7 @@ app.post('/api/logout', (req, res) => {
 app.get('/api/profile', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   try {
-    const user = await usersDb.findOne({ username: req.session.user.username }, { password: 0 });
+    const user = await User.findOne({ username: req.session.user.username }, { password: 0 });
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: 'Error fetching profile.' });
@@ -100,7 +126,7 @@ app.post('/api/profile/update', async (req, res) => {
       updateData.avatarUrl = avatarUrl;
     }
 
-    await usersDb.update(
+    await User.updateOne(
       { username: req.session.user.username },
       { $set: updateData }
     );
@@ -117,8 +143,8 @@ app.get('/api/members', async (req, res) => {
   const currentUser = req.session.user.username;
 
   try {
-    const allUsers = await usersDb.find({ username: { $ne: currentUser } }, { password: 0 });
-    const userFriends = await friendsDb.find({
+    const allUsers = await User.find({ username: { $ne: currentUser } }, { password: 0 });
+    const userFriends = await Friend.find({
       $or: [
         { requester: currentUser },
         { recipient: currentUser }
@@ -129,7 +155,7 @@ app.get('/api/members', async (req, res) => {
       const isFriend = userFriends.some(
         f => (f.requester === u.username || f.recipient === u.username) && f.status === 'accepted'
       );
-      return { ...u, isFriend };
+      return { ...u.toObject(), isFriend };
     });
 
     res.json(membersWithStatus);
@@ -144,7 +170,7 @@ app.post('/api/add-friend', async (req, res) => {
   const { recipient } = req.body;
 
   try {
-    const existing = await friendsDb.findOne({
+    const existing = await Friend.findOne({
       $or: [
         { requester, recipient },
         { requester: recipient, recipient: requester }
@@ -155,7 +181,7 @@ app.post('/api/add-friend', async (req, res) => {
       return res.json({ success: true, message: 'Friend request already sent or connected!' });
     }
 
-    await friendsDb.insert({ requester, recipient, status: 'accepted', createdAt: new Date() });
+    await Friend.create({ requester, recipient, status: 'accepted' });
     res.json({ success: true, message: `You are now friends with ${recipient}!` });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add friend.' });
@@ -169,7 +195,7 @@ app.get('/api/friends-chats', async (req, res) => {
   const currentUser = req.session.user.username;
 
   try {
-    const userFriends = await friendsDb.find({
+    const userFriends = await Friend.find({
       $or: [
         { requester: currentUser },
         { recipient: currentUser }
@@ -178,7 +204,7 @@ app.get('/api/friends-chats', async (req, res) => {
     });
 
     const friendUsernames = userFriends.map(f => f.requester === currentUser ? f.recipient : f.requester);
-    const friendsProfiles = await usersDb.find({ username: { $in: friendUsernames } }, { password: 0 });
+    const friendsProfiles = await User.find({ username: { $in: friendUsernames } }, { password: 0 });
 
     res.json(friendsProfiles);
   } catch (err) {
@@ -192,7 +218,7 @@ app.get('/api/messages/:friendUsername', async (req, res) => {
   const { friendUsername } = req.params;
 
   try {
-    const messages = await chatDb.find({
+    const messages = await Chat.find({
       $or: [
         { sender: currentUser, receiver: friendUsername },
         { sender: friendUsername, receiver: currentUser }
@@ -213,13 +239,11 @@ app.post('/api/messages/send', async (req, res) => {
   if (!text || !text.trim()) return res.status(400).json({ error: 'Message cannot be empty.' });
 
   try {
-    const newMsg = {
+    const newMsg = await Chat.create({
       sender,
       receiver,
-      text: text.trim(),
-      createdAt: new Date()
-    };
-    await chatDb.insert(newMsg);
+      text: text.trim()
+    });
     res.json({ success: true, message: newMsg });
   } catch (err) {
     res.status(500).json({ error: 'Failed to send message.' });
@@ -590,7 +614,6 @@ app.get('/', (req, res) => {
                 });
         }
 
-        // --- MESSAGING LOGIC ---
         let activeChatFriend = null;
 
         function loadFriendsChats() {
