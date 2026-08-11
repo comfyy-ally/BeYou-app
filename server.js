@@ -15,10 +15,10 @@ app.use(session({
   secret: 'texus_secret_key_987',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 Days in milliseconds
 }));
 
-// Databases
+// Databases (users.db permanently saves accounts)
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
 const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
@@ -26,36 +26,40 @@ const friendsDb = Datastore.create({ filename: './friends.db', autoload: true })
 
 // --- AUTHENTICATION API ROUTES ---
 
-// 1. Signup Route
+// 1. Signup Route (Create Account ONCE)
 app.post('/api/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
 
+    // Check if account already exists
     const existingUser = await usersDb.findOne({ username });
-    if (existingUser) return res.status(400).json({ error: 'Username is already taken!' });
+    if (existingUser) {
+      return res.status(400).json({ error: 'This account already exists! Please log in instead.' });
+    }
 
+    // Hash password and permanently save user
     const hashedPassword = await bcrypt.hash(password, 10);
     await usersDb.insert({ username, password: hashedPassword, createdAt: new Date() });
 
-    res.json({ success: true, message: 'Account created! You can now log in.' });
+    res.json({ success: true, message: 'Account created successfully! You can now log in.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error during signup.' });
   }
 });
 
-// 2. Login Route
+// 2. Login Route (For Existing Accounts)
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await usersDb.findOne({ username });
-    if (!user) return res.status(400).json({ error: 'Invalid username or password.' });
+    if (!user) return res.status(400).json({ error: 'Account not found. Check your username or sign up.' });
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ error: 'Invalid username or password.' });
+    if (!match) return res.status(400).json({ error: 'Incorrect password.' });
 
     req.session.user = { id: user._id, username: user.username };
-    res.json({ success: true, message: 'Logged in successfully!', username: user.username });
+    res.json({ success: true, message: 'Welcome back!', username: user.username });
   } catch (err) {
     res.status(500).json({ error: 'Server error during login.' });
   }
@@ -68,7 +72,6 @@ app.post('/api/logout', (req, res) => {
 
 // --- FRIENDS & USERS API ROUTES ---
 
-// Fetch All Users & Friend Statuses
 app.get('/api/members', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   const currentUser = req.session.user.username;
@@ -95,7 +98,6 @@ app.get('/api/members', async (req, res) => {
   }
 });
 
-// Add Friend Route
 app.post('/api/add-friend', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   const requester = req.session.user.username;
@@ -185,19 +187,19 @@ app.get('/', (req, res) => {
     ${!currentUser ? `
         <div class="auth-screen" id="loginView">
             <h1>TexUs</h1>
-            <p>Connect and text with people instantly.</p>
+            <p>Log in to your account</p>
             <input type="text" id="login-u" placeholder="Username">
             <input type="password" id="login-p" placeholder="Password">
             <button onclick="login()">Log In</button>
-            <button class="toggle-btn" onclick="toggleAuth('signup')">Don't have an account? Sign Up</button>
+            <button class="toggle-btn" onclick="toggleAuth('signup')">New here? Create an account</button>
         </div>
 
         <div class="auth-screen" id="signupView" style="display: none;">
             <h1>TexUs</h1>
-            <p>Join the TexUs community today.</p>
+            <p>Create your account once to join TexUs.</p>
             <input type="text" id="signup-u" placeholder="Choose a Username">
             <input type="password" id="signup-p" placeholder="Choose a Password">
-            <button onclick="signup()" style="background-color: #3897f0;">Create Account</button>
+            <button onclick="signup()" style="background-color: #3897f0;">Sign Up</button>
             <button class="toggle-btn" onclick="toggleAuth('login')">Already have an account? Log In</button>
         </div>
     ` : `
