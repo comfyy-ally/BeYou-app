@@ -6,9 +6,9 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware (Increased limit to allow base64 image uploads)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Session Setup: Keeps users logged in Facebook-style for 1 WEEK (7 Days)
 app.use(session({
@@ -79,7 +79,7 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-// --- PROFILE & SETTINGS ROUTES ---
+// --- PROFILE ROUTES ---
 
 app.get('/api/profile', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
@@ -96,9 +96,14 @@ app.post('/api/profile/update', async (req, res) => {
   const { bio, location, avatarUrl } = req.body;
 
   try {
+    const updateData = { bio, location };
+    if (avatarUrl !== undefined) {
+      updateData.avatarUrl = avatarUrl;
+    }
+
     await usersDb.update(
       { username: req.session.user.username },
-      { $set: { bio, location, avatarUrl } }
+      { $set: updateData }
     );
     res.json({ success: true, message: 'Profile updated successfully!' });
   } catch (err) {
@@ -192,19 +197,27 @@ app.get('/', (req, res) => {
         .hidden { display: none !important; }
 
         /* Profile Card */
-        .profile-card { text-align: center; padding: 25px 20px; border-bottom: 1px solid #dbdbdb; background: #fafafa; }
-        .profile-avatar-container { width: 80px; height: 80px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 10px; overflow: hidden; border: 2px solid #dbdbdb; }
+        .profile-card { text-align: center; padding: 25px 20px; background: #fafafa; }
+        .profile-avatar-container { width: 90px; height: 90px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; margin: 0 auto 12px; overflow: hidden; border: 2px solid #dbdbdb; cursor: pointer; }
         .profile-avatar-container img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 20px; font-weight: bold; }
         .profile-location { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
-        .profile-bio { font-size: 14px; color: #333; margin: 12px 0; padding: 0 15px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #eee; text-align: left; }
         
-        /* Settings Form */
-        .settings-form { padding: 20px; text-align: left; }
-        .settings-form label { font-size: 12px; font-weight: bold; color: #8e8e8e; display: block; margin-top: 10px; }
-        .settings-form input, .settings-form textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #dbdbdb; border-radius: 6px; font-size: 14px; }
-        .save-btn { width: 100%; margin-top: 15px; padding: 10px; background: #0095f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .logout-btn { width: 100%; margin-top: 20px; padding: 10px; background: #ed4956; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        /* Profile Custom Actions */
+        .profile-actions { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
+        .action-btn { padding: 8px 14px; background: #0095f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .action-btn-secondary { background: #efefef; color: #262626; border: 1px solid #dbdbdb; }
+
+        .profile-edit-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dbdbdb; margin-top: 15px; text-align: left; }
+        .profile-edit-box label { font-size: 11px; font-weight: bold; color: #8e8e8e; display: block; margin-top: 8px; }
+        .profile-edit-box textarea, .profile-edit-box input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #dbdbdb; border-radius: 4px; font-size: 13px; }
+        .save-profile-btn { width: 100%; margin-top: 10px; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .logout-btn { width: 100%; margin-top: 12px; padding: 8px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* Fullscreen Image Viewer Modal */
+        #imgModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        #imgModal img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        #imgModal span { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 30px; cursor: pointer; }
 
         /* Messages & Invite Box */
         .messages-container { padding: 20px; text-align: center; }
@@ -224,7 +237,7 @@ app.get('/', (req, res) => {
         .friend-badge { background: #eef7ee; color: #2e7d32; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
 
         /* Bottom Navigation */
-        nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; }
+        nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; z-index: 10; }
         nav i { cursor: pointer; color: #262626; }
     </style>
 </head>
@@ -235,8 +248,8 @@ app.get('/', (req, res) => {
         <div class="auth-screen" id="loginView">
             <h1>TexUs</h1>
             <p>Log in with your existing account</p>
-            <input type="text" id="login-u" placeholder="Username">
-            <input type="password" id="login-p" placeholder="Password">
+            <input type="text" id="login-u" placeholder="Username" autocomplete="username">
+            <input type="password" id="login-p" placeholder="Password" autocomplete="current-password">
             <button onclick="login()">Log In</button>
             <button class="toggle-btn" onclick="toggleAuth('signup')">New here? Create an account</button>
         </div>
@@ -244,15 +257,15 @@ app.get('/', (req, res) => {
         <div class="auth-screen" id="signupView" style="display: none;">
             <h1>TexUs</h1>
             <p>Create your account once to join TexUs.</p>
-            <input type="text" id="signup-u" placeholder="Choose a Username">
-            <input type="password" id="signup-p" placeholder="Choose a Password">
+            <input type="text" id="signup-u" placeholder="Choose a Username" autocomplete="username">
+            <input type="password" id="signup-p" placeholder="Choose a Password" autocomplete="new-password">
             <button onclick="signup()" style="background-color: #3897f0;">Sign Up</button>
             <button class="toggle-btn" onclick="toggleAuth('login')">Already have an account? Log In</button>
         </div>
     ` : `
         <header>
             <div class="logo">TexUs</div>
-            <i class="fas fa-cog" onclick="showTab('settingsTab')" style="cursor: pointer; font-size: 18px;" title="Settings"></i>
+            <i class="far fa-user" onclick="showTab('profileTab')" style="cursor: pointer; font-size: 18px;" title="Profile"></i>
         </header>
 
         <div id="membersTab" class="view-section">
@@ -279,39 +292,41 @@ app.get('/', (req, res) => {
 
         <div id="profileTab" class="view-section hidden">
             <div class="profile-card">
-                <div class="profile-avatar-container" id="profileAvatarDisplay">
+                <div class="profile-avatar-container" id="profileAvatarDisplay" onclick="viewProfilePicture()" title="Click to View Profile Picture">
                     ${currentUser.charAt(0).toUpperCase()}
                 </div>
                 <div class="profile-username">@${currentUser}</div>
                 <div class="profile-location" id="displayLocation">Location not set</div>
-                <div class="profile-bio" id="displayBio">Loading bio...</div>
-                <button onclick="showTab('settingsTab')" style="padding: 8px 18px; background: #0095f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">Edit Profile & Bio</button>
+                
+                <div class="profile-actions">
+                    <button class="action-btn" onclick="triggerPhotoUpload()">Profile Picture</button>
+                    <button class="action-btn action-btn-secondary" onclick="viewProfilePicture()">View Profile Picture</button>
+                    <input type="file" id="photoUploadInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                </div>
+
+                <div class="profile-edit-box">
+                    <label>ABOUT ME / BIO</label>
+                    <textarea id="editBio" rows="2" placeholder="Tell us about yourself..."></textarea>
+                    
+                    <label>LOCATION</label>
+                    <input type="text" id="editLocation" placeholder="e.g. New York, USA">
+
+                    <button class="save-profile-btn" onclick="updateProfile()">Save Profile Details</button>
+                </div>
+
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out of TexUs</button>
             </div>
         </div>
 
-        <div id="settingsTab" class="view-section hidden">
-            <div class="settings-form">
-                <h3>Edit Profile & Settings</h3>
-                
-                <label>PROFILE PICTURE (IMAGE URL)</label>
-                <input type="text" id="editAvatar" placeholder="Paste image web address (URL)">
-
-                <label>ABOUT ME / BIO</label>
-                <textarea id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
-                
-                <label>LOCATION</label>
-                <input type="text" id="editLocation" placeholder="e.g. New York, USA">
-
-                <button class="save-btn" onclick="updateProfile()">Save Changes</button>
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out of TexUs</button>
-            </div>
+        <div id="imgModal" onclick="closeModal()">
+            <span onclick="closeModal()">&times;</span>
+            <img id="modalImgSrc" src="" alt="Profile Full View">
         </div>
 
         <nav>
             <i class="fas fa-users" onclick="showTab('membersTab')" title="Members"></i>
             <i class="far fa-paper-plane" onclick="showTab('messagesTab')" title="Messages"></i>
             <i class="far fa-user" onclick="showTab('profileTab')" title="Profile"></i>
-            <i class="fas fa-cog" onclick="showTab('settingsTab')" title="Settings"></i>
         </nav>
     `}
 
@@ -333,7 +348,11 @@ app.get('/', (req, res) => {
             });
             const data = await res.json();
             alert(data.message || data.error);
-            if (data.success) toggleAuth('login');
+            if (data.success) {
+                // Switch back to login and prepopulate saved values if browser allows
+                toggleAuth('login');
+                document.getElementById('login-u').value = u;
+            }
         }
 
         async function login() {
@@ -361,7 +380,6 @@ app.get('/', (req, res) => {
             document.getElementById('membersTab').classList.add('hidden');
             document.getElementById('messagesTab').classList.add('hidden');
             document.getElementById('profileTab').classList.add('hidden');
-            document.getElementById('settingsTab').classList.add('hidden');
             document.getElementById(tabId).classList.remove('hidden');
         }
 
@@ -373,38 +391,75 @@ app.get('/', (req, res) => {
             alert('Invite link copied to clipboard! Share it with your friends.');
         }
 
+        let currentUserAvatarUrl = '';
+
         async function loadProfile() {
             if (!${JSON.stringify(!!currentUser)}) return;
             const res = await fetch('/api/profile');
             const user = await res.json();
             
-            document.getElementById('displayBio').innerText = user.bio || 'No bio added yet.';
             document.getElementById('displayLocation').innerText = user.location || 'Location not set';
-            
             document.getElementById('editBio').value = user.bio || '';
             document.getElementById('editLocation').value = user.location || '';
-            document.getElementById('editAvatar').value = user.avatarUrl || '';
 
-            if (user.avatarUrl) {
-                document.getElementById('profileAvatarDisplay.innerHTML') || 
-                (document.getElementById('profileAvatarDisplay').innerHTML = \`<img src="\${user.avatarUrl}" alt="Avatar">\`);
+            currentUserAvatarUrl = user.avatarUrl || '';
+            if (currentUserAvatarUrl) {
+                document.getElementById('profileAvatarDisplay').innerHTML = \`<img src="\${currentUserAvatarUrl}" alt="Avatar">\`;
             }
+        }
+
+        function triggerPhotoUpload() {
+            document.getElementById('photoUploadInput').click();
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Image = e.target.result;
+                currentUserAvatarUrl = base64Image;
+
+                const bio = document.getElementById('editBio').value;
+                const locationVal = document.getElementById('editLocation').value;
+
+                await fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ bio, location: locationVal, avatarUrl: base64Image })
+                });
+                alert('Profile picture updated successfully!');
+                loadProfile();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function viewProfilePicture() {
+            if (!currentUserAvatarUrl) {
+                alert('No profile picture uploaded yet!');
+                return;
+            }
+            document.getElementById('modalImgSrc').src = currentUserAvatarUrl;
+            document.getElementById('imgModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imgModal').style.display = 'none';
         }
 
         async function updateProfile() {
             const bio = document.getElementById('editBio').value;
             const locationVal = document.getElementById('editLocation').value;
-            const avatarUrl = document.getElementById('editAvatar').value;
 
             const res = await fetch('/api/profile/update', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ bio, location: locationVal, avatarUrl })
+                body: JSON.stringify({ bio, location: locationVal })
             });
             const data = await res.json();
             alert(data.message);
             loadProfile();
-            showTab('profileTab');
         }
 
         async function addFriend(targetUsername) {
