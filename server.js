@@ -6,22 +6,26 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Session Setup: Keeps users logged in for 1 WEEK (7 Days)
 app.use(session({
   secret: 'texus_secret_key_987',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 Days in milliseconds
 }));
 
+// Databases
 const usersDb = Datastore.create({ filename: './users.db', autoload: true });
 const postsDb = Datastore.create({ filename: './posts.db', autoload: true });
 const chatDb = Datastore.create({ filename: './chat.db', autoload: true });
 
-// --- AUTH API ROUTES ---
+// --- AUTHENTICATION API ROUTES ---
 
+// 1. Signup Route
 app.post('/api/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -39,6 +43,7 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
+// 2. Login Route
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -55,21 +60,22 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// 3. Logout Route
 app.post('/api/logout', (req, res) => {
   req.session.destroy(() => res.json({ success: true }));
 });
 
-// Route to fetch active community members
+// 4. Fetch All Users Route
 app.get('/api/users', async (req, res) => {
   try {
-    const users = await usersDb.find({}, { password: 0 }); // Hide passwords
+    const users = await usersDb.find({}, { password: 0 }); // Exclude passwords
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: 'Error loading users.' });
   }
 });
 
-// --- MAIN HTML ROUTE ---
+// --- MAIN FRONTEND ROUTE ---
 app.get('/', (req, res) => {
   const currentUser = req.session.user ? req.session.user.username : null;
 
@@ -84,25 +90,41 @@ app.get('/', (req, res) => {
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #fafafa; color: #262626; display: flex; justify-content: center; }
-        .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; }
+        .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; padding-bottom: 60px; }
         
-        /* Full Page Auth Screen */
+        /* Auth Screen Styling */
         .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 30px; text-align: center; background: #fff; }
-        .auth-screen h1 { font-size: 36px; color: #e1306c; margin-bottom: 10px; font-weight: 800; }
+        .auth-screen h1 { font-size: 38px; color: #e1306c; margin-bottom: 8px; font-weight: 800; }
         .auth-screen p { color: #8e8e8e; margin-bottom: 25px; font-size: 14px; }
         .auth-screen input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dbdbdb; border-radius: 6px; background: #fafafa; font-size: 14px; }
         .auth-screen button { width: 100%; padding: 12px; background-color: #0095f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 14px; }
-        .auth-screen .toggle-btn { background: transparent; color: #0095f6; margin-top: 15px; font-size: 13px; text-decoration: underline; }
+        .auth-screen .toggle-btn { background: transparent; color: #0095f6; margin-top: 15px; font-size: 13px; text-decoration: underline; border: none; cursor: pointer; }
 
-        /* Main App Interface */
+        /* Main App Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #dbdbdb; background: #fff; position: sticky; top: 0; z-index: 10; }
         .logo { font-size: 24px; font-weight: bold; color: #e1306c; }
+        
+        /* Views */
+        .view-section { display: block; }
+        .hidden { display: none !important; }
+
+        /* Profile Section */
+        .profile-card { text-align: center; padding: 25px 20px; border-bottom: 1px solid #dbdbdb; background: #fafafa; }
+        .profile-avatar { width: 70px; height: 70px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 10px; }
+        .profile-username { font-size: 18px; font-weight: bold; }
+        .profile-badge { font-size: 12px; color: #8e8e8e; margin-top: 4px; }
+        .logout-btn { margin-top: 15px; padding: 6px 15px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+
+        /* User List / Feed */
         .user-list { padding: 15px; border-bottom: 1px solid #dbdbdb; }
         .user-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
         .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 35px; height: 35px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .avatar { width: 35px; height: 35px; border-radius: 50%; background: #3897f0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
         .chat-btn { background: #0095f6; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+
+        /* Bottom Navigation */
         nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; }
+        nav i { cursor: pointer; color: #262626; }
     </style>
 </head>
 <body>
@@ -129,21 +151,29 @@ app.get('/', (req, res) => {
     ` : `
         <header>
             <div class="logo">TexUs</div>
-            <div>
-                <span style="font-size: 13px; margin-right: 10px;">@${currentUser}</span>
-                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor: pointer;" title="Logout"></i>
-            </div>
+            <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor: pointer; font-size: 18px;" title="Logout"></i>
         </header>
 
-        <div class="user-list">
-            <h4 style="margin-bottom: 10px;">People on TexUs</h4>
-            <div id="usersContainer">Loading members...</div>
+        <div id="feedTab" class="view-section">
+            <div class="user-list">
+                <h4 style="margin-bottom: 10px;">TexUs Community</h4>
+                <div id="usersContainer">Loading members...</div>
+            </div>
+        </div>
+
+        <div id="profileTab" class="view-section hidden">
+            <div class="profile-card">
+                <div class="profile-avatar">${currentUser.charAt(0).toUpperCase()}</div>
+                <div class="profile-username">@${currentUser}</div>
+                <div class="profile-badge">Active TexUs Member</div>
+                <button class="logout-btn" onclick="logout()">Log Out</button>
+            </div>
         </div>
 
         <nav>
-            <i class="fas fa-home"></i>
-            <i class="far fa-paper-plane" onclick="alert('Direct messages opening!')"></i>
-            <i class="far fa-user"></i>
+            <i class="fas fa-home" onclick="showTab('feedTab')"></i>
+            <i class="far fa-paper-plane" onclick="alert('Inbox coming next!')"></i>
+            <i class="far fa-user" onclick="showTab('profileTab')"></i>
         </nav>
     `}
 
@@ -189,7 +219,13 @@ app.get('/', (req, res) => {
             location.reload();
         }
 
-        // Fetch users if logged in
+        function showTab(tabId) {
+            document.getElementById('feedTab').classList.add('hidden');
+            document.getElementById('profileTab').classList.add('hidden');
+            document.getElementById(tabId).classList.remove('hidden');
+        }
+
+        // Load active users list
         if (${JSON.stringify(!!currentUser)}) {
             fetch('/api/users')
                 .then(res => res.json())
