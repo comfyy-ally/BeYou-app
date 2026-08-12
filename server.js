@@ -1,824 +1,89 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const session = require('express-session');
+// In-Memory User Storage (replaces MongoDB for testing)
+const users = [];
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-app.use(session({
-  secret: 'texus_secret_key_987',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: false
-  }
-}));
-
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://lenkoekarabo16_db_user:s9VX@Zn7z9o6c9fP@cluster0.youbf6r.mongodb.net/?appName=Cluster0';
-
-mongoose.connect(MONGO_URI)
-  .then(async () => {
-    console.log('Connected to permanent cloud database (MongoDB Atlas)!');
-    try {
-      await mongoose.connection.collection('users').createIndex({ username: 1 }, { unique: true });
-      await mongoose.connection.collection('users').createIndex({ email: 1 }, { unique: true });
-    } catch (e) {
-      console.log('Indices already exist or created.');
-    }
-  })
-  .catch(err => console.error('Database connection error:', err));
-
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  password: { type: String, required: true },
-  bio: { type: String, default: 'Hey there! I am using TexUs.' },
-  location: { type: String, default: 'Not specified' },
-  avatarUrl: { type: String, default: '' },
-  isActive: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now }
-});
-const User = mongoose.model('User', userSchema);
-
-const friendSchema = new mongoose.Schema({
-  requester: String,
-  recipient: String,
-  status: { type: String, default: 'accepted' },
-  createdAt: { type: Date, default: Date.now }
-});
-const Friend = mongoose.model('Friend', friendSchema);
-
-const chatSchema = new mongoose.Schema({
-  sender: String,
-  receiver: String,
-  text: String,
-  createdAt: { type: Date, default: Date.now }
-});
-const Chat = mongoose.model('Chat', chatSchema);
-
-
-// --- AUTHENTICATION & ACCOUNT ROUTES ---
-
-app.post('/api/signup', async (req, res) => {
+// Signup Route (Without MongoDB)
+app.post('/signup', async (req, res) => {
   try {
-    const { username, email, phone, password } = req.body;
-    if (!username || !email || !phone || !password) {
-      return res.status(400).json({ error: 'All fields are required.' });
-    }
-
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    const { name, email, phone, password } = req.body;
+    
+    // Check if user already exists
+    const existingUser = users.find(u => u.email === email);
     if (existingUser) {
-      return res.status(400).json({ error: 'Username or email is already registered!' });
+      return res.status(400).json({ error: 'User already exists with this email.' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({ 
-      username, 
-      email,
-      phone,
-      password: hashedPassword 
-    });
+    // Hash Password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    res.json({ success: true, message: 'Account created successfully! You can now log in.' });
+    // Create new user object
+    const newUser = {
+      _id: Date.now().toString(),
+      name, 
+      email, 
+      phone, 
+      password: hashedPassword,
+      bio: '',
+      followers: [],
+      following: [],
+      friendRequests: [],
+      friends: []
+    };
+    
+    users.push(newUser);
+
+    // Log user in automatically using session
+    req.session.userId = newUser._id;
+    req.session.user = { id: newUser._id, name: newUser.name, email: newUser.email };
+
+    res.status(201).json({ message: 'User registered and logged in successfully!' });
   } catch (err) {
     console.error('Signup error details:', err);
-    res.status(500).json({ error: 'Server error during signup: ' + err.message });
+    res.status(500).json({ error: 'Server error during signup.' });
   }
 });
 
-app.post('/api/login', async (req, res) => {
+// Login Route (Without MongoDB)
+app.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user || !user.isActive) {
-      return res.status(400).json({ error: 'Account not found or deactivated.' });
+    const { email, password } = req.body;
+
+    const user = users.find(u => u.email === email);
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid email or password.' });
     }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ error: 'Incorrect password.' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid email or password.' });
+    }
 
-    req.session.user = { id: user._id, username: user.username };
-    res.json({ success: true, message: 'Welcome back!', username: user.username });
+    req.session.userId = user._id;
+    req.session.user = { id: user._id, name: user.name, email: user.email };
+
+    res.status(200).json({ message: 'Logged in successfully!' });
   } catch (err) {
+    console.error('Login error details:', err);
     res.status(500).json({ error: 'Server error during login.' });
   }
 });
 
-app.post('/api/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.clearCookie('connect.sid');
-    res.json({ success: true });
-  });
-});
-
-app.post('/api/reset-password', async (req, res) => {
+// Profile Route (Without MongoDB)
+app.get('/profile', (req, res) => {
   try {
-    const { username, email, phone, newPassword } = req.body;
-    const user = await User.findOne({ username, email, phone });
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Unauthorized. Please log in.' });
+    }
 
+    const user = users.find(u => u._id === req.session.userId);
     if (!user) {
-      return res.status(400).json({ error: 'Account details do not match our records.' });
+      return res.status(404).json({ error: 'User not found.' });
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
-
-    res.json({ success: true, message: 'Password has been reset successfully! You can now log in.' });
+    const { password, ...userProfile } = user;
+    res.status(200).json(userProfile);
   } catch (err) {
-    res.status(500).json({ error: 'Server error during password reset.' });
+    console.error('Profile error details:', err);
+    res.status(500).json({ error: 'Server error fetching profile.' });
   }
-});
-
-app.post('/api/account/deactivate', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  try {
-    await User.updateOne({ username: req.session.user.username }, { $set: { isActive: false } });
-    req.session.destroy(() => {
-      res.clearCookie('connect.sid');
-      res.json({ success: true, message: 'Account deactivated successfully.' });
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to deactivate account.' });
-  }
-});
-
-app.post('/api/account/delete', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const username = req.session.user.username;
-  try {
-    await User.deleteOne({ username });
-    await Friend.deleteMany({ $or: [{ requester: username }, { recipient: username }] });
-    await Chat.deleteMany({ $or: [{ sender: username }, { receiver: username }] });
-
-    req.session.destroy(() => {
-      res.clearCookie('connect.sid');
-      res.json({ success: true, message: 'Account permanently deleted.' });
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to delete account.' });
-  }
-});
-
-app.get('/api/profile', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  try {
-    const user = await User.findOne({ username: req.session.user.username }, { password: 0 });
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching profile.' });
-  }
-});
-
-app.post('/api/profile/update', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const { bio, location, avatarUrl } = req.body;
-
-  try {
-    const updateData = { bio, location };
-    if (avatarUrl !== undefined) {
-      updateData.avatarUrl = avatarUrl;
-    }
-
-    await User.updateOne(
-      { username: req.session.user.username },
-      { $set: updateData }
-    );
-    res.json({ success: true, message: 'Profile updated successfully!' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update profile.' });
-  }
-});
-
-app.get('/api/members', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const currentUser = req.session.user.username;
-
-  try {
-    const allUsers = await User.find({ username: { $ne: currentUser }, isActive: true }, { password: 0 });
-    const userFriends = await Friend.find({
-      $or: [
-        { requester: currentUser },
-        { recipient: currentUser }
-      ]
-    });
-
-    const membersWithStatus = allUsers.map(u => {
-      const isFriend = userFriends.some(
-        f => (f.requester === u.username || f.recipient === u.username) && f.status === 'accepted'
-      );
-      return { ...u.toObject(), isFriend };
-    });
-
-    res.json(membersWithStatus);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching members.' });
-  }
-});
-
-app.post('/api/add-friend', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const requester = req.session.user.username;
-  const { recipient } = req.body;
-
-  try {
-    const existing = await Friend.findOne({
-      $or: [
-        { requester, recipient },
-        { requester: recipient, recipient: requester }
-      ]
-    });
-
-    if (existing) {
-      return res.json({ success: true, message: 'Friend request already sent or connected!' });
-    }
-
-    await Friend.create({ requester, recipient, status: 'accepted' });
-    res.json({ success: true, message: `You are now friends with ${recipient}!` });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to add friend.' });
-  }
-});
-
-app.get('/api/friends-chats', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const currentUser = req.session.user.username;
-
-  try {
-    const userFriends = await Friend.find({
-      $or: [
-        { requester: currentUser },
-        { recipient: currentUser }
-      ],
-      status: 'accepted'
-    });
-
-    const friendUsernames = userFriends.map(f => f.requester === currentUser ? f.recipient : f.requester);
-    const friendsProfiles = await User.find({ username: { $in: friendUsernames }, isActive: true }, { password: 0 });
-
-    res.json(friendsProfiles);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching chat friends.' });
-  }
-});
-
-app.get('/api/messages/:friendUsername', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const currentUser = req.session.user.username;
-  const { friendUsername } = req.params;
-
-  try {
-    const messages = await Chat.find({
-      $or: [
-        { sender: currentUser, receiver: friendUsername },
-        { sender: friendUsername, receiver: currentUser }
-      ]
-    }).sort({ createdAt: 1 });
-
-    res.json(messages);
-  } catch (err) {
-    res.status(500).json({ error: 'Error loading messages.' });
-  }
-});
-
-app.post('/api/messages/send', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-  const sender = req.session.user.username;
-  const { receiver, text } = req.body;
-
-  if (!text || !text.trim()) return res.status(400).json({ error: 'Message cannot be empty.' });
-
-  try {
-    const newMsg = await Chat.create({
-      sender,
-      receiver,
-      text: text.trim()
-    });
-    res.json({ success: true, message: newMsg });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to send message.' });
-  }
-});
-
-app.get('/', (req, res) => {
-  const currentUser = req.session.user ? req.session.user.username : null;
-
-  res.send(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs</title>
-    <meta name="theme-color" content="#3897f0">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%233897f0%22/><stop offset=%22100%25%22 stop-color=%22%23e1306c%22/></linearGradient></defs><rect width=%22100%22 height=%22100%22 rx=%2225%22 fill=%22url(%23grad)%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>T</text></svg>">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #fafafa; color: #262626; display: flex; justify-content: center; }
-        .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; padding-bottom: 70px; }
-        .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 30px; text-align: center; background: #fff; }
-        .auth-screen h1 { font-size: 38px; background: linear-gradient(45deg, #3897f0, #e1306c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; font-weight: 800; }
-        .auth-screen p { color: #8e8e8e; margin-bottom: 25px; font-size: 14px; }
-        .auth-screen input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dbdbdb; border-radius: 6px; background: #fafafa; font-size: 14px; outline: none; }
-        .auth-screen input:focus { border-color: #3897f0; }
-        .auth-screen button { width: 100%; padding: 12px; background: linear-gradient(45deg, #3897f0, #e1306c); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 14px; }
-        .auth-screen .toggle-btn { background: transparent; color: #3897f0; margin-top: 15px; font-size: 13px; text-decoration: underline; border: none; cursor: pointer; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #dbdbdb; background: #fff; position: sticky; top: 0; z-index: 10; }
-        .logo { font-size: 24px; font-weight: bold; background: linear-gradient(45deg, #3897f0, #e1306c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .view-section { display: block; }
-        .hidden { display: none !important; }
-        .profile-card { text-align: center; padding: 25px 20px; background: #fafafa; }
-        .profile-avatar-container { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(45deg, #3897f0, #e1306c); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; margin: 0 auto 12px; overflow: hidden; border: 2px solid #dbdbdb; cursor: pointer; }
-        .profile-avatar-container img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-username { font-size: 20px; font-weight: bold; }
-        .profile-location { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
-        .profile-actions { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
-        .action-btn { padding: 8px 14px; background: #3897f0; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .action-btn-secondary { background: #efefef; color: #262626; border: 1px solid #dbdbdb; }
-        .profile-edit-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dbdbdb; margin-top: 15px; text-align: left; }
-        .profile-edit-box label { font-size: 11px; font-weight: bold; color: #8e8e8e; display: block; margin-top: 8px; }
-        .profile-edit-box textarea, .profile-edit-box input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #dbdbdb; border-radius: 4px; font-size: 13px; outline: none; }
-        .save-profile-btn { width: 100%; margin-top: 10px; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .settings-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dbdbdb; margin-top: 15px; text-align: left; }
-        .settings-box h4 { font-size: 13px; color: #e1306c; margin-bottom: 8px; }
-        .deactivate-btn { width: 100%; margin-top: 6px; padding: 8px; background: #ff9800; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
-        .delete-btn { width: 100%; margin-top: 6px; padding: 8px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
-        .logout-btn { width: 100%; margin-top: 12px; padding: 8px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        #imgModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
-        #imgModal img { max-width: 90%; max-height: 90%; border-radius: 8px; }
-        #imgModal span { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 30px; cursor: pointer; }
-        .messages-container { padding: 15px; }
-        .invite-box { background: #f0f8ff; border: 1px solid #b0e0e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: left; }
-        .invite-box h4 { color: #3897f0; margin-bottom: 6px; font-size: 14px; }
-        .invite-box p { font-size: 12px; color: #555; margin-bottom: 8px; }
-        .invite-link-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fff; margin-bottom: 8px; }
-        .invite-btn { width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
-        .chat-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; cursor: pointer; }
-        .chat-user-info { display: flex; align-items: center; gap: 10px; }
-        #activeChatView { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 20; display: flex; flex-direction: column; }
-        .chat-header { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid #dbdbdb; background: #fff; font-weight: bold; }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 8px; }
-        .msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; word-break: break-word; }
-        .msg-sent { background: #3897f0; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .msg-received { background: #efefef; color: #262626; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .chat-input-area { display: flex; padding: 12px; border-top: 1px solid #dbdbdb; background: #fff; gap: 8px; }
-        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #dbdbdb; border-radius: 20px; outline: none; font-size: 13px; }
-        .chat-input-area button { background: #3897f0; color: #fff; border: none; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .user-list { padding: 15px; }
-        .user-card { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3897f0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; overflow: hidden; }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .add-btn { background: #3897f0; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
-        .friend-badge { background: #eef7ee; color: #2e7d32; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; z-index: 10; }
-        nav i { cursor: pointer; color: #262626; }
-        nav i:hover { color: #e1306c; }
-    </style>
-</head>
-<body>
-    <div class="main-wrapper">
-
-    ${!currentUser ? `
-        <div class="auth-screen" id="loginView">
-            <h1>TexUs</h1>
-            <p>Log in with your username and password</p>
-            <input type="text" id="login-u" placeholder="Username" autocomplete="username">
-            <input type="password" id="login-p" placeholder="Password" autocomplete="current-password">
-            <button onclick="login()">Log In</button>
-            <button class="toggle-btn" onclick="toggleAuth('signup')">New here? Create an account</button>
-            <button class="toggle-btn" onclick="toggleAuth('forgot')" style="color: #e1306c;">Forgot password?</button>
-        </div>
-
-        <div class="auth-screen" id="signupView" style="display: none;">
-            <h1>TexUs</h1>
-            <p>Sign up with email, phone number, and username.</p>
-            <input type="text" id="signup-u" placeholder="Username" autocomplete="username">
-            <input type="email" id="signup-email" placeholder="Email Address">
-            <input type="tel" id="signup-phone" placeholder="Phone Number">
-            <input type="password" id="signup-p" placeholder="Password" autocomplete="new-password">
-            <button onclick="signup()">Sign Up</button>
-            <button class="toggle-btn" onclick="toggleAuth('login')">Already have an account? Log In</button>
-        </div>
-
-        <div class="auth-screen" id="forgotView" style="display: none;">
-            <h1>TexUs</h1>
-            <p>Reset password using your registered email and phone number.</p>
-            <input type="text" id="forgot-u" placeholder="Username">
-            <input type="email" id="forgot-email" placeholder="Registered Email">
-            <input type="tel" id="forgot-phone" placeholder="Registered Phone Number">
-            <input type="password" id="forgot-new-p" placeholder="New Password">
-            <button onclick="resetPassword()" style="background: #e1306c;">Reset Password</button>
-            <button class="toggle-btn" onclick="toggleAuth('login')">Back to Log In</button>
-        </div>
-    ` : `
-        <header>
-            <div class="logo">TexUs</div>
-            <i class="far fa-user" onclick="showTab('profileTab')" style="cursor: pointer; font-size: 18px;" title="Profile & Settings"></i>
-        </header>
-
-        <div id="membersTab" class="view-section">
-            <div class="user-list">
-                <h3 style="margin-bottom: 12px;">Find Friends on TexUs</h3>
-                <div id="membersContainer">Loading members...</div>
-            </div>
-        </div>
-
-        <div id="messagesTab" class="view-section hidden">
-            <div class="messages-container">
-                <div class="invite-box">
-                    <h4><i class="fas fa-user-plus"></i> Invite Friends to TexUs</h4>
-                    <p>Share this link with your friends:</p>
-                    <input type="text" class="invite-link-input" id="inviteLinkText" value="https://beyou-app.onrender.com" readonly>
-                    <button class="invite-btn" onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copy Link</button>
-                </div>
-
-                <h3 style="font-size: 15px; margin-bottom: 10px;">Chats with Friends</h3>
-                <div id="friendsChatsContainer">Loading chats...</div>
-            </div>
-        </div>
-
-        <div id="activeChatView" class="hidden">
-            <div class="chat-header">
-                <i class="fas fa-arrow-left" onclick="closeActiveChat()" style="cursor: pointer;"></i>
-                <div class="avatar" id="activeChatAvatar" style="width: 32px; height: 32px; font-size: 14px;"></div>
-                <span id="activeChatUsername"></span>
-            </div>
-            <div class="chat-messages" id="chatMessagesContainer"></div>
-            <div class="chat-input-area">
-                <input type="text" id="chatMessageInput" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)">
-                <button onclick="sendChatMessage()">Send</button>
-            </div>
-        </div>
-
-        <div id="profileTab" class="view-section hidden">
-            <div class="profile-card">
-                <div class="profile-avatar-container" id="profileAvatarDisplay" onclick="viewProfilePicture()" title="Click to View Profile Picture">
-                    ${currentUser.charAt(0).toUpperCase()}
-                </div>
-                <div class="profile-username">@${currentUser}</div>
-                <div class="profile-location" id="displayLocation">Location not set</div>
-                
-                <div class="profile-actions">
-                    <button class="action-btn" onclick="triggerPhotoUpload()">Profile Picture</button>
-                    <button class="action-btn action-btn-secondary" onclick="viewProfilePicture()">View Picture</button>
-                    <input type="file" id="photoUploadInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
-                </div>
-
-                <div class="profile-edit-box">
-                    <label>ABOUT ME / BIO</label>
-                    <textarea id="editBio" rows="2" placeholder="Tell us about yourself..."></textarea>
-                    
-                    <label>LOCATION</label>
-                    <input type="text" id="editLocation" placeholder="e.g. New York, USA">
-
-                    <button class="save-profile-btn" onclick="updateProfile()">Save Profile Details</button>
-                </div>
-
-                <div class="settings-box">
-                    <h4>Account Settings</h4>
-                    <p style="font-size: 11px; color: #8e8e8e; margin-bottom: 8px;">Manage your account availability or remove your data permanently.</p>
-                    <button class="deactivate-btn" onclick="deactivateAccount()"><i class="fas fa-user-slash"></i> Deactivate Account</button>
-                    <button class="delete-btn" onclick="deleteAccount()"><i class="fas fa-trash-alt"></i> Delete Account</button>
-                </div>
-
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out</button>
-            </div>
-        </div>
-
-        <div id="imgModal" onclick="closeModal()">
-            <span onclick="closeModal()">&times;</span>
-            <img id="modalImgSrc" src="" alt="Profile Full View">
-        </div>
-
-        <nav>
-            <i class="fas fa-users" onclick="showTab('membersTab'); loadMembers();" title="Members"></i>
-            <i class="far fa-paper-plane" onclick="showTab('messagesTab'); loadFriendsChats();" title="Messages"></i>
-            <i class="far fa-user" onclick="showTab('profileTab')" title="Profile"></i>
-        </nav>
-    `}
-
-    </div>
-
-    <script>
-        function toggleAuth(type) {
-            document.getElementById('loginView').style.display = type === 'login' ? 'flex' : 'none';
-            document.getElementById('signupView').style.display = type === 'signup' ? 'flex' : 'none';
-            document.getElementById('forgotView').style.display = type === 'forgot' ? 'flex' : 'none';
-        }
-
-        async function signup() {
-            const u = document.getElementById('signup-u').value;
-            const email = document.getElementById('signup-email').value;
-            const phone = document.getElementById('signup-phone').value;
-            const p = document.getElementById('signup-p').value;
-
-            const res = await fetch('/api/signup', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username: u, email, phone, password: p })
-            });
-            const data = await res.json();
-            alert(data.message || data.error);
-            if (data.success) {
-                toggleAuth('login');
-                document.getElementById('login-u').value = u;
-            }
-        }
-
-        async function login() {
-            const u = document.getElementById('login-u').value;
-            const p = document.getElementById('login-p').value;
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username: u, password: p })
-            });
-            const data = await res.json();
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.error);
-            }
-        }
-
-        async function resetPassword() {
-            const username = document.getElementById('forgot-u').value;
-            const email = document.getElementById('forgot-email').value;
-            const phone = document.getElementById('forgot-phone').value;
-            const newPassword = document.getElementById('forgot-new-p').value;
-
-            const res = await fetch('/api/reset-password', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username, email, phone, newPassword })
-            });
-            const data = await res.json();
-            alert(data.message || data.error);
-            if (data.success) {
-                toggleAuth('login');
-                document.getElementById('login-u').value = username;
-            }
-        }
-
-        async function deactivateAccount() {
-            if (!confirm('Are you sure you want to deactivate your account? You can log back in anytime to reactivate.')) return;
-            const res = await fetch('/api/account/deactivate', { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                alert('Account deactivated.');
-                location.reload();
-            } else {
-                alert(data.error);
-            }
-        }
-
-        async function deleteAccount() {
-            if (!confirm('WARNING: This will permanently delete your account, chats, and friends list. This cannot be undone!')) return;
-            const res = await fetch('/api/account/delete', { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                alert('Account permanently deleted.');
-                location.reload();
-            } else {
-                alert(data.error);
-            }
-        }
-
-        async function logout() {
-            await fetch('/api/logout', { method: 'POST' });
-            location.reload();
-        }
-
-        function showTab(tabId) {
-            document.getElementById('membersTab').classList.add('hidden');
-            document.getElementById('messagesTab').classList.add('hidden');
-            document.getElementById('profileTab').classList.add('hidden');
-            document.getElementById(tabId).classList.remove('hidden');
-        }
-
-        function copyInviteLink() {
-            const linkInput = document.getElementById('inviteLinkText');
-            linkInput.select();
-            linkInput.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(linkInput.value);
-            alert('Invite link copied to clipboard!');
-        }
-
-        let currentUserAvatarUrl = '';
-
-        async function loadProfile() {
-            if (!${JSON.stringify(!!currentUser)}) return;
-            const res = await fetch('/api/profile');
-            const user = await res.json();
-            
-            document.getElementById('displayLocation').innerText = user.location || 'Location not set';
-            document.getElementById('editBio').value = user.bio || '';
-            document.getElementById('editLocation').value = user.location || '';
-
-            currentUserAvatarUrl = user.avatarUrl || '';
-            if (currentUserAvatarUrl) {
-                document.getElementById('profileAvatarDisplay').innerHTML = \`<img src="\${currentUserAvatarUrl}" alt="Avatar">\`;
-            }
-        }
-
-        function triggerPhotoUpload() {
-            document.getElementById('photoUploadInput').click();
-        }
-
-        function handlePhotoUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const base64Image = e.target.result;
-                currentUserAvatarUrl = base64Image;
-
-                const bio = document.getElementById('editBio').value;
-                const locationVal = document.getElementById('editLocation').value;
-
-                await fetch('/api/profile/update', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ bio, location: locationVal, avatarUrl: base64Image })
-                });
-                alert('Profile picture updated successfully!');
-                loadProfile();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function viewProfilePicture() {
-            if (!currentUserAvatarUrl) {
-                alert('No profile picture uploaded yet!');
-                return;
-            }
-            document.getElementById('modalImgSrc').src = currentUserAvatarUrl;
-            document.getElementById('imgModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('imgModal').style.display = 'none';
-        }
-
-        async function updateProfile() {
-            const bio = document.getElementById('editBio').value;
-            const locationVal = document.getElementById('editLocation').value;
-
-            const res = await fetch('/api/profile/update', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ bio, location: locationVal })
-            });
-            const data = await res.json();
-            alert(data.message);
-            loadProfile();
-        }
-
-        async function addFriend(targetUsername) {
-            const res = await fetch('/api/add-friend', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ recipient: targetUsername })
-            });
-            const data = await res.json();
-            alert(data.message);
-            loadMembers();
-            loadFriendsChats();
-        }
-
-        function loadMembers() {
-            if (!${JSON.stringify(!!currentUser)}) return;
-            fetch('/api/members')
-                .then(res => res.json())
-                .then(members => {
-                    const container = document.getElementById('membersContainer');
-                    if (members.length === 0) {
-                        container.innerHTML = '<p style="font-size: 13px; color: #8e8e8e;">No other members on TexUs yet.</p>';
-                        return;
-                    }
-                    container.innerHTML = members.map(m => \`
-                        <div class="user-card">
-                            <div class="user-info">
-                                <div class="avatar">
-                                    \${m.avatarUrl ? \`<img src="\${m.avatarUrl}" alt="Avatar">\` : m.username.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <strong style="font-size: 14px;">\${m.username}</strong>
-                                </div>
-                            </div>
-                            \${m.isFriend 
-                                ? '<span class="friend-badge"><i class="fas fa-check"></i> Friends</span>' 
-                                : \`<button class="add-btn" onclick="addFriend('\${m.username}')">+ Add Friend</button>\`
-                            }
-                        </div>
-                    \`).join('');
-                });
-        }
-
-        let activeChatFriend = null;
-
-        function loadFriendsChats() {
-            if (!${JSON.stringify(!!currentUser)}) return;
-            fetch('/api/friends-chats')
-                .then(res => res.json())
-                .then(friends => {
-                    const container = document.getElementById('friendsChatsContainer');
-                    if (friends.length === 0) {
-                        container.innerHTML = '<p style="font-size: 13px; color: #8e8e8e;">No friends yet. Go to the Members tab to add friends and start chatting!</p>';
-                        return;
-                    }
-                    container.innerHTML = friends.map(f => \`
-                        <div class="chat-list-item" onclick="openActiveChat('\${f.username}', '\${f.avatarUrl || ''}')">
-                            <div class="chat-user-info">
-                                <div class="avatar" style="width: 40px; height: 40px; font-size: 16px;">
-                                    \${f.avatarUrl ? \`<img src="\${f.avatarUrl}" alt="Avatar">\` : f.username.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <strong style="font-size: 14px;">\${f.username}</strong>
-                                    <p style="font-size: 11px; color: #8e8e8e;">Tap to open chat</p>
-                                </div>
-                            </div>
-                            <i class="fas fa-chevron-right" style="color: #c7c7c7; font-size: 12px;"></i>
-                        </div>
-                    \`).join('');
-                });
-        }
-
-        function openActiveChat(username, avatarUrl) {
-            activeChatFriend = username;
-            document.getElementById('activeChatUsername').innerText = username;
-            const avatarContainer = document.getElementById('activeChatAvatar');
-            if (avatarUrl) {
-                avatarContainer.innerHTML = \`<img src="\${avatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">\`;
-            } else {
-                avatarContainer.innerText = username.charAt(0).toUpperCase();
-            }
-
-            document.getElementById('activeChatView').classList.remove('hidden');
-            fetchMessages();
-        }
-
-        function closeActiveChat() {
-            document.getElementById('activeChatView').classList.add('hidden');
-            activeChatFriend = null;
-        }
-
-        async function fetchMessages() {
-            if (!activeChatFriend) return;
-            const res = await fetch(\`/api/messages/\${activeChatFriend}\`);
-            const messages = await res.json();
-
-            const container = document.getElementById('chatMessagesContainer');
-            container.innerHTML = messages.map(m => \`
-                <div class="msg-bubble \${m.sender === '${currentUser}' ? 'msg-sent' : 'msg-received'}">
-                    \${m.text}
-                </div>
-            \`).join('');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chatMessageInput');
-            const text = input.value;
-            if (!text.trim() || !activeChatFriend) return;
-
-            const res = await fetch('/api/messages/send', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ receiver: activeChatFriend, text })
-            });
-            const data = await res.json();
-            if (data.success) {
-                input.value = '';
-                fetchMessages();
-            }
-        }
-
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendChatMessage();
-            }
-        }
-
-        loadProfile();
-        loadMembers();
-        loadFriendsChats();
-    </script>
-</body>
-</html>
-  `);
-});
-
-app.listen(PORT, () => {
-  console.log('TexUs server running on port ' + PORT);
 });
