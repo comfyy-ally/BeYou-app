@@ -27,7 +27,7 @@ app.use(session({
   }
 }));
 
-// Serve Static Frontend Files (from your project directory or a 'public' folder)
+// Serve Static Frontend Files from your project directory
 app.use(express.static(path.join(__dirname, '.')));
 
 // In-Memory Database Arrays (replaces MongoDB)
@@ -132,6 +132,11 @@ app.get('/profile', (req, res) => {
     console.error('Profile error details:', err);
     res.status(500).json({ error: 'Server error fetching profile.' });
   }
+});
+
+// Fallback route to load your main frontend page (index.html)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 10000;
