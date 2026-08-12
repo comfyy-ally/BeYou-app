@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs</title>
+    <title>TexUs - Social App</title>
     <style>
         * {
             box-sizing: border-box;
@@ -17,7 +17,7 @@
             color: #333;
         }
 
-        /* --- AUTH SCREEN STYLES --- */
+        /* --- AUTH SCREEN --- */
         #auth-screen {
             background: linear-gradient(135deg, #00c6ff 0%, #ff758c 100%);
             height: 100vh;
@@ -71,7 +71,7 @@
             font-size: 14px;
         }
 
-        .input-group input {
+        .input-group input, .input-group textarea {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #ddd;
@@ -81,7 +81,7 @@
             transition: border-color 0.2s;
         }
 
-        .input-group input:focus {
+        .input-group input:focus, .input-group textarea:focus {
             border-color: #0072ff;
         }
 
@@ -131,7 +131,7 @@
             color: #2ecc71;
         }
 
-        /* --- APP DASHBOARD STYLES --- */
+        /* --- DASHBOARD LAYOUT --- */
         #app-screen {
             display: none;
             min-height: 100vh;
@@ -154,18 +154,31 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .logout-btn {
-            background: #ff758c;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+        /* Navigation Bar */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            justify-content: center;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+            padding: 0 10px;
         }
 
-        .logout-btn:hover {
-            opacity: 0.9;
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active {
+            color: #0072ff;
+            border-bottom: 3px solid #0072ff;
         }
 
         .main-content {
@@ -176,18 +189,29 @@
             padding: 20px;
         }
 
-        .newsfeed {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 40px;
+        /* Page Panels */
+        .app-page {
+            display: none;
         }
 
-        .post-card {
+        .app-page.active {
+            display: block;
+        }
+
+        /* Cards & UI elements */
+        .card {
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        /* Newsfeed Page */
+        .newsfeed {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .post-author {
@@ -201,12 +225,145 @@
             font-size: 15px;
         }
 
+        /* Posting Page */
+        .post-input-area {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: none;
+            outline: none;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        /* Following & Requests Page */
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .user-row:last-child {
+            border-bottom: none;
+        }
+
+        .action-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-blue {
+            background: #0072ff;
+            color: white;
+        }
+
+        .btn-pink {
+            background: #ff758c;
+            color: white;
+        }
+
+        /* Chatting Page */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #fafbfc;
+        }
+
+        .chat-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .chat-bubble.incoming {
+            background: #eee;
+            align-self: flex-start;
+            color: #333;
+        }
+
+        .chat-bubble.outgoing {
+            background: #0072ff;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .chat-input-area button {
+            margin-left: 8px;
+            padding: 0 16px;
+            background: #0072ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Settings Page */
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .logout-btn {
+            background: #ff758c;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
         .welcome-footer {
             text-align: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: #555;
-            padding: 20px 0 40px 0;
+            padding: 15px 0;
             background: white;
             border-top: 1px solid #eee;
             margin-top: auto;
@@ -231,7 +388,7 @@
                 </div>
                 <button class="btn" onclick="handleLogin()">Sign In</button>
                 <p id="login-msg" class="message"></p>
-                <p class="switch-text">Don't have an account? <span onclick="switchForm('signup')">Sign Up</span></p>
+                <p class="switch-text">Don't have an account? <span onclick="switchAuthForm('signup')">Sign Up</span></p>
             </div>
 
             <div id="signup-form" class="form-container">
@@ -250,7 +407,7 @@
                 </div>
                 <button class="btn" onclick="handleSignup()">Sign Up</button>
                 <p id="signup-msg" class="message"></p>
-                <p class="switch-text">Already have an account? <span onclick="switchForm('login')">Sign In</span></p>
+                <p class="switch-text">Already have an account? <span onclick="switchAuthForm('login')">Sign In</span></p>
             </div>
         </div>
     </div>
@@ -258,20 +415,90 @@
     <div id="app-screen">
         <header>
             <h1>TexUs</h1>
-            <button class="logout-btn" onclick="handleLogout()">Log Out</button>
+            <span id="user-display" style="font-weight: 600; color: #666;"></span>
         </header>
 
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchPage('feed-page', this)">Feed</button>
+            <button class="nav-btn" onclick="switchPage('post-page', this)">Post</button>
+            <button class="nav-btn" onclick="switchPage('friends-page', this)">Friends</button>
+            <button class="nav-btn" onclick="switchPage('chat-page', this)">Chat</button>
+            <button class="nav-btn" onclick="switchPage('settings-page', this)">Settings</button>
+        </div>
+
         <div class="main-content">
-            <div class="newsfeed">
-                <div class="post-card">
-                    <div class="post-author">TexUs Official</div>
-                    <div class="post-text">Welcome to the brand new blue and pink community feed! Connect and share your thoughts. ✨</div>
-                </div>
-                <div class="post-card">
-                    <div class="post-author">System Update</div>
-                    <div class="post-text">In-memory local mode is up and running smoothly without database lag. Enjoy! 🚀</div>
+            
+            <div id="feed-page" class="app-page active">
+                <div class="newsfeed" id="newsfeed-container">
+                    <div class="card">
+                        <div class="post-author">TexUs Official</div>
+                        <div class="post-text">Welcome to the community feed! Explore all pages using the navigation bar above. ✨</div>
+                    </div>
                 </div>
             </div>
+
+            <div id="post-page" class="app-page">
+                <div class="card">
+                    <h2 style="font-size: 18px; margin-bottom: 12px;">Create a New Post</h2>
+                    <textarea id="post-content" class="post-input-area" placeholder="What's on your mind?"></textarea>
+                    <button class="btn" onclick="submitPost()">Publish Post</button>
+                </div>
+            </div>
+
+            <div id="friends-page" class="app-page">
+                <div class="card">
+                    <div class="section-title">Friend Requests</div>
+                    <div class="user-row">
+                        <span>Alex Johnson</span>
+                        <div>
+                            <button class="action-btn btn-blue" onclick="alert('Request Accepted!')">Accept</button>
+                            <button class="action-btn btn-pink" onclick="alert('Request Declined!')">Decline</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Following & Suggestions</div>
+                    <div class="user-row">
+                        <span>Sarah Connor</span>
+                        <button class="action-btn btn-blue" onclick="toggleFollow(this)">Following</button>
+                    </div>
+                    <div class="user-row">
+                        <span>Michael Smith</span>
+                        <button class="action-btn btn-pink" onclick="toggleFollow(this)">Follow</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chat-page" class="app-page">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-bubble incoming">Hey there! Welcome to TexUs chat.</div>
+                        <div class="chat-bubble outgoing">Hi! Loving the pink and blue theme.</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Type a message...">
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-page" class="app-page">
+                <div class="card">
+                    <h2 style="font-size: 18px; margin-bottom: 15px;">Account Settings</h2>
+                    <div class="input-group setting-item">
+                        <label for="setting-name">Display Name</label>
+                        <input type="text" id="setting-name" value="User">
+                    </div>
+                    <div class="input-group setting-item">
+                        <label for="setting-email">Email Address</label>
+                        <input type="email" id="setting-email" value="user@texus.com">
+                    </div>
+                    <button class="btn" onclick="alert('Settings saved successfully!')" style="margin-bottom: 20px;">Save Changes</button>
+                    <button class="logout-btn" onclick="handleLogout()">Log Out</button>
+                </div>
+            </div>
+
         </div>
 
         <div class="welcome-footer">
@@ -282,13 +509,13 @@
     <script>
         // Check session on page load
         window.onload = function() {
-            const loggedInUser = localStorage.getItem('texus_logged_in');
+            const loggedInUser = JSON.parse(localStorage.getItem('texus_logged_in'));
             if (loggedInUser) {
-                showAppScreen();
+                showAppScreen(loggedInUser);
             }
         };
 
-        function switchForm(formType) {
+        function switchAuthForm(formType) {
             const loginForm = document.getElementById('login-form');
             const signupForm = document.getElementById('signup-form');
             
@@ -317,9 +544,7 @@
             }
 
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-
-            const userExists = users.some(u => u.email === email);
-            if (userExists) {
+            if (users.some(u => u.email === email)) {
                 msg.className = 'message error';
                 msg.innerText = 'Email is already registered.';
                 return;
@@ -329,11 +554,8 @@
             localStorage.setItem('texus_users', JSON.stringify(users));
 
             msg.className = 'message success';
-            msg.innerText = 'Account created successfully! You can now sign in.';
-            
-            setTimeout(() => {
-                switchForm('login');
-            }, 1500);
+            msg.innerText = 'Account created! You can now sign in.';
+            setTimeout(() => switchAuthForm('login'), 1500);
         }
 
         function handleLogin() {
@@ -352,16 +574,19 @@
 
             if (validUser) {
                 localStorage.setItem('texus_logged_in', JSON.stringify(validUser));
-                showAppScreen();
+                showAppScreen(validUser);
             } else {
                 msg.className = 'message error';
                 msg.innerText = 'Invalid email or password.';
             }
         }
 
-        function showAppScreen() {
+        function showAppScreen(user) {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'flex';
+            document.getElementById('user-display').innerText = user.name;
+            document.getElementById('setting-name').value = user.name;
+            document.getElementById('setting-email').value = user.email;
         }
 
         function handleLogout() {
@@ -370,7 +595,62 @@
             document.getElementById('auth-screen').style.display = 'flex';
             document.getElementById('login-email').value = '';
             document.getElementById('login-password').value = '';
-            document.getElementById('login-msg').innerText = '';
+        }
+
+        // Navigation Switcher
+        function switchPage(pageId, btnElement) {
+            document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(pageId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // Posting Function
+        function submitPost() {
+            const content = document.getElementById('post-content').value.trim();
+            if (!content) return alert('Post cannot be empty.');
+
+            const user = JSON.parse(localStorage.getItem('texus_logged_in'));
+            const feed = document.getElementById('newsfeed-container');
+
+            const postCard = document.createElement('div');
+            postCard.className = 'card';
+            postCard.innerHTML = `
+                <div class="post-author">${user ? user.name : 'User'}</div>
+                <div class="post-text">${content}</div>
+            `;
+            feed.prepend(postCard);
+
+            document.getElementById('post-content').value = '';
+            switchPage('feed-page', document.querySelectorAll('.nav-btn')[0]);
+        }
+
+        // Chatting Function
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatMessages = document.getElementById('chat-messages');
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble outgoing';
+            bubble.innerText = text;
+            chatMessages.appendChild(bubble);
+
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Follow Toggle
+        function toggleFollow(btn) {
+            if (btn.innerText === 'Follow') {
+                btn.innerText = 'Following';
+                btn.className = 'action-btn btn-blue';
+            } else {
+                btn.innerText = 'Follow';
+                btn.className = 'action-btn btn-pink';
+            }
         }
     </script>
 </body>
