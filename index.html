@@ -160,15 +160,16 @@
             background: white;
             justify-content: center;
             border-bottom: 1px solid #eee;
-            gap: 10px;
+            gap: 5px;
             padding: 0 10px;
+            flex-wrap: wrap;
         }
 
         .nav-btn {
             background: none;
             border: none;
-            padding: 12px 20px;
-            font-size: 15px;
+            padding: 12px 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #666;
             cursor: pointer;
@@ -382,20 +383,17 @@
             font-weight: bold;
         }
 
-        /* Settings Page */
-        .setting-item {
-            margin-bottom: 15px;
-        }
-
+        /* Logout button */
         .logout-btn {
             background: #ff758c;
             color: white;
             border: none;
-            padding: 10px 16px;
+            padding: 12px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
+            font-size: 16px;
         }
 
         .welcome-footer {
@@ -463,6 +461,7 @@
             <button class="nav-btn" onclick="switchPage('post-page', this)">Post</button>
             <button class="nav-btn" onclick="switchPage('friends-page', this)">Friends</button>
             <button class="nav-btn" onclick="switchPage('chat-page', this)">Chat</button>
+            <button class="nav-btn" onclick="switchPage('profile-page', this)">Profile</button>
             <button class="nav-btn" onclick="switchPage('settings-page', this)">Settings</button>
         </div>
 
@@ -486,17 +485,6 @@
             </div>
 
             <div id="friends-page" class="app-page">
-                <div class="card">
-                    <div class="section-title">Friend Requests</div>
-                    <div class="user-row">
-                        <span>Alex Johnson</span>
-                        <div>
-                            <button class="action-btn btn-blue" onclick="acceptFriendRequest('Alex Johnson')">Accept</button>
-                            <button class="action-btn btn-pink" onclick="alert('Request Declined!')">Decline</button>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card">
                     <div class="section-title">Public Accounts / Directory</div>
                     <div id="public-users-container">
@@ -522,18 +510,20 @@
                 </div>
             </div>
 
+            <div id="profile-page" class="app-page">
+                <div class="card" style="text-align: center;">
+                    <h2 id="profile-name" style="color: #0072ff; margin-bottom: 5px;"></h2>
+                    <p id="profile-email" style="color: #666; font-size: 14px; margin-bottom: 20px;"></p>
+                    <div style="border-top: 1px solid #eee; padding-top: 15px; text-align: left;">
+                        <div class="section-title">Your Bio / Status</div>
+                        <p style="color: #444; font-size: 14px;">Member of the TexUs community exploring posts and connecting with friends!</p>
+                    </div>
+                </div>
+            </div>
+
             <div id="settings-page" class="app-page">
                 <div class="card">
-                    <h2 style="font-size: 18px; margin-bottom: 15px;">Account Settings</h2>
-                    <div class="input-group setting-item">
-                        <label for="setting-name">Display Name</label>
-                        <input type="text" id="setting-name" value="User">
-                    </div>
-                    <div class="input-group setting-item">
-                        <label for="setting-email">Email Address</label>
-                        <input type="email" id="setting-email" value="user@texus.com">
-                    </div>
-                    <button class="btn" onclick="alert('Settings saved successfully!')" style="margin-bottom: 20px;">Save Changes</button>
+                    <h2 style="font-size: 18px; margin-bottom: 20px;">Settings</h2>
                     <button class="logout-btn" onclick="handleLogout()">Log Out</button>
                 </div>
             </div>
@@ -591,6 +581,7 @@
                 return;
             }
 
+            // New account creation (automatically public in friends directory)
             users.push({ name, email, password, friends: [] });
             localStorage.setItem('texus_users', JSON.stringify(users));
 
@@ -626,8 +617,10 @@
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'flex';
             document.getElementById('user-display').innerText = user.name;
-            document.getElementById('setting-name').value = user.name;
-            document.getElementById('setting-email').value = user.email;
+            
+            // Populate Profile details
+            document.getElementById('profile-name').innerText = user.name;
+            document.getElementById('profile-email').innerText = user.email;
             
             loadPublicUsers(user);
             loadChatFriends(user);
@@ -685,25 +678,9 @@
                 currentUser.friends = currentUser.friends.filter(f => f !== friendName);
             }
 
-            // Update session and local storage registry
             sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
             updatePersistentUserRecord(currentUser);
             loadChatFriends(currentUser);
-        }
-
-        function acceptFriendRequest(friendName) {
-            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            if (!currentUser.friends) currentUser.friends = [];
-
-            if (!currentUser.friends.includes(friendName)) {
-                currentUser.friends.push(friendName);
-                sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
-                updatePersistentUserRecord(currentUser);
-                loadChatFriends(currentUser);
-                alert(`${friendName} is now added to your friends & chat page!`);
-            } else {
-                alert('You are already friends!');
-            }
         }
 
         function updatePersistentUserRecord(updatedUser) {
