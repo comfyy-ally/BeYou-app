@@ -23,13 +23,21 @@ app.use(session({
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://lenkoekarabo16_db_user:s9VX@Zn7z9o6c9fP@cluster0.youbf6r.mongodb.net/?appName=Cluster0';
 
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('Connected to permanent cloud database (MongoDB Atlas)!'))
+  .then(async () => {
+    console.log('Connected to permanent cloud database (MongoDB Atlas)!');
+    // Ensure indices match the schema cleanly
+    try {
+      await mongoose.connection.collection('users').createIndex({ username: 1 }, { unique: true });
+      await mongoose.connection.collection('users').createIndex({ email: 1 }, { unique: true });
+    } catch (e) {
+      console.log('Indices already exist or created.');
+    }
+  })
   .catch(err => console.error('Database connection error:', err));
 
-// --- UPDATED USER SCHEMA WITH EMAIL & PHONE ---
 const userSchema = new mongoose.Schema({
-  username: { type: String, unique: true, required: true },
-  email: { type: String, unique: true, required: true },
+  username: { type: String, required: true },
+  email: { type: String, required: true },
   phone: { type: String, required: true },
   password: { type: String, required: true },
   bio: { type: String, default: 'Hey there! I am using TexUs.' },
@@ -63,7 +71,7 @@ app.post('/api/signup', async (req, res) => {
   try {
     const { username, email, phone, password } = req.body;
     if (!username || !email || !phone || !password) {
-      return res.status(400).json({ error: 'All fields (username, email, phone, password) are required.' });
+      return.status(400).json({ error: 'All fields are required.' });
     }
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -81,7 +89,8 @@ app.post('/api/signup', async (req, res) => {
 
     res.json({ success: true, message: 'Account created successfully! You can now log in.' });
   } catch (err) {
-    res.status(500).json({ error: 'Server error during signup.' });
+    console.error('Signup error details:', err);
+    res.status(500).json({ error: 'Server error during signup: ' + err.message });
   }
 });
 
@@ -110,7 +119,6 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-// --- PASSWORD RESET ROUTE ---
 app.post('/api/reset-password', async (req, res) => {
   try {
     const { username, email, phone, newPassword } = req.body;
@@ -130,7 +138,6 @@ app.post('/api/reset-password', async (req, res) => {
   }
 });
 
-// --- ACCOUNT DEACTIVATION & DELETION ROUTES ---
 app.post('/api/account/deactivate', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   try {
@@ -161,8 +168,6 @@ app.post('/api/account/delete', async (req, res) => {
   }
 });
 
-// --- PROFILE ROUTES ---
-
 app.get('/api/profile', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   try {
@@ -192,8 +197,6 @@ app.post('/api/profile/update', async (req, res) => {
     res.status(500).json({ error: 'Failed to update profile.' });
   }
 });
-
-// --- FRIENDS & MEMBERS ROUTES ---
 
 app.get('/api/members', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
@@ -244,8 +247,6 @@ app.post('/api/add-friend', async (req, res) => {
     res.status(500).json({ error: 'Failed to add friend.' });
   }
 });
-
-// --- MESSAGING ROUTES ---
 
 app.get('/api/friends-chats', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
@@ -307,7 +308,6 @@ app.post('/api/messages/send', async (req, res) => {
   }
 });
 
-// --- MAIN FRONTEND ROUTE WITH BLUE & PINK THEME + APP ICON & SETTINGS ---
 app.get('/', (req, res) => {
   const currentUser = req.session.user ? req.session.user.username : null;
 
@@ -325,8 +325,6 @@ app.get('/', (req, res) => {
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #fafafa; color: #262626; display: flex; justify-content: center; }
         .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; padding-bottom: 70px; }
-        
-        /* Auth Screen Styling with Blue & Pink Theme */
         .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 30px; text-align: center; background: #fff; }
         .auth-screen h1 { font-size: 38px; background: linear-gradient(45deg, #3897f0, #e1306c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; font-weight: 800; }
         .auth-screen p { color: #8e8e8e; margin-bottom: 25px; font-size: 14px; }
@@ -334,54 +332,38 @@ app.get('/', (req, res) => {
         .auth-screen input:focus { border-color: #3897f0; }
         .auth-screen button { width: 100%; padding: 12px; background: linear-gradient(45deg, #3897f0, #e1306c); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 14px; }
         .auth-screen .toggle-btn { background: transparent; color: #3897f0; margin-top: 15px; font-size: 13px; text-decoration: underline; border: none; cursor: pointer; }
-
-        /* Main App Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #dbdbdb; background: #fff; position: sticky; top: 0; z-index: 10; }
         .logo { font-size: 24px; font-weight: bold; background: linear-gradient(45deg, #3897f0, #e1306c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
         .view-section { display: block; }
         .hidden { display: none !important; }
-
-        /* Profile Card */
         .profile-card { text-align: center; padding: 25px 20px; background: #fafafa; }
         .profile-avatar-container { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(45deg, #3897f0, #e1306c); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; margin: 0 auto 12px; overflow: hidden; border: 2px solid #dbdbdb; cursor: pointer; }
         .profile-avatar-container img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 20px; font-weight: bold; }
         .profile-location { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
-        
         .profile-actions { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
         .action-btn { padding: 8px 14px; background: #3897f0; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
         .action-btn-secondary { background: #efefef; color: #262626; border: 1px solid #dbdbdb; }
-
         .profile-edit-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dbdbdb; margin-top: 15px; text-align: left; }
         .profile-edit-box label { font-size: 11px; font-weight: bold; color: #8e8e8e; display: block; margin-top: 8px; }
         .profile-edit-box textarea, .profile-edit-box input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #dbdbdb; border-radius: 4px; font-size: 13px; outline: none; }
         .save-profile-btn { width: 100%; margin-top: 10px; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        
-        /* Settings / Account Control Styles */
         .settings-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dbdbdb; margin-top: 15px; text-align: left; }
         .settings-box h4 { font-size: 13px; color: #e1306c; margin-bottom: 8px; }
         .deactivate-btn { width: 100%; margin-top: 6px; padding: 8px; background: #ff9800; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
         .delete-btn { width: 100%; margin-top: 6px; padding: 8px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
         .logout-btn { width: 100%; margin-top: 12px; padding: 8px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-
-        /* Fullscreen Image Viewer Modal */
         #imgModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         #imgModal img { max-width: 90%; max-height: 90%; border-radius: 8px; }
         #imgModal span { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 30px; cursor: pointer; }
-
-        /* Messages & Chats View */
         .messages-container { padding: 15px; }
         .invite-box { background: #f0f8ff; border: 1px solid #b0e0e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: left; }
         .invite-box h4 { color: #3897f0; margin-bottom: 6px; font-size: 14px; }
         .invite-box p { font-size: 12px; color: #555; margin-bottom: 8px; }
         .invite-link-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fff; margin-bottom: 8px; }
         .invite-btn { width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
-
         .chat-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; cursor: pointer; }
         .chat-user-info { display: flex; align-items: center; gap: 10px; }
-        
-        /* Active Chat Box */
         #activeChatView { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 20; display: flex; flex-direction: column; }
         .chat-header { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid #dbdbdb; background: #fff; font-weight: bold; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 8px; }
@@ -391,8 +373,6 @@ app.get('/', (req, res) => {
         .chat-input-area { display: flex; padding: 12px; border-top: 1px solid #dbdbdb; background: #fff; gap: 8px; }
         .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #dbdbdb; border-radius: 20px; outline: none; font-size: 13px; }
         .chat-input-area button { background: #3897f0; color: #fff; border: none; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
-
-        /* Members Directory */
         .user-list { padding: 15px; }
         .user-card { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; }
         .user-info { display: flex; align-items: center; gap: 10px; }
@@ -400,8 +380,6 @@ app.get('/', (req, res) => {
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .add-btn { background: #3897f0; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
         .friend-badge { background: #eef7ee; color: #2e7d32; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-
-        /* Bottom Navigation */
         nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; z-index: 10; }
         nav i { cursor: pointer; color: #262626; }
         nav i:hover { color: #e1306c; }
