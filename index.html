@@ -432,7 +432,7 @@
                 <div class="newsfeed" id="newsfeed-container">
                     <div class="card">
                         <div class="post-author">TexUs Official</div>
-                        <div class="post-text">Welcome to the community feed! Explore all pages using the navigation bar above. ✨</div>
+                        <div class="post-text">Welcome to the community feed! ✨</div>
                     </div>
                 </div>
             </div>
@@ -458,15 +458,9 @@
                 </div>
 
                 <div class="card">
-                    <div class="section-title">Following & Suggestions</div>
-                    <div class="user-row">
-                        <span>Sarah Connor</span>
-                        <button class="action-btn btn-blue" onclick="toggleFollow(this)">Following</button>
-                    </div>
-                    <div class="user-row">
-                        <span>Michael Smith</span>
-                        <button class="action-btn btn-pink" onclick="toggleFollow(this)">Follow</button>
-                    </div>
+                    <div class="section-title">Public Accounts / Friends Directory</div>
+                    <div id="public-users-container">
+                        </div>
                 </div>
             </div>
 
@@ -507,9 +501,9 @@
     </div>
 
     <script>
-        // Check session on page load
+        // Session check: Using sessionStorage ensures user must log back in every time the app/tab/browser is exited
         window.onload = function() {
-            const loggedInUser = JSON.parse(localStorage.getItem('texus_logged_in'));
+            const loggedInUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             if (loggedInUser) {
                 showAppScreen(loggedInUser);
             }
@@ -550,6 +544,7 @@
                 return;
             }
 
+            // New account creation (automatically public in friends directory)
             users.push({ name, email, password });
             localStorage.setItem('texus_users', JSON.stringify(users));
 
@@ -573,7 +568,8 @@
             const validUser = users.find(u => u.email === email && u.password === password);
 
             if (validUser) {
-                localStorage.setItem('texus_logged_in', JSON.stringify(validUser));
+                // Using sessionStorage ensures that closing the browser tab/window wipes the session
+                sessionStorage.setItem('texus_logged_in', JSON.stringify(validUser));
                 showAppScreen(validUser);
             } else {
                 msg.className = 'message error';
@@ -587,14 +583,43 @@
             document.getElementById('user-display').innerText = user.name;
             document.getElementById('setting-name').value = user.name;
             document.getElementById('setting-email').value = user.email;
+            
+            // Load public users directory on the friends page automatically
+            loadPublicUsers(user.email);
         }
 
         function handleLogout() {
-            localStorage.removeItem('texus_logged_in');
+            sessionStorage.removeItem('texus_logged_in');
             document.getElementById('app-screen').style.display = 'none';
             document.getElementById('auth-screen').style.display = 'flex';
             document.getElementById('login-email').value = '';
             document.getElementById('login-password').value = '';
+        }
+
+        // Render all registered users as public on the friends page
+        function loadPublicUsers(currentUserEmail) {
+            const container = document.getElementById('public-users-container');
+            container.innerHTML = '';
+
+            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
+            
+            // Filter out the currently logged-in user from their own recommendations list
+            const publicUsers = users.filter(u => u.email !== currentUserEmail);
+
+            if (publicUsers.length === 0) {
+                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No other public accounts found yet.</div>';
+                return;
+            }
+
+            publicUsers.forEach(u => {
+                const row = document.createElement('div');
+                row.className = 'user-row';
+                row.innerHTML = `
+                    <span>${u.name} (Public)</span>
+                    <button class="action-btn btn-blue" onclick="toggleFollow(this)">Follow</button>
+                `;
+                container.appendChild(row);
+            });
         }
 
         // Navigation Switcher
@@ -611,7 +636,7 @@
             const content = document.getElementById('post-content').value.trim();
             if (!content) return alert('Post cannot be empty.');
 
-            const user = JSON.parse(localStorage.getItem('texus_logged_in'));
+            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             const feed = document.getElementById('newsfeed-container');
 
             const postCard = document.createElement('div');
@@ -646,10 +671,10 @@
         function toggleFollow(btn) {
             if (btn.innerText === 'Follow') {
                 btn.innerText = 'Following';
-                btn.className = 'action-btn btn-blue';
+                btn.className = 'action-btn btn-pink';
             } else {
                 btn.innerText = 'Follow';
-                btn.className = 'action-btn btn-pink';
+                btn.className = 'action-btn btn-blue';
             }
         }
     </script>
