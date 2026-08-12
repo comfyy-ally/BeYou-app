@@ -1,7 +1,38 @@
-// In-Memory User Storage (replaces MongoDB for testing)
-const users = [];
+const express = require('express');
+const cors = require('cors');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
+require('dotenv').config();
 
-// Signup Route (Without MongoDB)
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
+// Session Setup
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'beyou_super_secret_key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  }
+}));
+
+// In-Memory Database Arrays (replaces MongoDB)
+const users = [];
+const messages = [];
+
+// --- AUTHENTICATION ROUTES ---
+
+// Signup Route
 app.post('/signup', async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
@@ -32,7 +63,7 @@ app.post('/signup', async (req, res) => {
     
     users.push(newUser);
 
-    // Log user in automatically using session
+    // Log user in automatically
     req.session.userId = newUser._id;
     req.session.user = { id: newUser._id, name: newUser.name, email: newUser.email };
 
@@ -43,7 +74,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Login Route (Without MongoDB)
+// Login Route
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -68,7 +99,18 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Profile Route (Without MongoDB)
+// Logout Route
+app.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Could not log out.' });
+    }
+    res.clearCookie('connect.sid');
+    res.status(200).json({ message: 'Logged out successfully.' });
+  });
+});
+
+// --- PROFILE ROUTE ---
 app.get('/profile', (req, res) => {
   try {
     if (!req.session.userId) {
@@ -86,4 +128,14 @@ app.get('/profile', (req, res) => {
     console.error('Profile error details:', err);
     res.status(500).json({ error: 'Server error fetching profile.' });
   }
+});
+
+// Test Route
+app.get('/', (req, res) => {
+  res.send('BeYou server is running successfully without MongoDB!');
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`BeYou server running on port ${PORT}`);
 });
