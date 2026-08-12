@@ -25,7 +25,6 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://lenkoekarabo16_db_user
 mongoose.connect(MONGO_URI)
   .then(async () => {
     console.log('Connected to permanent cloud database (MongoDB Atlas)!');
-    // Ensure indices match the schema cleanly
     try {
       await mongoose.connection.collection('users').createIndex({ username: 1 }, { unique: true });
       await mongoose.connection.collection('users').createIndex({ email: 1 }, { unique: true });
@@ -71,7 +70,7 @@ app.post('/api/signup', async (req, res) => {
   try {
     const { username, email, phone, password } = req.body;
     if (!username || !email || !phone || !password) {
-      return.status(400).json({ error: 'All fields are required.' });
+      return res.status(400).json({ error: 'All fields are required.' });
     }
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
