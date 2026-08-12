@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeYou - Sign In / Sign Up</title>
+    <title>TexUs - Sign In / Sign Up</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,7 +13,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #00c6ff 0%, #ff758c 100%);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -33,7 +33,9 @@
         .app-logo {
             font-size: 32px;
             font-weight: bold;
-            color: #764ba2;
+            background: linear-gradient(135deg, #0072ff, #ff1493);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 25px;
             letter-spacing: 1px;
         }
@@ -74,24 +76,24 @@
         }
 
         .input-group input:focus {
-            border-color: #764ba2;
+            border-color: #0072ff;
         }
 
         .btn {
             width: 100%;
             padding: 12px;
-            background: #764ba2;
+            background: linear-gradient(135deg, #0072ff, #ff1493);
             border: none;
             color: white;
             font-size: 16px;
             border-radius: 6px;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.2s;
+            transition: opacity 0.2s;
         }
 
         .btn:hover {
-            background: #5a3782;
+            opacity: 0.9;
         }
 
         .switch-text {
@@ -101,7 +103,7 @@
         }
 
         .switch-text span {
-            color: #764ba2;
+            color: #0072ff;
             cursor: pointer;
             font-weight: bold;
         }
@@ -127,7 +129,7 @@
 <body>
 
     <div class="container">
-        <div class="app-logo">BeYou</div>
+        <div class="app-logo">TexUs</div>
 
         <div id="login-form" class="form-container active">
             <h2>Welcome Back</h2>
@@ -166,7 +168,6 @@
     </div>
 
     <script>
-        // Switch between Sign In and Sign Up views
         function switchForm(formType) {
             const loginForm = document.getElementById('login-form');
             const signupForm = document.getElementById('signup-form');
@@ -183,7 +184,6 @@
             }
         }
 
-        // Handle client-side registration using localStorage (No MongoDB needed)
         function handleSignup() {
             const name = document.getElementById('signup-name').value.trim();
             const email = document.getElementById('signup-email').value.trim();
@@ -196,10 +196,8 @@
                 return;
             }
 
-            // Get existing users or initialize empty array
-            let users = JSON.parse(localStorage.getItem('beyou_users')) || [];
+            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
 
-            // Check if user already exists
             const userExists = users.some(u => u.email === email);
             if (userExists) {
                 msg.className = 'message error';
@@ -207,9 +205,8 @@
                 return;
             }
 
-            // Save new user
             users.push({ name, email, password });
-            localStorage.setItem('beyou_users', JSON.stringify(users));
+            localStorage.setItem('texus_users', JSON.stringify(users));
 
             msg.className = 'message success';
             msg.innerText = 'Account created successfully! You can now sign in.';
@@ -219,7 +216,6 @@
             }, 1500);
         }
 
-        // Handle client-side login using localStorage
         function handleLogin() {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
@@ -231,20 +227,15 @@
                 return;
             }
 
-            let users = JSON.parse(localStorage.getItem('beyou_users')) || [];
+            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
 
-            // Verify credentials
             const validUser = users.find(u => u.email === email && u.password === password);
 
             if (validUser) {
                 msg.className = 'message success';
                 msg.innerText = `Welcome back, ${validUser.name}! Loading app...`;
                 
-                // Store active session flag
-                localStorage.setItem('beyou_logged_in', JSON.stringify(validUser));
-
-                // Here you can redirect or load the rest of your app interface:
-                // window.location.href = 'dashboard.html';
+                localStorage.setItem('texus_logged_in', JSON.stringify(validUser));
             } else {
                 msg.className = 'message error';
                 msg.innerText = 'Invalid email or password.';
