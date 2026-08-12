@@ -276,15 +276,55 @@
             color: white;
         }
 
-        /* Chatting Page */
-        .chat-container {
+        /* Chatting Page layout */
+        .chat-layout {
+            display: flex;
+            gap: 15px;
+            height: 420px;
+        }
+
+        .chat-sidebar {
+            width: 35%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .chat-contact-item {
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #444;
+            transition: background 0.2s;
+            margin-bottom: 5px;
+        }
+
+        .chat-contact-item:hover, .chat-contact-item.active {
+            background: #f0f4ff;
+            color: #0072ff;
+        }
+
+        .chat-main-box {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            height: 400px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             overflow: hidden;
+        }
+
+        .chat-header-info {
+            padding: 12px;
+            background: #fafbfc;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            font-size: 14px;
+            color: #0072ff;
         }
 
         .chat-messages {
@@ -451,28 +491,33 @@
                     <div class="user-row">
                         <span>Alex Johnson</span>
                         <div>
-                            <button class="action-btn btn-blue" onclick="alert('Request Accepted!')">Accept</button>
+                            <button class="action-btn btn-blue" onclick="acceptFriendRequest('Alex Johnson')">Accept</button>
                             <button class="action-btn btn-pink" onclick="alert('Request Declined!')">Decline</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="section-title">Public Accounts / Friends Directory</div>
+                    <div class="section-title">Public Accounts / Directory</div>
                     <div id="public-users-container">
                         </div>
                 </div>
             </div>
 
             <div id="chat-page" class="app-page">
-                <div class="chat-container">
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="chat-bubble incoming">Hey there! Welcome to TexUs chat.</div>
-                        <div class="chat-bubble outgoing">Hi! Loving the pink and blue theme.</div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chat-input" placeholder="Type a message...">
-                        <button onclick="sendMessage()">Send</button>
+                <div class="chat-layout">
+                    <div class="chat-sidebar" id="chat-friends-list">
+                        <div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 8px;">CHATS</div>
+                        </div>
+                    <div class="chat-main-box">
+                        <div class="chat-header-info" id="active-chat-title">Select a friend to chat</div>
+                        <div class="chat-messages" id="chat-messages">
+                            <div style="color: #888; font-size: 14px; text-align: center; margin-top: auto; margin-bottom: auto;">Choose someone from your friend list to start messaging.</div>
+                        </div>
+                        <div class="chat-input-area" id="chat-input-box" style="display: none;">
+                            <input type="text" id="chat-input" placeholder="Type a message...">
+                            <button onclick="sendMessage()">Send</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -501,7 +546,9 @@
     </div>
 
     <script>
-        // Session check: Using sessionStorage ensures user must log back in every time the app/tab/browser is exited
+        let currentChatFriend = null;
+
+        // Session check: forces log in upon exit/tab close
         window.onload = function() {
             const loggedInUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             if (loggedInUser) {
@@ -544,8 +591,7 @@
                 return;
             }
 
-            // New account creation (automatically public in friends directory)
-            users.push({ name, email, password });
+            users.push({ name, email, password, friends: [] });
             localStorage.setItem('texus_users', JSON.stringify(users));
 
             msg.className = 'message success';
@@ -568,7 +614,6 @@
             const validUser = users.find(u => u.email === email && u.password === password);
 
             if (validUser) {
-                // Using sessionStorage ensures that closing the browser tab/window wipes the session
                 sessionStorage.setItem('texus_logged_in', JSON.stringify(validUser));
                 showAppScreen(validUser);
             } else {
@@ -584,8 +629,8 @@
             document.getElementById('setting-name').value = user.name;
             document.getElementById('setting-email').value = user.email;
             
-            // Load public users directory on the friends page automatically
-            loadPublicUsers(user.email);
+            loadPublicUsers(user);
+            loadChatFriends(user);
         }
 
         function handleLogout() {
@@ -596,15 +641,13 @@
             document.getElementById('login-password').value = '';
         }
 
-        // Render all registered users as public on the friends page
-        function loadPublicUsers(currentUserEmail) {
+        // Public accounts loader
+        function loadPublicUsers(currentUser) {
             const container = document.getElementById('public-users-container');
             container.innerHTML = '';
 
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            
-            // Filter out the currently logged-in user from their own recommendations list
-            const publicUsers = users.filter(u => u.email !== currentUserEmail);
+            const publicUsers = users.filter(u => u.email !== currentUser.email);
 
             if (publicUsers.length === 0) {
                 container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No other public accounts found yet.</div>';
@@ -612,14 +655,98 @@
             }
 
             publicUsers.forEach(u => {
+                const isAlreadyFriend = currentUser.friends && currentUser.friends.includes(u.name);
                 const row = document.createElement('div');
                 row.className = 'user-row';
                 row.innerHTML = `
                     <span>${u.name} (Public)</span>
-                    <button class="action-btn btn-blue" onclick="toggleFollow(this)">Follow</button>
+                    <button class="action-btn ${isAlreadyFriend ? 'btn-pink' : 'btn-blue'}" onclick="toggleFriend(this, '${u.name}')">
+                        ${isAlreadyFriend ? 'Friends' : 'Follow / Add'}
+                    </button>
                 `;
                 container.appendChild(row);
             });
+        }
+
+        // Follow or Add Friend
+        function toggleFriend(btn, friendName) {
+            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            if (!currentUser.friends) currentUser.friends = [];
+
+            if (btn.innerText === 'Follow / Add') {
+                btn.innerText = 'Friends';
+                btn.className = 'action-btn btn-pink';
+                if (!currentUser.friends.includes(friendName)) {
+                    currentUser.friends.push(friendName);
+                }
+            } else {
+                btn.innerText = 'Follow / Add';
+                btn.className = 'action-btn btn-blue';
+                currentUser.friends = currentUser.friends.filter(f => f !== friendName);
+            }
+
+            // Update session and local storage registry
+            sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
+            updatePersistentUserRecord(currentUser);
+            loadChatFriends(currentUser);
+        }
+
+        function acceptFriendRequest(friendName) {
+            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            if (!currentUser.friends) currentUser.friends = [];
+
+            if (!currentUser.friends.includes(friendName)) {
+                currentUser.friends.push(friendName);
+                sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
+                updatePersistentUserRecord(currentUser);
+                loadChatFriends(currentUser);
+                alert(`${friendName} is now added to your friends & chat page!`);
+            } else {
+                alert('You are already friends!');
+            }
+        }
+
+        function updatePersistentUserRecord(updatedUser) {
+            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
+            const index = users.findIndex(u => u.email === updatedUser.email);
+            if (index !== -1) {
+                users[index] = updatedUser;
+                localStorage.setItem('texus_users', JSON.stringify(users));
+            }
+        }
+
+        // Load friends into the chat sidebar automatically
+        function loadChatFriends(currentUser) {
+            const sidebar = document.getElementById('chat-friends-list');
+            sidebar.innerHTML = '<div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 8px;">CHATS</div>';
+
+            const friends = currentUser.friends || [];
+            if (friends.length === 0) {
+                sidebar.innerHTML += '<div style="font-size: 13px; color: #999; padding: 5px;">No active chat friends yet. Add friends on the Friends page!</div>';
+                return;
+            }
+
+            friends.forEach(friend => {
+                const item = document.createElement('div');
+                item.className = 'chat-contact-item';
+                item.innerText = friend;
+                item.onclick = () => selectChatFriend(friend, item);
+                sidebar.appendChild(item);
+            });
+        }
+
+        function selectChatFriend(friendName, element) {
+            document.querySelectorAll('.chat-contact-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            currentChatFriend = friendName;
+            document.getElementById('active-chat-title').innerText = `Chat with ${friendName}`;
+            document.getElementById('chat-input-box').style.display = 'flex';
+
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = `
+                <div class="chat-bubble incoming">Hey! Connected with ${friendName}. Say hello!</div>
+            `;
         }
 
         // Navigation Switcher
@@ -629,6 +756,11 @@
 
             document.getElementById(pageId).classList.add('active');
             btnElement.classList.add('active');
+
+            if (pageId === 'friends-page') {
+                const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+                loadPublicUsers(currentUser);
+            }
         }
 
         // Posting Function
@@ -653,6 +785,7 @@
 
         // Chatting Function
         function sendMessage() {
+            if (!currentChatFriend) return alert('Please select a friend from the chat sidebar first.');
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text) return;
@@ -665,17 +798,6 @@
 
             input.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Follow Toggle
-        function toggleFollow(btn) {
-            if (btn.innerText === 'Follow') {
-                btn.innerText = 'Following';
-                btn.className = 'action-btn btn-pink';
-            } else {
-                btn.innerText = 'Follow';
-                btn.className = 'action-btn btn-blue';
-            }
         }
     </script>
 </body>
