@@ -27,7 +27,7 @@ app.use(session({
   }
 }));
 
-// Serve Static Frontend Files from your project directory
+// Serve Static Frontend Files
 app.use(express.static(path.join(__dirname, '.')));
 
 // In-Memory Database Arrays (replaces MongoDB)
@@ -36,22 +36,18 @@ const messages = [];
 
 // --- AUTHENTICATION ROUTES ---
 
-// Signup Route
 app.post('/signup', async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
     
-    // Check if user already exists
     const existingUser = users.find(u => u.email === email);
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists with this email.' });
     }
 
-    // Hash Password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user object
     const newUser = {
       _id: Date.now().toString(),
       name, 
@@ -67,7 +63,6 @@ app.post('/signup', async (req, res) => {
     
     users.push(newUser);
 
-    // Log user in automatically
     req.session.userId = newUser._id;
     req.session.user = { id: newUser._id, name: newUser.name, email: newUser.email };
 
@@ -78,7 +73,6 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Login Route
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -103,7 +97,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Logout Route
 app.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -114,7 +107,6 @@ app.post('/logout', (req, res) => {
   });
 });
 
-// --- PROFILE ROUTE ---
 app.get('/profile', (req, res) => {
   try {
     if (!req.session.userId) {
@@ -134,7 +126,7 @@ app.get('/profile', (req, res) => {
   }
 });
 
-// Fallback route to load your main frontend page (index.html)
+// Fallback route to load your frontend webpage
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
