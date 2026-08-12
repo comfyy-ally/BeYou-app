@@ -6,11 +6,9 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Session Setup: Keeps users logged in for 1 week
 app.use(session({
   secret: 'texus_secret_key_987',
   resave: false,
@@ -22,20 +20,22 @@ app.use(session({
   }
 }));
 
-// --- PERMANENT CLOUD DATABASE CONNECTION (MONGODB ATLAS) ---
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://lenkoekarabo16_db_user:s9VX@Zn7z9o6c9fP@cluster0.youbf6r.mongodb.net/?appName=Cluster0';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('Connected to permanent cloud database (MongoDB Atlas)!'))
   .catch(err => console.error('Database connection error:', err));
 
-// --- MONGODB SCHEMAS & MODELS ---
+// --- UPDATED USER SCHEMA WITH EMAIL & PHONE ---
 const userSchema = new mongoose.Schema({
   username: { type: String, unique: true, required: true },
+  email: { type: String, unique: true, required: true },
+  phone: { type: String, required: true },
   password: { type: String, required: true },
   bio: { type: String, default: 'Hey there! I am using TexUs.' },
   location: { type: String, default: 'Not specified' },
   avatarUrl: { type: String, default: '' },
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
@@ -57,21 +57,25 @@ const chatSchema = new mongoose.Schema({
 const Chat = mongoose.model('Chat', chatSchema);
 
 
-// --- AUTHENTICATION API ROUTES ---
+// --- AUTHENTICATION & ACCOUNT ROUTES ---
 
 app.post('/api/signup', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
+    const { username, email, phone, password } = req.body;
+    if (!username || !email || !phone || !password) {
+      return res.status(400).json({ error: 'All fields (username, email, phone, password) are required.' });
+    }
 
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      return res.status(400).json({ error: 'This account already exists! Please log in instead.' });
+      return res.status(400).json({ error: 'Username or email is already registered!' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({ 
       username, 
+      email,
+      phone,
       password: hashedPassword 
     });
 
@@ -85,7 +89,9 @@ app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ error: 'Account not found. Check your username or sign up.' });
+    if (!user || !user.isActive) {
+      return res.status(400).json({ error: 'Account not found or deactivated.' });
+    }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: 'Incorrect password.' });
@@ -102,6 +108,57 @@ app.post('/api/logout', (req, res) => {
     res.clearCookie('connect.sid');
     res.json({ success: true });
   });
+});
+
+// --- PASSWORD RESET ROUTE ---
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { username, email, phone, newPassword } = req.body;
+    const user = await User.findOne({ username, email, phone });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Account details do not match our records.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ success: true, message: 'Password has been reset successfully! You can now log in.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error during password reset.' });
+  }
+});
+
+// --- ACCOUNT DEACTIVATION & DELETION ROUTES ---
+app.post('/api/account/deactivate', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    await User.updateOne({ username: req.session.user.username }, { $set: { isActive: false } });
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.json({ success: true, message: 'Account deactivated successfully.' });
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to deactivate account.' });
+  }
+});
+
+app.post('/api/account/delete', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+  const username = req.session.user.username;
+  try {
+    await User.deleteOne({ username });
+    await Friend.deleteMany({ $or: [{ requester: username }, { recipient: username }] });
+    await Chat.deleteMany({ $or: [{ sender: username }, { receiver: username }] });
+
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.json({ success: true, message: 'Account permanently deleted.' });
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete account.' });
+  }
 });
 
 // --- PROFILE ROUTES ---
@@ -143,7 +200,7 @@ app.get('/api/members', async (req, res) => {
   const currentUser = req.session.user.username;
 
   try {
-    const allUsers = await User.find({ username: { $ne: currentUser } }, { password: 0 });
+    const allUsers = await User.find({ username: { $ne: currentUser }, isActive: true }, { password: 0 });
     const userFriends = await Friend.find({
       $or: [
         { requester: currentUser },
@@ -204,7 +261,7 @@ app.get('/api/friends-chats', async (req, res) => {
     });
 
     const friendUsernames = userFriends.map(f => f.requester === currentUser ? f.recipient : f.requester);
-    const friendsProfiles = await User.find({ username: { $in: friendUsernames } }, { password: 0 });
+    const friendsProfiles = await User.find({ username: { $in: friendUsernames }, isActive: true }, { password: 0 });
 
     res.json(friendsProfiles);
   } catch (err) {
@@ -250,7 +307,7 @@ app.post('/api/messages/send', async (req, res) => {
   }
 });
 
-// --- MAIN FRONTEND ROUTE ---
+// --- MAIN FRONTEND ROUTE WITH BLUE & PINK THEME + APP ICON & SETTINGS ---
 app.get('/', (req, res) => {
   const currentUser = req.session.user ? req.session.user.username : null;
 
@@ -261,44 +318,52 @@ app.get('/', (req, res) => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TexUs</title>
+    <meta name="theme-color" content="#3897f0">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%233897f0%22/><stop offset=%22100%25%22 stop-color=%22%23e1306c%22/></linearGradient></defs><rect width=%22100%22 height=%22100%22 rx=%2225%22 fill=%22url(%23grad)%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>T</text></svg>">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #fafafa; color: #262626; display: flex; justify-content: center; }
         .main-wrapper { width: 100%; max-width: 450px; background: #fff; min-height: 100vh; border-left: 1px solid #dbdbdb; border-right: 1px solid #dbdbdb; position: relative; padding-bottom: 70px; }
         
-        /* Auth Screen Styling */
+        /* Auth Screen Styling with Blue & Pink Theme */
         .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 30px; text-align: center; background: #fff; }
-        .auth-screen h1 { font-size: 38px; color: #e1306c; margin-bottom: 8px; font-weight: 800; }
+        .auth-screen h1 { font-size: 38px; background: linear-gradient(45deg, #3897f0, #e1306c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; font-weight: 800; }
         .auth-screen p { color: #8e8e8e; margin-bottom: 25px; font-size: 14px; }
-        .auth-screen input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dbdbdb; border-radius: 6px; background: #fafafa; font-size: 14px; }
-        .auth-screen button { width: 100%; padding: 12px; background-color: #0095f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 14px; }
-        .auth-screen .toggle-btn { background: transparent; color: #0095f6; margin-top: 15px; font-size: 13px; text-decoration: underline; border: none; cursor: pointer; }
+        .auth-screen input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dbdbdb; border-radius: 6px; background: #fafafa; font-size: 14px; outline: none; }
+        .auth-screen input:focus { border-color: #3897f0; }
+        .auth-screen button { width: 100%; padding: 12px; background: linear-gradient(45deg, #3897f0, #e1306c); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 14px; }
+        .auth-screen .toggle-btn { background: transparent; color: #3897f0; margin-top: 15px; font-size: 13px; text-decoration: underline; border: none; cursor: pointer; }
 
         /* Main App Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #dbdbdb; background: #fff; position: sticky; top: 0; z-index: 10; }
-        .logo { font-size: 24px; font-weight: bold; color: #e1306c; }
+        .logo { font-size: 24px; font-weight: bold; background: linear-gradient(45deg, #3897f0, #e1306c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Views */
         .view-section { display: block; }
         .hidden { display: none !important; }
 
         /* Profile Card */
         .profile-card { text-align: center; padding: 25px 20px; background: #fafafa; }
-        .profile-avatar-container { width: 90px; height: 90px; border-radius: 50%; background: #e1306c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; margin: 0 auto 12px; overflow: hidden; border: 2px solid #dbdbdb; cursor: pointer; }
+        .profile-avatar-container { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(45deg, #3897f0, #e1306c); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; margin: 0 auto 12px; overflow: hidden; border: 2px solid #dbdbdb; cursor: pointer; }
         .profile-avatar-container img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 20px; font-weight: bold; }
         .profile-location { font-size: 12px; color: #8e8e8e; margin-top: 3px; }
         
         .profile-actions { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
-        .action-btn { padding: 8px 14px; background: #0095f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .action-btn { padding: 8px 14px; background: #3897f0; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
         .action-btn-secondary { background: #efefef; color: #262626; border: 1px solid #dbdbdb; }
 
         .profile-edit-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dbdbdb; margin-top: 15px; text-align: left; }
         .profile-edit-box label { font-size: 11px; font-weight: bold; color: #8e8e8e; display: block; margin-top: 8px; }
-        .profile-edit-box textarea, .profile-edit-box input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #dbdbdb; border-radius: 4px; font-size: 13px; }
+        .profile-edit-box textarea, .profile-edit-box input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #dbdbdb; border-radius: 4px; font-size: 13px; outline: none; }
         .save-profile-btn { width: 100%; margin-top: 10px; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .logout-btn { width: 100%; margin-top: 12px; padding: 8px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        
+        /* Settings / Account Control Styles */
+        .settings-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dbdbdb; margin-top: 15px; text-align: left; }
+        .settings-box h4 { font-size: 13px; color: #e1306c; margin-bottom: 8px; }
+        .deactivate-btn { width: 100%; margin-top: 6px; padding: 8px; background: #ff9800; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .delete-btn { width: 100%; margin-top: 6px; padding: 8px; background: #ed4956; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .logout-btn { width: 100%; margin-top: 12px; padding: 8px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
         /* Fullscreen Image Viewer Modal */
         #imgModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
@@ -308,7 +373,7 @@ app.get('/', (req, res) => {
         /* Messages & Chats View */
         .messages-container { padding: 15px; }
         .invite-box { background: #f0f8ff; border: 1px solid #b0e0e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: left; }
-        .invite-box h4 { color: #0077cc; margin-bottom: 6px; font-size: 14px; }
+        .invite-box h4 { color: #3897f0; margin-bottom: 6px; font-size: 14px; }
         .invite-box p { font-size: 12px; color: #555; margin-bottom: 8px; }
         .invite-link-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fff; margin-bottom: 8px; }
         .invite-btn { width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
@@ -321,11 +386,11 @@ app.get('/', (req, res) => {
         .chat-header { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid #dbdbdb; background: #fff; font-weight: bold; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 8px; }
         .msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; word-break: break-word; }
-        .msg-sent { background: #0095f6; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-sent { background: #3897f0; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
         .msg-received { background: #efefef; color: #262626; align-self: flex-start; border-bottom-left-radius: 2px; }
         .chat-input-area { display: flex; padding: 12px; border-top: 1px solid #dbdbdb; background: #fff; gap: 8px; }
         .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #dbdbdb; border-radius: 20px; outline: none; font-size: 13px; }
-        .chat-input-area button { background: #0095f6; color: #fff; border: none; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .chat-input-area button { background: #3897f0; color: #fff; border: none; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
 
         /* Members Directory */
         .user-list { padding: 15px; }
@@ -333,12 +398,13 @@ app.get('/', (req, res) => {
         .user-info { display: flex; align-items: center; gap: 10px; }
         .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3897f0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; overflow: hidden; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .add-btn { background: #0095f6; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .add-btn { background: #3897f0; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
         .friend-badge { background: #eef7ee; color: #2e7d32; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
 
         /* Bottom Navigation */
         nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 12px 0; font-size: 20px; z-index: 10; }
         nav i { cursor: pointer; color: #262626; }
+        nav i:hover { color: #e1306c; }
     </style>
 </head>
 <body>
@@ -347,25 +413,39 @@ app.get('/', (req, res) => {
     ${!currentUser ? `
         <div class="auth-screen" id="loginView">
             <h1>TexUs</h1>
-            <p>Log in with your existing account</p>
+            <p>Log in with your username and password</p>
             <input type="text" id="login-u" placeholder="Username" autocomplete="username">
             <input type="password" id="login-p" placeholder="Password" autocomplete="current-password">
             <button onclick="login()">Log In</button>
             <button class="toggle-btn" onclick="toggleAuth('signup')">New here? Create an account</button>
+            <button class="toggle-btn" onclick="toggleAuth('forgot')" style="color: #e1306c;">Forgot password?</button>
         </div>
 
         <div class="auth-screen" id="signupView" style="display: none;">
             <h1>TexUs</h1>
-            <p>Create your account once to join TexUs.</p>
-            <input type="text" id="signup-u" placeholder="Choose a Username" autocomplete="username">
-            <input type="password" id="signup-p" placeholder="Choose a Password" autocomplete="new-password">
-            <button onclick="signup()" style="background-color: #3897f0;">Sign Up</button>
+            <p>Sign up with email, phone number, and username.</p>
+            <input type="text" id="signup-u" placeholder="Username" autocomplete="username">
+            <input type="email" id="signup-email" placeholder="Email Address">
+            <input type="tel" id="signup-phone" placeholder="Phone Number">
+            <input type="password" id="signup-p" placeholder="Password" autocomplete="new-password">
+            <button onclick="signup()">Sign Up</button>
             <button class="toggle-btn" onclick="toggleAuth('login')">Already have an account? Log In</button>
+        </div>
+
+        <div class="auth-screen" id="forgotView" style="display: none;">
+            <h1>TexUs</h1>
+            <p>Reset password using your registered email and phone number.</p>
+            <input type="text" id="forgot-u" placeholder="Username">
+            <input type="email" id="forgot-email" placeholder="Registered Email">
+            <input type="tel" id="forgot-phone" placeholder="Registered Phone Number">
+            <input type="password" id="forgot-new-p" placeholder="New Password">
+            <button onclick="resetPassword()" style="background: #e1306c;">Reset Password</button>
+            <button class="toggle-btn" onclick="toggleAuth('login')">Back to Log In</button>
         </div>
     ` : `
         <header>
             <div class="logo">TexUs</div>
-            <i class="far fa-user" onclick="showTab('profileTab')" style="cursor: pointer; font-size: 18px;" title="Profile"></i>
+            <i class="far fa-user" onclick="showTab('profileTab')" style="cursor: pointer; font-size: 18px;" title="Profile & Settings"></i>
         </header>
 
         <div id="membersTab" class="view-section">
@@ -412,7 +492,7 @@ app.get('/', (req, res) => {
                 
                 <div class="profile-actions">
                     <button class="action-btn" onclick="triggerPhotoUpload()">Profile Picture</button>
-                    <button class="action-btn action-btn-secondary" onclick="viewProfilePicture()">View Profile Picture</button>
+                    <button class="action-btn action-btn-secondary" onclick="viewProfilePicture()">View Picture</button>
                     <input type="file" id="photoUploadInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
                 </div>
 
@@ -426,7 +506,14 @@ app.get('/', (req, res) => {
                     <button class="save-profile-btn" onclick="updateProfile()">Save Profile Details</button>
                 </div>
 
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out of TexUs</button>
+                <div class="settings-box">
+                    <h4>Account Settings</h4>
+                    <p style="font-size: 11px; color: #8e8e8e; margin-bottom: 8px;">Manage your account availability or remove your data permanently.</p>
+                    <button class="deactivate-btn" onclick="deactivateAccount()"><i class="fas fa-user-slash"></i> Deactivate Account</button>
+                    <button class="delete-btn" onclick="deleteAccount()"><i class="fas fa-trash-alt"></i> Delete Account</button>
+                </div>
+
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out</button>
             </div>
         </div>
 
@@ -446,17 +533,21 @@ app.get('/', (req, res) => {
 
     <script>
         function toggleAuth(type) {
-            document.getElementById('loginView').style.display = type === 'signup' ? 'none' : 'flex';
+            document.getElementById('loginView').style.display = type === 'login' ? 'flex' : 'none';
             document.getElementById('signupView').style.display = type === 'signup' ? 'flex' : 'none';
+            document.getElementById('forgotView').style.display = type === 'forgot' ? 'flex' : 'none';
         }
 
         async function signup() {
             const u = document.getElementById('signup-u').value;
+            const email = document.getElementById('signup-email').value;
+            const phone = document.getElementById('signup-phone').value;
             const p = document.getElementById('signup-p').value;
+
             const res = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username: u, password: p })
+                body: JSON.stringify({ username: u, email, phone, password: p })
             });
             const data = await res.json();
             alert(data.message || data.error);
@@ -476,6 +567,49 @@ app.get('/', (req, res) => {
             });
             const data = await res.json();
             if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function resetPassword() {
+            const username = document.getElementById('forgot-u').value;
+            const email = document.getElementById('forgot-email').value;
+            const phone = document.getElementById('forgot-phone').value;
+            const newPassword = document.getElementById('forgot-new-p').value;
+
+            const res = await fetch('/api/reset-password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username, email, phone, newPassword })
+            });
+            const data = await res.json();
+            alert(data.message || data.error);
+            if (data.success) {
+                toggleAuth('login');
+                document.getElementById('login-u').value = username;
+            }
+        }
+
+        async function deactivateAccount() {
+            if (!confirm('Are you sure you want to deactivate your account? You can log back in anytime to reactivate.')) return;
+            const res = await fetch('/api/account/deactivate', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Account deactivated.');
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function deleteAccount() {
+            if (!confirm('WARNING: This will permanently delete your account, chats, and friends list. This cannot be undone!')) return;
+            const res = await fetch('/api/account/delete', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Account permanently deleted.');
                 location.reload();
             } else {
                 alert(data.error);
