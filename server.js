@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -25,6 +26,9 @@ app.use(session({
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }));
+
+// Serve Static Frontend Files (from your project directory or a 'public' folder)
+app.use(express.static(path.join(__dirname, '.')));
 
 // In-Memory Database Arrays (replaces MongoDB)
 const users = [];
@@ -128,11 +132,6 @@ app.get('/profile', (req, res) => {
     console.error('Profile error details:', err);
     res.status(500).json({ error: 'Server error fetching profile.' });
   }
-});
-
-// Test Route
-app.get('/', (req, res) => {
-  res.send('BeYou server is running successfully without MongoDB!');
 });
 
 const PORT = process.env.PORT || 10000;
