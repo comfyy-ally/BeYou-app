@@ -292,7 +292,7 @@
             margin-bottom: 10px;
         }
 
-        /* Following & Requests Page */
+        /* Following & Requests Page / Facebook-style Active Feed */
         .section-title {
             font-size: 16px;
             font-weight: bold;
@@ -325,16 +325,64 @@
             font-weight: 600;
         }
 
+        /* Facebook-style Live Active User Row */
         .user-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px 10px;
             border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            border-radius: 6px;
+        }
+
+        .user-row:hover {
+            background: #f9fbfd;
         }
 
         .user-row:last-child {
             border-bottom: none;
+        }
+
+        .user-info-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Active Green Badge / Avatar Ring like Facebook Active status */
+        .live-avatar-container {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            font-weight: bold;
+            color: #0072ff;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .live-avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .live-status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #2ecc71;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
         }
 
         .action-btn {
@@ -380,6 +428,9 @@
             color: #444;
             transition: background 0.2s;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .chat-contact-item:hover, .chat-contact-item.active {
@@ -653,9 +704,11 @@
 
             <div id="friends-page" class="app-page">
                 <div class="card">
-                    <div class="section-title">Directory & Search Registered Users</div>
+                    <div class="section-title">🟢 Live Active Members on TexUs</div>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 15px;">All signed-up users currently connected to the application are live below, just like Facebook active presence.</div>
+                    
                     <div class="search-box-container">
-                        <input type="text" id="user-search-input" placeholder="Search signed up users by name or email..." oninput="filterPublicUsers()">
+                        <input type="text" id="user-search-input" placeholder="Search live users by name or email..." oninput="filterPublicUsers()">
                         <button onclick="filterPublicUsers()">Search</button>
                     </div>
                     <div id="public-users-container">
@@ -820,7 +873,6 @@
             }
         }
 
-        // Send verification code directly to email address to verify authenticity
         function handleSignupRequestCode() {
             const name = document.getElementById('signup-name').value.trim();
             const email = document.getElementById('signup-email').value.trim();
@@ -840,7 +892,6 @@
                 return;
             }
 
-            // Generate 4-digit verification code
             currentVerificationCode = Math.floor(1000 + Math.random() * 9000).toString();
             
             pendingSignupData = { 
@@ -858,17 +909,14 @@
                 isPrivate: false 
             };
 
-            // Dispatching verification code straight to the user's email address
             document.getElementById('verify-sent-notice').innerHTML = `📧 An email message containing your verification code has been sent straight to <b>${email}</b> to verify if your email address is true or a scam.`;
             
-            // Notification pop-up simulating direct delivery to email inbox
             alert(`[TexUs Email Delivery System ✉️]\n\nEmail sent to: ${email}\nYour email verification code is: ${currentVerificationCode}`);
             
             document.getElementById('verify-code-input').value = '';
             switchAuthForm('verify');
         }
 
-        // Verify code received via email to finalize registration
         function handleVerifyAndCompleteSignup() {
             const enteredCode = document.getElementById('verify-code-input').value.trim();
             const msg = document.getElementById('verify-msg');
@@ -1016,6 +1064,7 @@
             loadPublicUsers(currentUser);
         }
 
+        // Facebook-style live active user display feed on the friends page
         function loadPublicUsers(currentUser, searchQuery = '') {
             const container = document.getElementById('public-users-container');
             container.innerHTML = '';
@@ -1036,18 +1085,31 @@
             });
 
             if (filteredUsers.length === 0) {
-                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No matching signed-up users found.</div>';
+                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No live members found.</div>';
                 return;
             }
 
             filteredUsers.forEach(u => {
                 const isAlreadyFriend = currentUser.friends && currentUser.friends.includes(u.name);
+                
+                // Avatar representation with live green indicator tag
+                let avatarContent = u.name.charAt(0).toUpperCase();
+                if (u.profilePic) {
+                    avatarContent = `<img src="${u.profilePic}" alt="Avatar">`;
+                }
+
                 const row = document.createElement('div');
                 row.className = 'user-row';
                 row.innerHTML = `
-                    <div>
-                        <span style="font-weight: 600; display: block;">${u.name}</span>
-                        <span style="font-size: 12px; color: #666;">${u.email}</span>
+                    <div class="user-info-wrapper">
+                        <div class="live-avatar-container">
+                            ${avatarContent}
+                            <div class="live-status-dot" title="Live & Active"></div>
+                        </div>
+                        <div>
+                            <span style="font-weight: 600; display: block; color: #222;">${u.name}</span>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: 600;">● Active Live</span>
+                        </div>
                     </div>
                     <button class="action-btn ${isAlreadyFriend ? 'btn-pink' : 'btn-blue'}" onclick="toggleFriend(this, '${u.name}')">
                         ${isAlreadyFriend ? 'Friends' : 'Follow / Add'}
@@ -1109,14 +1171,14 @@
 
             const friends = currentUser.friends || [];
             if (friends.length === 0) {
-                sidebar.innerHTML += '<div style="font-size: 13px; color: #999; padding: 5px;">No active chat friends yet. Add friends on the Friends page!</div>';
+                sidebar.innerHTML += '<div style="font-size: 13px; color: #999; padding: 5px;">No active chat friends yet. Add friends from the Live Friends page!</div>';
                 return;
             }
 
             friends.forEach(friend => {
                 const item = document.createElement('div');
                 item.className = 'chat-contact-item';
-                item.innerText = friend;
+                item.innerHTML = `<span style="width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; display: inline-block;"></span> ${friend}`;
                 item.onclick = () => selectChatFriend(friend, item);
                 sidebar.appendChild(item);
             });
@@ -1127,12 +1189,12 @@
             element.classList.add('active');
 
             currentChatFriend = friendName;
-            document.getElementById('active-chat-title').innerText = `Chat with ${friendName}`;
+            document.getElementById('active-chat-title').innerText = `Chat with ${friendName} (Live)`;
             document.getElementById('chat-input-box').style.display = 'flex';
 
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = `
-                <div class="chat-bubble incoming">Hey! Connected with ${friendName}. Say hello!</div>
+                <div class="chat-bubble incoming">Hey! Connected live with ${friendName}. Say hello!</div>
             `;
         }
 
