@@ -227,6 +227,32 @@
             font-size: 15px;
         }
 
+        .post-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+            align-items: center;
+        }
+
+        .like-btn {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .like-btn.liked {
+            background: #ff758c;
+            color: white;
+            border-color: #ff758c;
+        }
+
         .welcome-video-container {
             width: 100%;
             border-radius: 8px;
@@ -398,16 +424,53 @@
             font-weight: bold;
         }
 
-        /* Profile Styles */
-        .profile-pic-preview {
-            width: 100px;
-            height: 100px;
+        /* Profile Styles with Circular Upload Container */
+        .profile-circle-container {
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
-            object-fit: cover;
             border: 3px solid #0072ff;
-            margin: 10px auto;
-            background: #ddd;
+            margin: 10px auto 15px auto;
+            overflow: hidden;
+            background: #eaeaea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-circle-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-stats-row {
+            display: flex;
+            justify-content: space-around;
+            background: #fafbfc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .stat-box span {
             display: block;
+        }
+
+        .stat-num {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0072ff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
         }
 
         /* Action buttons */
@@ -513,7 +576,7 @@
                         <div class="post-author">TexUs Official Promotional Video 🎥</div>
                         <div class="post-text" style="margin-bottom: 8px;">Welcome to TexUs! Connect, share, and chat instantly with friends globally. Check out our app intro!</div>
                         <div class="welcome-video-container">
-                            <video controls poster="">
+                            <video controls>
                                 <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
                                 Your browser does not support HTML video.
                             </video>
@@ -522,6 +585,9 @@
                     <div class="card">
                         <div class="post-author">TexUs Official</div>
                         <div class="post-text">Welcome to the community feed! ✨</div>
+                        <div class="post-actions">
+                            <button class="like-btn" onclick="toggleLikePost(this, 'TexUs Official')">Like (<span class="like-count">0</span>)</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -562,12 +628,27 @@
 
             <div id="profile-page" class="app-page">
                 <div class="card">
-                    <h2 style="font-size: 18px; margin-bottom: 15px; text-align: center;">User Profile</h2>
+                    <h2 id="profile-name-title" style="font-size: 18px; margin-bottom: 5px; text-align: center;">User Profile</h2>
                     
-                    <img id="profile-pic-display" class="profile-pic-preview" src="" alt="Profile Picture" style="display:none;">
-                    <div class="input-group">
-                        <label for="profile-img-input">Upload Profile Picture</label>
-                        <input type="file" id="profile-img-input" accept="image/*" onchange="handleProfilePictureUpload(event)">
+                    <div class="profile-circle-container" onclick="document.getElementById('profile-img-input').click()">
+                        <img id="profile-pic-display" src="" alt="Avatar" style="display:none;">
+                        <span id="profile-placeholder-text" style="font-size: 11px; color: #888; text-align: center; padding: 5px;">Upload Pic</span>
+                    </div>
+                    <input type="file" id="profile-img-input" accept="image/*" style="display:none;" onchange="handleProfilePictureUpload(event)">
+
+                    <div class="profile-stats-row">
+                        <div class="stat-box">
+                            <span class="stat-num" id="stat-followers">0</span>
+                            <span class="stat-label">Followers</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num" id="stat-friends">0</span>
+                            <span class="stat-label">Friends</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num" id="stat-likes">0</span>
+                            <span class="stat-label">Likes</span>
+                        </div>
                     </div>
 
                     <div class="input-group" style="margin-top: 15px;">
@@ -577,7 +658,7 @@
 
                     <div class="input-group">
                         <label for="country-code-select">Select Country & Mobile Number</label>
-                        <select id="country-code-select" onchange="updateCountryPrefix()">
+                        <select id="country-code-select">
                             <option value="">-- Choose Country --</option>
                         </select>
                     </div>
@@ -643,7 +724,6 @@
             { name: "United States", code: "+1" }, { name: "Vietnam", code: "+84" }, { name: "Zimbabwe", code: "+263" }
         ];
 
-        // Session check: forces log in upon exit/tab close
         window.onload = function() {
             populateCountriesDropdown();
             const loggedInUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
@@ -697,12 +777,14 @@
                 return;
             }
 
-            // New account creation (automatically public on friends directory by default)
             users.push({ 
                 name, 
                 email, 
                 password, 
                 friends: [], 
+                followersCount: 0,
+                friendsCount: 0,
+                likesCount: 0,
                 profilePic: '', 
                 bio: 'Member of the TexUs community exploring posts and connecting with friends!',
                 countryCode: '',
@@ -743,7 +825,13 @@
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'flex';
             document.getElementById('user-display').innerText = user.name;
+            document.getElementById('profile-name-title').innerText = `${user.name}'s Profile`;
             
+            // Populate stats
+            document.getElementById('stat-followers').innerText = user.followersCount || 0;
+            document.getElementById('stat-friends').innerText = user.friendsCount || 0;
+            document.getElementById('stat-likes').innerText = user.likesCount || 0;
+
             // Populate Profile info fields
             document.getElementById('profile-bio-input').value = user.bio || '';
             document.getElementById('profile-mobile-input').value = user.mobileNumber || '';
@@ -753,9 +841,9 @@
                 const imgDisplay = document.getElementById('profile-pic-display');
                 imgDisplay.src = user.profilePic;
                 imgDisplay.style.display = 'block';
+                document.getElementById('profile-placeholder-text').style.display = 'none';
             }
 
-            // Populate Privacy Toggle state
             document.getElementById('privacy-mode-toggle').checked = !!user.isPrivate;
             
             loadPublicUsers(user);
@@ -770,7 +858,6 @@
             document.getElementById('login-password').value = '';
         }
 
-        // Account Deletion / Deactivation
         function deleteAccount() {
             if (confirm('Are you sure you want to permanently delete/deactivate your account? This action cannot be undone.')) {
                 let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
@@ -784,7 +871,6 @@
             }
         }
 
-        // Handle profile picture image file selection & Base64 storage conversion
         function handleProfilePictureUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -801,13 +887,10 @@
                 const imgDisplay = document.getElementById('profile-pic-display');
                 imgDisplay.src = base64Image;
                 imgDisplay.style.display = 'block';
+                document.getElementById('profile-placeholder-text').style.display = 'none';
                 alert('Profile picture uploaded successfully!');
             };
             reader.readAsDataURL(file);
-        }
-
-        function updateCountryPrefix() {
-            // Optional handling if needed when selecting dropdown code
         }
 
         function saveProfileData() {
@@ -821,7 +904,6 @@
             alert('Profile details updated successfully!');
         }
 
-        // Toggle private mode status
         function togglePrivacyMode(checkbox) {
             let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             currentUser.isPrivate = checkbox.checked;
@@ -833,13 +915,11 @@
             loadPublicUsers(currentUser);
         }
 
-        // Public accounts loader (Excludes private accounts from public directory)
         function loadPublicUsers(currentUser) {
             const container = document.getElementById('public-users-container');
             container.innerHTML = '';
 
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            // Filter out current user and any users who have switched their account to private mode
             const publicUsers = users.filter(u => u.email !== currentUser.email && !u.isPrivate);
 
             if (publicUsers.length === 0) {
@@ -861,7 +941,7 @@
             });
         }
 
-        // Follow or Add Friend
+        // Follow & Friend Request Logic (Increments Followers/Friends automatically)
         function toggleFriend(btn, friendName) {
             let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             if (!currentUser.friends) currentUser.friends = [];
@@ -871,15 +951,28 @@
                 btn.className = 'action-btn btn-pink';
                 if (!currentUser.friends.includes(friendName)) {
                     currentUser.friends.push(friendName);
+                    
+                    // Increment Followers and Friends counters
+                    currentUser.followersCount = (currentUser.followersCount || 0) + 1;
+                    currentUser.friendsCount = (currentUser.friendsCount || 0) + 1;
                 }
             } else {
                 btn.innerText = 'Follow / Add';
                 btn.className = 'action-btn btn-blue';
                 currentUser.friends = currentUser.friends.filter(f => f !== friendName);
+                
+                // Decrement Followers and Friends counters
+                currentUser.followersCount = Math.max(0, (currentUser.followersCount || 1) - 1);
+                currentUser.friendsCount = Math.max(0, (currentUser.friendsCount || 1) - 1);
             }
 
             sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
             updatePersistentUserRecord(currentUser);
+            
+            // Update profile stats view dynamically
+            document.getElementById('stat-followers').innerText = currentUser.followersCount;
+            document.getElementById('stat-friends').innerText = currentUser.friendsCount;
+
             loadChatFriends(currentUser);
         }
 
@@ -892,7 +985,7 @@
             }
         }
 
-        // Load friends into the chat sidebar automatically
+        // Automatically occurs on the Chat page when users become friends
         function loadChatFriends(currentUser) {
             const sidebar = document.getElementById('chat-friends-list');
             sidebar.innerHTML = '<div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 8px;">CHATS</div>';
@@ -953,11 +1046,44 @@
             postCard.innerHTML = `
                 <div class="post-author">${user ? user.name : 'User'}</div>
                 <div class="post-text">${content}</div>
+                <div class="post-actions">
+                    <button class="like-btn" onclick="toggleLikePost(this, '${user ? user.name : 'User'}')">Like (<span class="like-count">0</span>)</button>
+                </div>
             `;
             feed.insertBefore(postCard, feed.children[1]); // Insert beneath the welcome video card
 
             document.getElementById('post-content').value = '';
             switchPage('feed-page', document.querySelectorAll('.nav-btn')[0]);
+        }
+
+        // Likes increment handler
+        function toggleLikePost(btnElement, authorName) {
+            const countSpan = btnElement.querySelector('.like-count');
+            let currentLikes = parseInt(countSpan.innerText);
+            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+
+            if (!btnElement.classList.contains('liked')) {
+                btnElement.classList.add('liked');
+                countSpan.innerText = currentLikes + 1;
+                
+                // If it's the logged-in user's post or global interaction, increment user likes counter
+                if (currentUser && authorName === currentUser.name) {
+                    currentUser.likesCount = (currentUser.likesCount || 0) + 1;
+                    sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
+                    updatePersistentUserRecord(currentUser);
+                    document.getElementById('stat-likes').innerText = currentUser.likesCount;
+                }
+            } else {
+                btnElement.classList.remove('liked');
+                countSpan.innerText = Math.max(0, currentLikes - 1);
+
+                if (currentUser && authorName === currentUser.name) {
+                    currentUser.likesCount = Math.max(0, (currentUser.likesCount || 1) - 1);
+                    sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
+                    updatePersistentUserRecord(currentUser);
+                    document.getElementById('stat-likes').innerText = currentUser.likesCount;
+                }
+            }
         }
 
         // Chatting Function
