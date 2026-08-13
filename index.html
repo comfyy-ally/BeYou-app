@@ -132,6 +132,18 @@
             color: #2ecc71;
         }
 
+        /* Verification Banner Box */
+        .verification-alert {
+            background: #eef6ff;
+            border: 1px solid #bce8f1;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #31708f;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
         /* --- DASHBOARD LAYOUT --- */
         #app-screen {
             display: none;
@@ -571,9 +583,23 @@
                     <label for="signup-password">Password</label>
                     <input type="password" id="signup-password" placeholder="Create a password">
                 </div>
-                <button class="btn" onclick="handleSignup()">Sign Up</button>
+                <button class="btn" onclick="handleSignupRequestCode()">Send Verification Code</button>
                 <p id="signup-msg" class="message"></p>
                 <p class="switch-text">Already have an account? <span onclick="switchAuthForm('login')">Sign In</span></p>
+            </div>
+
+            <div id="verify-form" class="form-container">
+                <h2>Email Verification</h2>
+                <div class="verification-alert">
+                    🔒 A 4-digit verification security code has been sent to your email to verify that your account is authentic and not a scam bot.
+                </div>
+                <div class="input-group">
+                    <label for="verify-code-input">Enter 4-Digit Verification Code</label>
+                    <input type="text" id="verify-code-input" placeholder="e.g. 4815" maxlength="4" style="text-align: center; font-size: 18px; letter-spacing: 3px;">
+                </div>
+                <button class="btn" onclick="handleVerifyAndCompleteSignup()">Verify & Complete Signup</button>
+                <p id="verify-msg" class="message"></p>
+                <p class="switch-text"><span onclick="switchAuthForm('signup')">Back to Sign Up</span></p>
             </div>
         </div>
     </div>
@@ -729,6 +755,8 @@
 
     <script>
         let currentChatFriend = null;
+        let pendingSignupData = null;
+        let currentVerificationCode = null;
 
         const countriesList = [
             { name: "Afghanistan", code: "+93" }, { name: "Albania", code: "+355" }, { name: "Algeria", code: "+213" },
@@ -773,20 +801,27 @@
         function switchAuthForm(formType) {
             const loginForm = document.getElementById('login-form');
             const signupForm = document.getElementById('signup-form');
+            const verifyForm = document.getElementById('verify-form');
+            
+            loginForm.classList.remove('active');
+            signupForm.classList.remove('active');
+            verifyForm.classList.remove('active');
             
             document.getElementById('login-msg').innerText = '';
             document.getElementById('signup-msg').innerText = '';
+            document.getElementById('verify-msg').innerText = '';
 
             if (formType === 'signup') {
-                loginForm.classList.remove('active');
                 signupForm.classList.add('active');
+            } else if (formType === 'verify') {
+                verifyForm.classList.add('active');
             } else {
-                signupForm.classList.remove('active');
                 loginForm.classList.add('active');
             }
         }
 
-        function handleSignup() {
+        // Step 1: Generate verification code and prompt verification step to filter scam bots
+        function handleSignupRequestCode() {
             const name = document.getElementById('signup-name').value.trim();
             const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value.trim();
@@ -805,7 +840,10 @@
                 return;
             }
 
-            users.push({ 
+            // Generate a random 4-digit verification security code
+            currentVerificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            pendingSignupData = { 
                 name, 
                 email, 
                 password, 
@@ -818,12 +856,46 @@
                 countryCode: '',
                 mobileNumber: '',
                 isPrivate: false 
-            });
+            };
+
+            // Simulated Email Verification alert displaying code for authentic testing
+            alert(`[TexUs Security Email Service]\n\nYour anti-scam verification code for email (${email}) is: ${currentVerificationCode}`);
+            
+            document.getElementById('verify-code-input').value = '';
+            switchAuthForm('verify');
+        }
+
+        // Step 2: Validate code to verify true email identity before finalizing account
+        function handleVerifyAndCompleteSignup() {
+            const enteredCode = document.getElementById('verify-code-input').value.trim();
+            const msg = document.getElementById('verify-msg');
+
+            if (!enteredCode) {
+                msg.className = 'message error';
+                msg.innerText = 'Please enter the verification code.';
+                return;
+            }
+
+            if (enteredCode !== currentVerificationCode) {
+                msg.className = 'message error';
+                msg.innerText = 'Invalid verification code. Please check your email code.';
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
+            users.push(pendingSignupData);
             localStorage.setItem('texus_users', JSON.stringify(users));
 
             msg.className = 'message success';
-            msg.innerText = 'Account created! You can now sign in.';
-            setTimeout(() => switchAuthForm('login'), 1500);
+            msg.innerText = 'Email verified successfully! Redirecting to sign in...';
+            
+            setTimeout(() => {
+                pendingSignupData = null;
+                currentVerificationCode = null;
+                switchAuthForm('login');
+                document.getElementById('login-msg').className = 'message success';
+                document.getElementById('login-msg').innerText = 'Account verified & created successfully! Sign in now.';
+            }, 1500);
         }
 
         function handleLogin() {
@@ -941,14 +1013,12 @@
             loadPublicUsers(currentUser);
         }
 
-        // Render signed up users with a search query filter implementation
         function loadPublicUsers(currentUser, searchQuery = '') {
             const container = document.getElementById('public-users-container');
             container.innerHTML = '';
 
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
             
-            // Filter users: exclude current user, exclude private accounts, and match search query
             const filteredUsers = users.filter(u => {
                 if (u.email === currentUser.email) return false;
                 if (u.isPrivate) return false;
@@ -992,7 +1062,6 @@
             }
         }
 
-        // Follow & Friend Request Logic
         function toggleFriend(btn, friendName) {
             let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             if (!currentUser.friends) currentUser.friends = [];
