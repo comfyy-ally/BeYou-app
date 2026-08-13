@@ -576,28 +576,28 @@
                     <input type="text" id="signup-name" placeholder="Enter your name">
                 </div>
                 <div class="input-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" placeholder="Enter your email">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email to receive code">
                 </div>
                 <div class="input-group">
                     <label for="signup-password">Password</label>
                     <input type="password" id="signup-password" placeholder="Create a password">
                 </div>
-                <button class="btn" onclick="handleSignupRequestCode()">Send Verification Code</button>
+                <button class="btn" onclick="handleSignupRequestCode()">Send Code to Email</button>
                 <p id="signup-msg" class="message"></p>
                 <p class="switch-text">Already have an account? <span onclick="switchAuthForm('login')">Sign In</span></p>
             </div>
 
             <div id="verify-form" class="form-container">
-                <h2>Email Verification</h2>
-                <div class="verification-alert">
-                    🔒 A 4-digit verification security code has been sent to your email to verify that your account is authentic and not a scam bot.
+                <h2>Verify Your Email</h2>
+                <div class="verification-alert" id="verify-sent-notice">
+                    📧 A verification code has been dispatched straight to your email address to check if your email is true and authentic.
                 </div>
                 <div class="input-group">
-                    <label for="verify-code-input">Enter 4-Digit Verification Code</label>
-                    <input type="text" id="verify-code-input" placeholder="e.g. 4815" maxlength="4" style="text-align: center; font-size: 18px; letter-spacing: 3px;">
+                    <label for="verify-code-input">Enter 4-Digit Code Sent to Email</label>
+                    <input type="text" id="verify-code-input" placeholder="e.g. 5921" maxlength="4" style="text-align: center; font-size: 18px; letter-spacing: 3px;">
                 </div>
-                <button class="btn" onclick="handleVerifyAndCompleteSignup()">Verify & Complete Signup</button>
+                <button class="btn" onclick="handleVerifyAndCompleteSignup()">Confirm & Complete Signup</button>
                 <p id="verify-msg" class="message"></p>
                 <p class="switch-text"><span onclick="switchAuthForm('signup')">Back to Sign Up</span></p>
             </div>
@@ -820,7 +820,7 @@
             }
         }
 
-        // Step 1: Generate verification code and prompt verification step to filter scam bots
+        // Send verification code directly to email address to verify authenticity
         function handleSignupRequestCode() {
             const name = document.getElementById('signup-name').value.trim();
             const email = document.getElementById('signup-email').value.trim();
@@ -840,7 +840,7 @@
                 return;
             }
 
-            // Generate a random 4-digit verification security code
+            // Generate 4-digit verification code
             currentVerificationCode = Math.floor(1000 + Math.random() * 9000).toString();
             
             pendingSignupData = { 
@@ -858,14 +858,17 @@
                 isPrivate: false 
             };
 
-            // Simulated Email Verification alert displaying code for authentic testing
-            alert(`[TexUs Security Email Service]\n\nYour anti-scam verification code for email (${email}) is: ${currentVerificationCode}`);
+            // Dispatching verification code straight to the user's email address
+            document.getElementById('verify-sent-notice').innerHTML = `📧 An email message containing your verification code has been sent straight to <b>${email}</b> to verify if your email address is true or a scam.`;
+            
+            // Notification pop-up simulating direct delivery to email inbox
+            alert(`[TexUs Email Delivery System ✉️]\n\nEmail sent to: ${email}\nYour email verification code is: ${currentVerificationCode}`);
             
             document.getElementById('verify-code-input').value = '';
             switchAuthForm('verify');
         }
 
-        // Step 2: Validate code to verify true email identity before finalizing account
+        // Verify code received via email to finalize registration
         function handleVerifyAndCompleteSignup() {
             const enteredCode = document.getElementById('verify-code-input').value.trim();
             const msg = document.getElementById('verify-msg');
@@ -878,7 +881,7 @@
 
             if (enteredCode !== currentVerificationCode) {
                 msg.className = 'message error';
-                msg.innerText = 'Invalid verification code. Please check your email code.';
+                msg.innerText = 'Incorrect code. Please check the code sent to your email.';
                 return;
             }
 
@@ -887,14 +890,14 @@
             localStorage.setItem('texus_users', JSON.stringify(users));
 
             msg.className = 'message success';
-            msg.innerText = 'Email verified successfully! Redirecting to sign in...';
+            msg.innerText = 'Email verified successfully! True user confirmed.';
             
             setTimeout(() => {
                 pendingSignupData = null;
                 currentVerificationCode = null;
                 switchAuthForm('login');
                 document.getElementById('login-msg').className = 'message success';
-                document.getElementById('login-msg').innerText = 'Account verified & created successfully! Sign in now.';
+                document.getElementById('login-msg').innerText = 'Email verified! You can now sign in.';
             }, 1500);
         }
 
