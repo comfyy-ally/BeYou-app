@@ -3,47 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs - Social App</title>
+    <title>TexUs</title>
     <style>
+        :root {
+            --fb-blue: #1877f2;
+            --fb-blue-hover: #166fe5;
+            --fb-green: #42b72a;
+            --fb-green-hover: #36a420;
+            --fb-bg: #f0f2f5;
+            --fb-card-bg: #ffffff;
+            --fb-text: #050505;
+            --fb-text-secondary: #65676b;
+            --fb-border: #ccd0d5;
+            --fb-input-bg: #f0f2f5;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Helvetica, Arial, sans-serif;
         }
 
         body {
-            background: #f4f6f9;
-            color: #333;
+            background-color: var(--fb-bg);
+            color: var(--fb-text);
         }
 
-        /* --- AUTH SCREEN --- */
+        /* --- AUTH SCREEN (Facebook Desktop Split Layout) --- */
         #auth-screen {
-            background: linear-gradient(135deg, #00c6ff 0%, #ff758c 100%);
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: var(--fb-bg);
         }
 
-        .container {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        .auth-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 980px;
             width: 100%;
-            max-width: 400px;
-            text-align: center;
+            gap: 40px;
+            margin-bottom: 80px;
         }
 
-        .app-logo {
-            font-size: 32px;
+        .auth-left {
+            flex: 1;
+            padding-bottom: 90px;
+        }
+
+        .auth-logo-text {
+            color: var(--fb-blue);
+            font-size: 64px;
             font-weight: bold;
-            background: linear-gradient(135deg, #0072ff, #ff1493);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 25px;
-            letter-spacing: 1px;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .auth-tagline {
+            font-size: 28px;
+            line-height: 32px;
+            color: #1c1e21;
+        }
+
+        .auth-right {
+            width: 396px;
+            flex-shrink: 0;
+        }
+
+        .fb-card {
+            background-color: var(--fb-card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
         }
 
         .form-container {
@@ -54,757 +90,698 @@
             display: block;
         }
 
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .input-group input, .input-group textarea, .input-group select {
+        .fb-input {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
+            padding: 14px 16px;
+            font-size: 17px;
+            border: 1px solid var(--fb-border);
             border-radius: 6px;
-            font-size: 14px;
+            margin-bottom: 12px;
             outline: none;
-            transition: border-color 0.2s;
-            background: white;
+            background: var(--fb-input-bg);
         }
 
-        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
-            border-color: #0072ff;
+        .fb-input:focus {
+            border-color: var(--fb-blue);
+            background: #fff;
+            box-shadow: 0 0 0 2px #e7f3ff;
         }
 
-        .btn {
+        .fb-btn-primary {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #0072ff, #ff1493);
-            border: none;
+            background-color: var(--fb-blue);
             color: white;
-            font-size: 16px;
+            border: none;
             border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: opacity 0.2s;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .switch-text {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .switch-text span {
-            color: #0072ff;
-            cursor: pointer;
+            font-size: 20px;
             font-weight: bold;
+            padding: 12px;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: background-color 0.2s;
         }
 
-        .switch-text span:hover {
+        .fb-btn-primary:hover {
+            background-color: var(--fb-blue-hover);
+        }
+
+        .fb-btn-success {
+            background-color: var(--fb-green);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: bold;
+            padding: 10px 20px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .fb-btn-success:hover {
+            background-color: var(--fb-green-hover);
+        }
+
+        .fb-divider {
+            border-bottom: 1px solid var(--fb-border);
+            margin: 20px 0;
+        }
+
+        .switch-link {
+            color: var(--fb-blue);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .switch-link:hover {
             text-decoration: underline;
         }
 
         .message {
-            margin-top: 15px;
+            margin-top: 10px;
             font-size: 14px;
         }
+        .error { color: #fa383e; }
+        .success { color: var(--fb-green); }
 
-        .error {
-            color: #e74c3c;
-        }
-
-        .success {
-            color: #2ecc71;
-        }
-
-        /* Verification Banner Box */
-        .verification-alert {
-            background: #eef6ff;
-            border: 1px solid #bce8f1;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #31708f;
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        /* --- DASHBOARD LAYOUT --- */
+        /* --- DASHBOARD SCREEN (Facebook 3-Column Layout) --- */
         #app-screen {
             display: none;
+            flex-direction: column;
             min-height: 100vh;
-            flex-direction: column;
         }
 
-        header {
-            background: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        /* Top Navigation Bar */
+        .fb-header {
+            background-color: #fff;
+            height: 56px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        header h1 {
+        .fb-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-badge {
             font-size: 24px;
-            background: linear-gradient(135deg, #0072ff, #ff1493);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Navigation Bar */
-        .nav-tabs {
-            display: flex;
-            background: white;
-            justify-content: center;
-            border-bottom: 1px solid #eee;
-            gap: 5px;
-            padding: 0 10px;
-            flex-wrap: wrap;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            padding: 12px 15px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .nav-btn.active {
-            color: #0072ff;
-            border-bottom: 3px solid #0072ff;
-        }
-
-        .main-content {
-            flex: 1;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Page Panels */
-        .app-page {
-            display: none;
-        }
-
-        .app-page.active {
-            display: block;
-        }
-
-        /* Cards & UI elements */
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-        }
-
-        /* Newsfeed Page */
-        .newsfeed {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .post-author {
             font-weight: bold;
-            color: #0072ff;
-            margin-bottom: 8px;
+            color: var(--fb-blue);
+            letter-spacing: -1px;
         }
 
-        .post-text {
-            color: #444;
-            font-size: 15px;
-        }
-
-        .post-actions {
-            margin-top: 12px;
+        .fb-search-bar {
             display: flex;
-            gap: 15px;
-            font-size: 14px;
-            color: #666;
             align-items: center;
-        }
-
-        .like-btn {
-            background: none;
-            border: 1px solid #ddd;
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #555;
-            transition: all 0.2s;
-        }
-
-        .like-btn.liked {
-            background: #ff758c;
-            color: white;
-            border-color: #ff758c;
-        }
-
-        .welcome-video-container {
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-            margin-top: 10px;
-        }
-
-        .welcome-video-container video {
-            width: 100%;
-            display: block;
-            max-height: 300px;
-        }
-
-        /* Posting Page */
-        .post-input-area {
-            width: 100%;
-            height: 120px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            resize: none;
-            outline: none;
-            font-size: 15px;
-            margin-bottom: 10px;
-        }
-
-        /* Following & Public Feed */
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #444;
-        }
-
-        .search-box-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .search-box-container input {
-            flex: 1;
+            background: var(--fb-input-bg);
+            border-radius: 50px;
             padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            outline: none;
-            font-size: 14px;
+            width: 240px;
         }
 
-        .search-box-container button {
-            padding: 8px 16px;
-            background: #0072ff;
-            color: white;
+        .fb-search-bar input {
             border: none;
-            border-radius: 6px;
+            background: transparent;
+            outline: none;
+            margin-left: 8px;
+            font-size: 15px;
+            width: 100%;
+        }
+
+        /* Center Navigation Tabs */
+        .fb-header-center {
+            display: flex;
+            height: 100%;
+            gap: 4px;
+        }
+
+        .nav-tab-btn {
+            background: none;
+            border: none;
+            width: 110px;
+            height: 100%;
             cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* Facebook-style Live Active User Row */
-        .user-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 10px;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.2s;
-            border-radius: 6px;
-        }
-
-        .user-row:hover {
-            background: #f9fbfd;
-        }
-
-        .user-row:last-child {
-            border-bottom: none;
-        }
-
-        .user-info-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .live-avatar-container {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #e2e8f0;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-            font-weight: bold;
-            color: #0072ff;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            flex-shrink: 0;
+            font-size: 24px;
+            color: var(--fb-text-secondary);
+            border-bottom: 4px solid transparent;
+            border-radius: 8px;
+            transition: background 0.2s;
         }
 
-        .live-avatar-container img {
+        .nav-tab-btn:hover {
+            background: var(--fb-bg);
+        }
+
+        .nav-tab-btn.active {
+            color: var(--fb-blue);
+            border-bottom: 4px solid var(--fb-blue);
+            border-radius: 0;
+        }
+
+        .fb-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--fb-input-bg);
+            padding: 4px 12px 4px 4px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Main Workspace Split */
+        .fb-workspace {
+            display: flex;
+            flex: 1;
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .fb-sidebar-left {
+            width: 280px;
+            padding: 16px;
+            position: sticky;
+            top: 56px;
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+        }
+
+        .fb-sidebar-right {
+            width: 300px;
+            padding: 16px;
+            position: sticky;
+            top: 56px;
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+        }
+
+        .fb-main-content {
+            flex: 1;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        /* Sidebar Shortcuts */
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--fb-text);
+            transition: background 0.2s;
+        }
+
+        .sidebar-item:hover {
+            background: #e4e6eb;
+        }
+
+        /* Feed & Posts */
+        .app-page {
+            display: none;
+        }
+        .app-page.active {
+            display: block;
+        }
+
+        .post-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            padding: 12px 16px 10px 16px;
+            margin-bottom: 16px;
+        }
+
+        .post-input-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid var(--fb-border);
+            padding-bottom: 10px;
+            margin-bottom: 8px;
+        }
+
+        .post-input-box input {
+            flex: 1;
+            background: var(--fb-input-bg);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e4e6eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--fb-blue);
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .avatar-circle img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .live-status-dot {
-            width: 12px;
-            height: 12px;
-            background-color: #2ecc71;
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--fb-green);
             border: 2px solid white;
             border-radius: 50%;
             position: absolute;
             bottom: 0;
             right: 0;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+        }
+
+        .feed-post-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+            padding: 12px 16px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .post-author-name {
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--fb-text);
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: var(--fb-text-secondary);
+        }
+
+        .post-body-text {
+            font-size: 15px;
+            line-height: 20px;
+            margin-bottom: 12px;
+        }
+
+        .post-action-bar {
+            display: flex;
+            border-top: 1px solid var(--fb-border);
+            border-bottom: 1px solid var(--fb-border);
+            padding: 4px 0;
+            margin-bottom: 8px;
         }
 
         .action-btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-blue {
-            background: #0072ff;
-            color: white;
-        }
-
-        .btn-pink {
-            background: #ff758c;
-            color: white;
-        }
-
-        /* Chatting Page layout (Real-time Broadcast & Direct Messaging) */
-        .chat-layout {
-            display: flex;
-            gap: 15px;
-            height: 440px;
-        }
-
-        .chat-sidebar {
-            width: 40%;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            padding: 10px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .chat-contact-item {
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            color: #444;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fafbfc;
-            border: 1px solid #eee;
-        }
-
-        .chat-contact-item:hover, .chat-contact-item.active {
-            background: #f0f4ff;
-            color: #0072ff;
-            border-color: #bce8f1;
-        }
-
-        .chat-main-box {
             flex: 1;
+            background: none;
+            border: none;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--fb-text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--fb-bg);
+        }
+
+        .action-btn.liked {
+            color: var(--fb-blue);
+        }
+
+        /* Messenger Real-Time Split Layout */
+        .messenger-container {
+            display: flex;
+            height: calc(100vh - 100px);
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
-        .chat-header-info {
-            padding: 12px;
-            background: #fafbfc;
-            border-bottom: 1px solid #eee;
-            font-weight: bold;
-            font-size: 14px;
-            color: #0072ff;
+        .messenger-sidebar {
+            width: 320px;
+            border-right: 1px solid var(--fb-border);
+            overflow-y: auto;
+            padding: 10px;
         }
 
-        .chat-messages {
+        .messenger-chat-area {
             flex: 1;
-            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messenger-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--fb-border);
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .messenger-messages {
+            flex: 1;
+            padding: 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: #fafbfc;
+            background: #fdfdfd;
         }
 
-        .chat-bubble {
-            max-width: 75%;
+        .msg-bubble {
+            max-width: 65%;
             padding: 10px 14px;
-            border-radius: 8px;
+            border-radius: 18px;
             font-size: 14px;
             word-break: break-word;
         }
 
-        .chat-bubble.incoming {
-            background: #eee;
+        .msg-bubble.incoming {
+            background: var(--fb-input-bg);
+            color: var(--fb-text);
             align-self: flex-start;
-            color: #333;
         }
 
-        .chat-bubble.outgoing {
-            background: #0072ff;
+        .msg-bubble.outgoing {
+            background: var(--fb-blue);
             color: white;
             align-self: flex-end;
         }
 
-        .chat-input-area {
+        .messenger-input-row {
             display: flex;
-            padding: 10px;
-            border-top: 1px solid #eee;
-            background: white;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .chat-input-area button {
-            margin-left: 8px;
-            padding: 0 16px;
-            background: #0072ff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* Profile Styles */
-        .profile-circle-container {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            border: 3px solid #0072ff;
-            margin: 10px auto 15px auto;
-            overflow: hidden;
-            background: #eaeaea;
-            display: flex;
-            justify-content: center;
+            padding: 12px;
+            border-top: 1px solid var(--fb-border);
+            gap: 8px;
             align-items: center;
+        }
+
+        .messenger-input-row input {
+            flex: 1;
+            background: var(--fb-input-bg);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 16px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .contact-row-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .contact-row-item:hover, .contact-row-item.active {
+            background: var(--fb-bg);
+        }
+
+        /* Profile Grid Layout */
+        .profile-cover {
+            height: 250px;
+            background: linear-gradient(135deg, #1877f2, #42b72a);
+            border-radius: 0 0 8px 8px;
             position: relative;
+        }
+
+        .profile-avatar-container {
+            width: 168px;
+            height: 168px;
+            border-radius: 50%;
+            border: 4px solid white;
+            position: absolute;
+            bottom: -30px;
+            left: 30px;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             cursor: pointer;
         }
 
-        .profile-circle-container img {
+        .profile-avatar-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .profile-stats-row {
-            display: flex;
-            justify-content: space-around;
-            background: #fafbfc;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .stat-box span {
-            display: block;
-        }
-
-        .stat-num {
-            font-size: 18px;
-            font-weight: bold;
-            color: #0072ff;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-            margin-top: 2px;
-        }
-
-        .logout-btn {
-            background: #ff758c;
+        /* Utility buttons */
+        .fb-btn-blue-solid {
+            background: var(--fb-blue);
             color: white;
             border: none;
-            padding: 12px 16px;
+            padding: 8px 16px;
             border-radius: 6px;
-            cursor: pointer;
             font-weight: bold;
-            width: 100%;
-            font-size: 16px;
+            cursor: pointer;
         }
 
-        .danger-btn {
-            background: #e74c3c;
-            color: white;
+        .fb-btn-gray-solid {
+            background: #e4e6eb;
+            color: var(--fb-text);
             border: none;
-            padding: 12px 16px;
+            padding: 8px 16px;
             border-radius: 6px;
-            cursor: pointer;
             font-weight: bold;
-            width: 100%;
-            font-size: 16px;
-            margin-top: 15px;
-        }
-
-        .welcome-footer {
-            text-align: center;
-            font-size: 18px;
-            font-weight: 600;
-            color: #555;
-            padding: 15px 0;
-            background: white;
-            border-top: 1px solid #eee;
-            margin-top: auto;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <div class="container">
-            <div class="app-logo">TexUs</div>
-
-            <div id="login-form" class="form-container active">
-                <h2>Welcome Back</h2>
-                <div class="input-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" placeholder="Enter your email">
-                </div>
-                <div class="input-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="Enter your password">
-                </div>
-                <button class="btn" onclick="handleLogin()">Sign In</button>
-                <p id="login-msg" class="message"></p>
-                <p class="switch-text">Don't have an account? <span onclick="switchAuthForm('signup')">Sign Up</span></p>
+        <div class="auth-wrapper">
+            <div class="auth-left">
+                <div class="auth-logo-text">TexUs</div>
+                <div class="auth-tagline">TexUs helps you connect and share with the people in your life.</div>
             </div>
+            <div class="auth-right">
+                <div id="login-form" class="fb-card form-container active">
+                    <h2></h2>
+                    <input type="email" id="login-email" class="fb-input" placeholder="Email address or phone number">
+                    <input type="password" id="login-password" class="fb-input" placeholder="Password">
+                    <button class="fb-btn-primary" onclick="handleLogin()">Log In</button>
+                    <p id="login-msg" class="message"></p>
+                    <div class="fb-divider"></div>
+                    <button class="fb-btn-success" onclick="switchAuthForm('signup')">Create new account</button>
+                </div>
 
-            <div id="signup-form" class="form-container">
-                <h2>Create Account</h2>
-                <div class="input-group">
-                    <label for="signup-name">Full Name</label>
-                    <input type="text" id="signup-name" placeholder="Enter your name">
+                <div id="signup-form" class="fb-card form-container">
+                    <h2>Sign Up</h2>
+                    <p style="color: var(--fb-text-secondary); margin-bottom: 15px; font-size: 15px;">It's quick and easy.</p>
+                    <input type="text" id="signup-name" class="fb-input" placeholder="Full name">
+                    <input type="email" id="signup-email" class="fb-input" placeholder="Email address">
+                    <input type="password" id="signup-password" class="fb-input" placeholder="New password">
+                    <button class="fb-btn-success" style="width: 100%; font-size: 18px;" onclick="handleSignupRequestCode()">Sign Up</button>
+                    <p id="signup-msg" class="message"></p>
+                    <p style="margin-top: 15px; font-size: 14px;">Already have an account? <span class="switch-link" onclick="switchAuthForm('login')">Log in</span></p>
                 </div>
-                <div class="input-group">
-                    <label for="signup-email">Email Address</label>
-                    <input type="email" id="signup-email" placeholder="Enter your email to receive code">
-                </div>
-                <div class="input-group">
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" placeholder="Create a password">
-                </div>
-                <button class="btn" onclick="handleSignupRequestCode()">Send Code to Email</button>
-                <p id="signup-msg" class="message"></p>
-                <p class="switch-text">Already have an account? <span onclick="switchAuthForm('login')">Sign In</span></p>
-            </div>
 
-            <div id="verify-form" class="form-container">
-                <h2>Verify Your Email</h2>
-                <div class="verification-alert" id="verify-sent-notice">
-                    📧 A verification code has been dispatched straight to your email address to check if your email is true and authentic.
+                <div id="verify-form" class="fb-card form-container">
+                    <h2>Email Verification</h2>
+                    <p id="verify-sent-notice" style="font-size: 14px; color: var(--fb-text-secondary); margin-bottom: 15px; text-align: left;"></p>
+                    <input type="text" id="verify-code-input" class="fb-input" placeholder="Enter 4-digit code" maxlength="4" style="text-align: center; letter-spacing: 4px; font-size: 20px;">
+                    <button class="fb-btn-primary" onclick="handleVerifyAndCompleteSignup()">Confirm Code</button>
+                    <p id="verify-msg" class="message"></p>
                 </div>
-                <div class="input-group">
-                    <label for="verify-code-input">Enter 4-Digit Code Sent to Email</label>
-                    <input type="text" id="verify-code-input" placeholder="e.g. 5921" maxlength="4" style="text-align: center; font-size: 18px; letter-spacing: 3px;">
-                </div>
-                <button class="btn" onclick="handleVerifyAndCompleteSignup()">Confirm & Complete Signup</button>
-                <p id="verify-msg" class="message"></p>
-                <p class="switch-text"><span onclick="switchAuthForm('signup')">Back to Sign Up</span></p>
             </div>
         </div>
     </div>
 
     <div id="app-screen">
-        <header>
-            <h1>TexUs</h1>
-            <span id="user-display" style="font-weight: 600; color: #666;"></span>
+        <header class="fb-header">
+            <div class="fb-header-left">
+                <div class="logo-badge">TexUs</div>
+                <div class="fb-search-bar">
+                    <span style="color: var(--fb-text-secondary);">🔍</span>
+                    <input type="text" id="global-search-input" placeholder="Search TexUs" oninput="handleGlobalSearch()">
+                </div>
+            </div>
+
+            <div class="fb-header-center">
+                <button class="nav-tab-btn active" onclick="switchPage('feed-page', this)" title="Home">🏠</button>
+                <button class="nav-tab-btn" onclick="switchPage('friends-page', this)" title="Friends & Live Directory">👥</button>
+                <button class="nav-tab-btn" onclick="switchPage('chat-page', this)" title="Messenger">💬</button>
+            </div>
+
+            <div class="fb-header-right">
+                <div class="user-mini-profile" onclick="switchPage('profile-page', document.querySelectorAll('.nav-tab-btn')[0])" style="cursor: pointer;">
+                    <div class="avatar-circle" id="header-avatar-mini" style="width: 28px; height: 28px; font-size: 12px;">U</div>
+                    <span id="header-username-display">User</span>
+                </div>
+            </div>
         </header>
 
-        <div class="nav-tabs">
-            <button class="nav-btn active" onclick="switchPage('feed-page', this)">Feed</button>
-            <button class="nav-btn" onclick="switchPage('post-page', this)">Post</button>
-            <button class="nav-btn" onclick="switchPage('friends-page', this)">Friends & Live</button>
-            <button class="nav-btn" onclick="switchPage('chat-page', this)">Real-time Chat</button>
-            <button class="nav-btn" onclick="switchPage('profile-page', this)">Profile</button>
-            <button class="nav-btn" onclick="switchPage('settings-page', this)">Settings</button>
-        </div>
+        <div class="fb-workspace">
+            <div class="fb-sidebar-left">
+                <div class="sidebar-item" onclick="switchPage('profile-page', this)">
+                    <div class="avatar-circle" id="sidebar-avatar-mini" style="width: 32px; height: 32px; font-size: 14px;">U</div>
+                    <span id="sidebar-username-display">Profile</span>
+                </div>
+                <div class="sidebar-item" onclick="switchPage('friends-page', document.querySelectorAll('.nav-tab-btn')[1])">👥 Friends & Live Directory</div>
+                <div class="sidebar-item" onclick="switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2])">💬 Messenger Chats</div>
+                <div class="sidebar-item" onclick="switchPage('settings-page', this)">⚙️ Settings & Privacy</div>
+            </div>
 
-        <div class="main-content">
-            
-            <div id="feed-page" class="app-page active">
-                <div class="newsfeed" id="newsfeed-container">
-                    <div class="card">
-                        <div class="post-author">TexUs Official Promotional Video 🎥</div>
-                        <div class="post-text" style="margin-bottom: 8px;">Welcome to TexUs! All signed up members appear live across the app for instant connectivity and real-time chat.</div>
-                        <div class="welcome-video-container">
-                            <video controls>
-                                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                                Your browser does not support HTML video.
-                            </video>
+            <div class="fb-main-content">
+                
+                <div id="feed-page" class="app-page active">
+                    <div class="post-box">
+                        <div class="post-input-box">
+                            <div class="avatar-circle" id="post-user-avatar">U</div>
+                            <input type="text" id="post-content-input" placeholder="What's on your mind?">
+                        </div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button class="fb-btn-blue-solid" onclick="publishPost()">Post</button>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="post-author">TexUs Official</div>
-                        <div class="post-text">Welcome to the community feed! ✨ Check out the Friends & Live page to view and message every active user instantly.</div>
-                        <div class="post-actions">
-                            <button class="like-btn" onclick="toggleLikePost(this, 'TexUs Official')">Like (<span class="like-count">0</span>)</button>
+
+                    <div class="feed-post-card">
+                        <div class="post-header">
+                            <div class="avatar-circle" style="background: var(--fb-blue); color: white;">T</div>
+                            <div>
+                                <div class="post-author-name">TexUs Official</div>
+                                <div class="post-time">Promotional Video • 🟢 Live</div>
+                            </div>
+                        </div>
+                        <div class="post-body-text">Welcome to TexUs! All registered users appear live across the application instantly.</div>
+                        <video controls style="width: 100%; border-radius: 8px; background: #000; max-height: 300px;">
+                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <div id="newsfeed-stream"></div>
+                </div>
+
+                <div id="friends-page" class="app-page">
+                    <div class="feed-post-card">
+                        <h2 style="font-size: 20px; margin-bottom: 5px;">TexUs Live Directory & Friends</h2>
+                        <p style="font-size: 14px; color: var(--fb-text-secondary); margin-bottom: 15px;">Every user who has signed up is visible live here instantly. Follow them or jump into real-time messenger chats!</p>
+                        
+                        <div id="public-live-users-list"></div>
+                    </div>
+                </div>
+
+                <div id="chat-page" class="app-page">
+                    <div class="messenger-container">
+                        <div class="messenger-sidebar">
+                            <div style="font-weight: bold; font-size: 18px; margin-bottom: 12px;">Chats</div>
+                            <div id="messenger-contact-list"></div>
+                        </div>
+                        <div class="messenger-chat-area">
+                            <div class="messenger-header" id="messenger-active-title">Select a contact to start messaging</div>
+                            <div class="messenger-messages" id="messenger-messages-box">
+                                <div style="color: var(--fb-text-secondary); text-align: center; margin: auto; font-size: 14px;">Select someone from the left sidebar to start real-time messaging.</div>
+                            </div>
+                            <div class="messenger-input-row" id="messenger-input-container" style="display: none;">
+                                <input type="text" id="messenger-msg-input" placeholder="Aa" onkeypress="handleChatEnter(event)">
+                                <button class="fb-btn-blue-solid" onclick="sendMessengerMessage()">Send</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="post-page" class="app-page">
-                <div class="card">
-                    <h2 style="font-size: 18px; margin-bottom: 12px;">Create a New Post</h2>
-                    <textarea id="post-content" class="post-input-area" placeholder="What's on your mind?"></textarea>
-                    <button class="btn" onclick="submitPost()">Publish Post</button>
-                </div>
-            </div>
+                <div id="profile-page" class="app-page">
+                    <div class="feed-post-card" style="padding: 0; overflow: hidden;">
+                        <div class="profile-cover">
+                            <div class="profile-avatar-container" onclick="document.getElementById('profile-pic-uploader').click()">
+                                <img id="profile-avatar-img" src="" alt="Avatar" style="display:none;">
+                                <div id="profile-avatar-fallback" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 48px; color: var(--fb-blue); font-weight: bold;">U</div>
+                            </div>
+                        </div>
+                        <input type="file" id="profile-pic-uploader" accept="image/*" style="display:none;" onchange="uploadProfilePicture(event)">
+                        
+                        <div style="padding: 40px 20px 20px 20px;">
+                            <h2 id="profile-display-name" style="font-size: 24px; margin-bottom: 5px;">User Name</h2>
+                            <p id="profile-display-email" style="color: var(--fb-text-secondary); font-size: 14px; margin-bottom: 15px;"></p>
+                            
+                            <div style="display: flex; gap: 20px; font-weight: 600; color: var(--fb-text-secondary); font-size: 14px; border-bottom: 1px solid var(--fb-border); padding-bottom: 15px; margin-bottom: 15px;">
+                                <div>Followers: <span id="stat-followers" style="color: var(--fb-text);">0</span></div>
+                                <div>Friends: <span id="stat-friends" style="color: var(--fb-text);">0</span></div>
+                                <div>Likes: <span id="stat-likes" style="color: var(--fb-text);">0</span></div>
+                            </div>
 
-            <div id="friends-page" class="app-page">
-                <div class="card">
-                    <div class="section-title">🟢 All Registered Users Live on TexUs</div>
-                    <div style="font-size: 13px; color: #666; margin-bottom: 15px;">Every person who has signed up is publicly visible here. Click "Chat Instantly" to jump straight into a real-time conversation!</div>
-                    
-                    <div class="search-box-container">
-                        <input type="text" id="user-search-input" placeholder="Search live users by name or email..." oninput="filterPublicUsers()">
-                        <button onclick="filterPublicUsers()">Search</button>
-                    </div>
-                    <div id="public-users-container">
-                        </div>
-                </div>
-            </div>
-
-            <div id="chat-page" class="app-page">
-                <div class="chat-layout">
-                    <div class="chat-sidebar" id="chat-friends-list">
-                        <div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 5px;">ALL LIVE USERS (CLICK TO CHAT)</div>
-                        </div>
-                    <div class="chat-main-box">
-                        <div class="chat-header-info" id="active-chat-title">Select a user to start real-time chatting</div>
-                        <div class="chat-messages" id="chat-messages">
-                            <div style="color: #888; font-size: 14px; text-align: center; margin-top: auto; margin-bottom: auto;">Pick any registered user from the left list to send real-time messages!</div>
-                        </div>
-                        <div class="chat-input-area" id="chat-input-box" style="display: none;">
-                            <input type="text" id="chat-input" placeholder="Type a real-time message..." onkeypress="handleChatKeyPress(event)">
-                            <button onclick="sendRealtimeMessage()">Send</button>
+                            <div style="margin-bottom: 15px;">
+                                <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px;">Bio / Status</label>
+                                <textarea id="profile-bio-textarea" class="fb-input" style="height: 70px; resize: none;"></textarea>
+                                <button class="fb-btn-blue-solid" onclick="saveProfileBio()">Save Bio</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="profile-page" class="app-page">
-                <div class="card">
-                    <h2 id="profile-name-title" style="font-size: 18px; margin-bottom: 5px; text-align: center;">User Profile</h2>
-                    
-                    <div class="profile-circle-container" onclick="document.getElementById('profile-img-input').click()">
-                        <img id="profile-pic-display" src="" alt="Avatar" style="display:none;">
-                        <span id="profile-placeholder-text" style="font-size: 11px; color: #888; text-align: center; padding: 5px;">Upload Pic</span>
-                    </div>
-                    <input type="file" id="profile-img-input" accept="image/*" style="display:none;" onchange="handleProfilePictureUpload(event)">
-
-                    <div class="profile-stats-row">
-                        <div class="stat-box">
-                            <span class="stat-num" id="stat-followers">0</span>
-                            <span class="stat-label">Followers</span>
+                <div id="settings-page" class="app-page">
+                    <div class="feed-post-card">
+                        <h2 style="font-size: 20px; margin-bottom: 15px;">Settings & Privacy</h2>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--fb-border);">
+                            <div>
+                                <div style="font-weight: 600;">Private Mode</div>
+                                <div style="font-size: 13px; color: var(--fb-text-secondary);">Hide profile visibility from public live directory</div>
+                            </div>
+                            <input type="checkbox" id="privacy-toggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="togglePrivacyMode(this)">
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-num" id="stat-friends">0</span>
-                            <span class="stat-label">Friends</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="stat-num" id="stat-likes">0</span>
-                            <span class="stat-label">Likes</span>
+                        <div style="margin-top: 20px;">
+                            <button class="fb-btn-gray-solid" onclick="handleLogout()" style="width: 100%; margin-bottom: 10px;">Log Out</button>
+                            <button class="fb-btn-primary" style="background-color: #fa383e;" onclick="deleteAccount()">Delete Account</button>
                         </div>
                     </div>
-
-                    <div class="input-group" style="margin-top: 15px;">
-                        <label for="profile-bio-input">Bio / Status</label>
-                        <textarea id="profile-bio-input" class="post-input-area" style="height: 70px;" placeholder="Write a short bio about yourself...">Member of the TexUs community exploring posts and connecting with friends!</textarea>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="country-code-select">Select Country & Mobile Number</label>
-                        <select id="country-code-select">
-                            <option value="">-- Choose Country --</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="profile-mobile-input">Mobile Number</label>
-                        <input type="text" id="profile-mobile-input" placeholder="e.g. 555-0199">
-                    </div>
-
-                    <button class="btn" onclick="saveProfileData()">Save Profile Details</button>
                 </div>
+
             </div>
 
-            <div id="settings-page" class="app-page">
-                <div class="card">
-                    <h2 style="font-size: 18px; margin-bottom: 20px;">Settings</h2>
-                    
-                    <div class="input-group" style="display: flex; align-items: center; justify-content: space-between; background: #fafbfc; padding: 12px; border-radius: 6px; border: 1px solid #ddd;">
-                        <div>
-                            <span style="font-weight: 600; font-size: 14px; display: block;">Private Mode</span>
-                            <span style="font-size: 12px; color: #666;">Hide account visibility from public directory</span>
-                        </div>
-                        <input type="checkbox" id="privacy-mode-toggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="togglePrivacyMode(this)">
-                    </div>
-
-                    <button class="btn" onclick="switchPage('profile-page', document.querySelectorAll('.nav-btn')[4])" style="background: #2ecc71; margin-bottom: 15px;">Edit Profile Information</button>
-                    <button class="logout-btn" onclick="handleLogout()" style="margin-bottom: 15px;">Log Out</button>
-                    <button class="danger-btn" onclick="deleteAccount()">Delete / Deactivate Account</button>
-                </div>
+            <div class="fb-sidebar-right">
+                <div style="font-weight: bold; color: var(--fb-text-secondary); font-size: 15px; margin-bottom: 10px;">Live Contacts</div>
+                <div id="right-sidebar-contacts"></div>
             </div>
-
-        </div>
-
-        <div class="welcome-footer">
-            Welcome to TexUs
         </div>
     </div>
 
@@ -813,77 +790,36 @@
         let pendingSignupData = null;
         let currentVerificationCode = null;
 
-        const countriesList = [
-            { name: "Afghanistan", code: "+93" }, { name: "Albania", code: "+355" }, { name: "Algeria", code: "+213" },
-            { name: "Andorra", code: "+376" }, { name: "Angola", code: "+244" }, { name: "Argentina", code: "+54" },
-            { name: "Australia", code: "+61" }, { name: "Austria", code: "+43" }, { name: "Bahamas", code: "+1-242" },
-            { name: "Bahrain", code: "+973" }, { name: "Bangladesh", code: "+880" }, { name: "Belgium", code: "+32" },
-            { name: "Brazil", code: "+55" }, { name: "Canada", code: "+1" }, { name: "China", code: "+86" },
-            { name: "Colombia", code: "+57" }, { name: "Denmark", code: "+45" }, { name: "Egypt", code: "+20" },
-            { name: "France", code: "+33" }, { name: "Germany", code: "+49" }, { name: "Greece", code: "+30" },
-            { name: "India", code: "+91" }, { name: "Indonesia", code: "+62" }, { name: "Iran", code: "+98" },
-            { name: "Iraq", code: "+964" }, { name: "Ireland", code: "+353" }, { name: "Israel", code: "+972" },
-            { name: "Italy", code: "+39" }, { name: "Japan", code: "+81" }, { name: "Kenya", code: "+254" },
-            { name: "Malaysia", code: "+60" }, { name: "Mexico", code: "+52" }, { name: "Netherlands", code: "+31" },
-            { name: "New Zealand", code: "+64" }, { name: "Nigeria", code: "+234" }, { name: "Norway", code: "+47" },
-            { name: "Pakistan", code: "+92" }, { name: "Philippines", code: "+63" }, { name: "Poland", code: "+48" },
-            { name: "Portugal", code: "+351" }, { name: "Romania", code: "+40" }, { name: "Russia", code: "+7" },
-            { name: "Saudi Arabia", code: "+966" }, { name: "Singapore", code: "+65" }, { name: "South Africa", code: "+27" },
-            { name: "South Korea", code: "+82" }, { name: "Spain", code: "+34" }, { name: "Sweden", code: "+46" },
-            { name: "Switzerland", code: "+41" }, { name: "Thailand", code: "+66" }, { name: "Turkey", code: "+90" },
-            { name: "Ukraine", code: "+380" }, { name: "United Arab Emirates", code: "+971" }, { name: "United Kingdom", code: "+44" },
-            { name: "United States", code: "+1" }, { name: "Vietnam", code: "+84" }, { name: "Zimbabwe", code: "+263" }
-        ];
-
         window.onload = function() {
-            populateCountriesDropdown();
-            const loggedInUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            if (loggedInUser) {
-                showAppScreen(loggedInUser);
+            const loggedIn = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            if (loggedIn) {
+                initApp(loggedIn);
             }
-            
-            // Real-time synchronization check interval across tabs/users
+
+            // Real-time synchronization loop across tabs/users
             setInterval(() => {
-                const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-                if (currentUser) {
-                    loadPublicUsers(currentUser, document.getElementById('user-search-input').value.trim());
-                    loadChatSidebar(currentUser);
-                    if (currentChatUserEmail) {
-                        renderChatMessages();
-                    }
+                const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+                if (user) {
+                    refreshLiveElements(user);
                 }
             }, 1000);
         };
 
-        function populateCountriesDropdown() {
-            const select = document.getElementById('country-code-select');
-            countriesList.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.code;
-                opt.textContent = `${c.name} (${c.code})`;
-                select.appendChild(opt);
-            });
-        }
-
         function switchAuthForm(formType) {
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            const verifyForm = document.getElementById('verify-form');
-            
-            loginForm.classList.remove('active');
-            signupForm.classList.remove('active');
-            verifyForm.classList.remove('active');
-            
+            document.getElementById('login-form').classList.remove('active');
+            document.getElementById('signup-form').classList.remove('active');
+            document.getElementById('verify-form').classList.remove('active');
+
             document.getElementById('login-msg').innerText = '';
             document.getElementById('signup-msg').innerText = '';
             document.getElementById('verify-msg').innerText = '';
 
             if (formType === 'signup') {
-                signupForm.classList.add('active');
+                document.getElementById('signup-form').classList.add('active');
             } else if (formType === 'verify') {
-                verifyForm.classList.add('active');
+                document.getElementById('verify-form').classList.add('active');
             } else {
-                loginForm.classList.add('active');
+                document.getElementById('login-form').classList.add('active');
             }
         }
 
@@ -895,54 +831,37 @@
 
             if (!name || !email || !password) {
                 msg.className = 'message error';
-                msg.innerText = 'Please fill in all fields.';
+                msg.innerText = 'Please fill out all fields.';
                 return;
             }
 
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
             if (users.some(u => u.email === email)) {
                 msg.className = 'message error';
-                msg.innerText = 'Email is already registered.';
+                msg.innerText = 'Email already exists.';
                 return;
             }
 
             currentVerificationCode = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            pendingSignupData = { 
-                name, 
-                email, 
-                password, 
-                friends: [], 
-                followersCount: 0,
-                friendsCount: 0,
-                likesCount: 0,
-                profilePic: '', 
-                bio: 'Member of the TexUs community exploring posts and connecting with friends!',
-                countryCode: '',
-                mobileNumber: '',
-                isPrivate: false 
+            pendingSignupData = {
+                name, email, password,
+                friends: [], followersCount: 0, friendsCount: 0, likesCount: 0,
+                profilePic: '', bio: 'Using TexUs to connect!', isPrivate: false
             };
 
-            document.getElementById('verify-sent-notice').innerHTML = `📧 An email message containing your verification code has been sent straight to <b>${email}</b> to verify if your email address is true or a scam.`;
-            alert(`[TexUs Email Delivery System ✉️]\n\nEmail sent to: ${email}\nYour email verification code is: ${currentVerificationCode}`);
-            
+            document.getElementById('verify-sent-notice').innerHTML = `A verification code has been sent to <b>${email}</b>.`;
+            alert(`[TexUs Email Dispatch ✉️]\nCode for ${email}: ${currentVerificationCode}`);
             document.getElementById('verify-code-input').value = '';
             switchAuthForm('verify');
         }
 
         function handleVerifyAndCompleteSignup() {
-            const enteredCode = document.getElementById('verify-code-input').value.trim();
+            const code = document.getElementById('verify-code-input').value.trim();
             const msg = document.getElementById('verify-msg');
 
-            if (!enteredCode) {
+            if (code !== currentVerificationCode) {
                 msg.className = 'message error';
-                msg.innerText = 'Please enter the verification code.';
-                return;
-            }
-
-            if (enteredCode !== currentVerificationCode) {
-                msg.className = 'message error';
-                msg.innerText = 'Incorrect code. Please check the code sent to your email.';
+                msg.innerText = 'Incorrect verification code.';
                 return;
             }
 
@@ -951,15 +870,13 @@
             localStorage.setItem('texus_users', JSON.stringify(users));
 
             msg.className = 'message success';
-            msg.innerText = 'Email verified successfully! True user confirmed.';
-            
+            msg.innerText = 'Account verified successfully!';
             setTimeout(() => {
                 pendingSignupData = null;
-                currentVerificationCode = null;
                 switchAuthForm('login');
                 document.getElementById('login-msg').className = 'message success';
-                document.getElementById('login-msg').innerText = 'Email verified! You can now sign in.';
-            }, 1500);
+                document.getElementById('login-msg').innerText = 'Account ready! Please log in.';
+            }, 1200);
         }
 
         function handleLogin() {
@@ -967,382 +884,311 @@
             const password = document.getElementById('login-password').value.trim();
             const msg = document.getElementById('login-msg');
 
-            if (!email || !password) {
-                msg.className = 'message error';
-                msg.innerText = 'Please fill in all fields.';
-                return;
-            }
-
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            const validUser = users.find(u => u.email === email && u.password === password);
+            const user = users.find(u => u.email === email && u.password === password);
 
-            if (validUser) {
-                sessionStorage.setItem('texus_logged_in', JSON.stringify(validUser));
-                showAppScreen(validUser);
+            if (user) {
+                sessionStorage.setItem('texus_logged_in', JSON.stringify(user));
+                initApp(user);
             } else {
                 msg.className = 'message error';
-                msg.innerText = 'Invalid email or password.';
+                msg.innerText = 'Incorrect email or password.';
             }
         }
 
-        function showAppScreen(user) {
+        function initApp(user) {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'flex';
-            document.getElementById('user-display').innerText = user.name;
-            document.getElementById('profile-name-title').innerText = `${user.name}'s Profile`;
-            
+
+            document.getElementById('header-username-display').innerText = user.name;
+            document.getElementById('sidebar-username-display').innerText = user.name;
+            document.getElementById('profile-display-name').innerText = user.name;
+            document.getElementById('profile-display-email').innerText = user.email;
+            document.getElementById('profile-bio-textarea').value = user.bio || '';
+            document.getElementById('privacy-toggle').checked = !!user.isPrivate;
+
+            updateStatNumbers(user);
+            setAvatars(user);
+            refreshLiveElements(user);
+        }
+
+        function updateStatNumbers(user) {
             document.getElementById('stat-followers').innerText = user.followersCount || 0;
             document.getElementById('stat-friends').innerText = user.friendsCount || 0;
             document.getElementById('stat-likes').innerText = user.likesCount || 0;
+        }
 
-            document.getElementById('profile-bio-input').value = user.bio || '';
-            document.getElementById('profile-mobile-input').value = user.mobileNumber || '';
-            document.getElementById('country-code-select').value = user.countryCode || '';
-            
+        function setAvatars(user) {
+            const initial = user.name.charAt(0).toUpperCase();
+            ['header-avatar-mini', 'sidebar-avatar-mini', 'post-user-avatar'].forEach(id => {
+                const el = document.getElementById(id);
+                if (user.profilePic) {
+                    el.innerHTML = `<img src="${user.profilePic}"><div class="online-dot"></div>`;
+                } else {
+                    el.innerHTML = `${initial}<div class="online-dot"></div>`;
+                }
+            });
+
+            const profileImg = document.getElementById('profile-avatar-img');
+            const profileFallback = document.getElementById('profile-avatar-fallback');
             if (user.profilePic) {
-                const imgDisplay = document.getElementById('profile-pic-display');
-                imgDisplay.src = user.profilePic;
-                imgDisplay.style.display = 'block';
-                document.getElementById('profile-placeholder-text').style.display = 'none';
+                profileImg.src = user.profilePic;
+                profileImg.style.display = 'block';
+                profileFallback.style.display = 'none';
+            } else {
+                profileImg.style.display = 'none';
+                profileFallback.style.display = 'flex';
+                profileFallback.innerText = initial;
             }
-
-            document.getElementById('privacy-mode-toggle').checked = !!user.isPrivate;
-            
-            loadPublicUsers(user);
-            loadChatSidebar(user);
         }
 
         function handleLogout() {
             sessionStorage.removeItem('texus_logged_in');
             document.getElementById('app-screen').style.display = 'none';
             document.getElementById('auth-screen').style.display = 'flex';
-            document.getElementById('login-email').value = '';
-            document.getElementById('login-password').value = '';
         }
 
         function deleteAccount() {
-            if (confirm('Are you sure you want to permanently delete/deactivate your account? This action cannot be undone.')) {
-                let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            if (confirm('Permanently delete account?')) {
+                const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
                 let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-                
-                users = users.filter(u => u.email !== currentUser.email);
+                users = users.filter(u => u.email !== user.email);
                 localStorage.setItem('texus_users', JSON.stringify(users));
-                
-                alert('Account deleted successfully.');
                 handleLogout();
             }
         }
 
-        function handleProfilePictureUpload(event) {
+        function uploadProfilePicture(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64Image = e.target.result;
-                let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-                currentUser.profilePic = base64Image;
-                
-                sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
-                updatePersistentUserRecord(currentUser);
-
-                const imgDisplay = document.getElementById('profile-pic-display');
-                imgDisplay.src = base64Image;
-                imgDisplay.style.display = 'block';
-                document.getElementById('profile-placeholder-text').style.display = 'none';
-                alert('Profile picture uploaded successfully!');
+                let user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+                user.profilePic = e.target.result;
+                sessionStorage.setItem('texus_logged_in', JSON.stringify(user));
+                updateUserRecord(user);
+                setAvatars(user);
+                alert('Profile picture updated!');
             };
             reader.readAsDataURL(file);
         }
 
-        function saveProfileData() {
-            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            currentUser.bio = document.getElementById('profile-bio-input').value.trim();
-            currentUser.countryCode = document.getElementById('country-code-select').value;
-            currentUser.mobileNumber = document.getElementById('profile-mobile-input').value.trim();
-
-            sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
-            updatePersistentUserRecord(currentUser);
-            alert('Profile details updated successfully!');
+        function saveProfileBio() {
+            let user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            user.bio = document.getElementById('profile-bio-textarea').value.trim();
+            sessionStorage.setItem('texus_logged_in', JSON.stringify(user));
+            updateUserRecord(user);
+            alert('Bio saved!');
         }
 
         function togglePrivacyMode(checkbox) {
-            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            currentUser.isPrivate = checkbox.checked;
-
-            sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
-            updatePersistentUserRecord(currentUser);
-            
-            alert(currentUser.isPrivate ? 'Account is now Private.' : 'Account is now Public.');
-            loadPublicUsers(currentUser);
+            let user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            user.isPrivate = checkbox.checked;
+            sessionStorage.setItem('texus_logged_in', JSON.stringify(user));
+            updateUserRecord(user);
         }
 
-        // Display all signed-up users live on the Friends page
-        function loadPublicUsers(currentUser, searchQuery = '') {
-            const container = document.getElementById('public-users-container');
-            container.innerHTML = '';
-
+        function updateUserRecord(updatedUser) {
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            
-            const filteredUsers = users.filter(u => {
-                if (u.email === currentUser.email) return false;
-                if (u.isPrivate) return false;
-                
-                if (searchQuery) {
-                    const query = searchQuery.toLowerCase();
-                    return u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query);
-                }
-                return true;
-            });
-
-            if (filteredUsers.length === 0) {
-                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No other live signed-up members found.</div>';
-                return;
-            }
-
-            filteredUsers.forEach(u => {
-                const isAlreadyFriend = currentUser.friends && currentUser.friends.includes(u.name);
-                
-                let avatarContent = u.name.charAt(0).toUpperCase();
-                if (u.profilePic) {
-                    avatarContent = `<img src="${u.profilePic}" alt="Avatar">`;
-                }
-
-                const row = document.createElement('div');
-                row.className = 'user-row';
-                row.innerHTML = `
-                    <div class="user-info-wrapper">
-                        <div class="live-avatar-container">
-                            ${avatarContent}
-                            <div class="live-status-dot" title="Live & Active"></div>
-                        </div>
-                        <div>
-                            <span style="font-weight: 600; display: block; color: #222;">${u.name}</span>
-                            <span style="font-size: 12px; color: #2ecc71; font-weight: 600;">● Live on TexUs</span>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 6px;">
-                        <button class="action-btn ${isAlreadyFriend ? 'btn-pink' : 'btn-blue'}" onclick="toggleFriend(this, '${u.name}')">
-                            ${isAlreadyFriend ? 'Following' : 'Follow'}
-                        </button>
-                        <button class="action-btn btn-blue" style="background: #2ecc71;" onclick="startChatDirectly('${u.email}', '${u.name}')">
-                            Chat Instantly
-                        </button>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function filterPublicUsers() {
-            const query = document.getElementById('user-search-input').value.trim();
-            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            if (currentUser) {
-                loadPublicUsers(currentUser, query);
-            }
-        }
-
-        function toggleFriend(btn, friendName) {
-            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            if (!currentUser.friends) currentUser.friends = [];
-
-            if (btn.innerText === 'Follow') {
-                btn.innerText = 'Following';
-                btn.className = 'action-btn btn-pink';
-                if (!currentUser.friends.includes(friendName)) {
-                    currentUser.friends.push(friendName);
-                    currentUser.followersCount = (currentUser.followersCount || 0) + 1;
-                    currentUser.friendsCount = (currentUser.friendsCount || 0) + 1;
-                }
-            } else {
-                btn.innerText = 'Follow';
-                btn.className = 'action-btn btn-blue';
-                currentUser.friends = currentUser.friends.filter(f => f !== friendName);
-                currentUser.followersCount = Math.max(0, (currentUser.followersCount || 1) - 1);
-                currentUser.friendsCount = Math.max(0, (currentUser.friendsCount || 1) - 1);
-            }
-
-            sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
-            updatePersistentUserRecord(currentUser);
-            
-            document.getElementById('stat-followers').innerText = currentUser.followersCount;
-            document.getElementById('stat-friends').innerText = currentUser.friendsCount;
-        }
-
-        function updatePersistentUserRecord(updatedUser) {
-            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            const index = users.findIndex(u => u.email === updatedUser.email);
-            if (index !== -1) {
-                users[index] = updatedUser;
+            const idx = users.findIndex(u => u.email === updatedUser.email);
+            if (idx !== -1) {
+                users[idx] = updatedUser;
                 localStorage.setItem('texus_users', JSON.stringify(users));
             }
         }
 
-        // Expose ALL signed-up public users in the chat sidebar list
-        function loadChatSidebar(currentUser) {
-            const sidebar = document.getElementById('chat-friends-list');
-            sidebar.innerHTML = '<div style="font-size: 11px; font-weight: bold; color: #888; margin-bottom: 5px;">ALL LIVE USERS (CLICK TO CHAT)</div>';
-
+        function refreshLiveElements(currentUser) {
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
             const publicUsers = users.filter(u => u.email !== currentUser.email && !u.isPrivate);
 
+            // Render Live Directory (Friends Page)
+            const listContainer = document.getElementById('public-live-users-list');
+            listContainer.innerHTML = '';
             if (publicUsers.length === 0) {
-                sidebar.innerHTML += '<div style="font-size: 13px; color: #999; padding: 5px;">No other users available to chat yet.</div>';
-                return;
+                listContainer.innerHTML = '<p style="color: var(--fb-text-secondary); font-size: 14px;">No other users active yet.</p>';
             }
+            publicUsers.forEach(u => {
+                const isFriend = currentUser.friends && currentUser.friends.includes(u.name);
+                const row = document.createElement('div');
+                row.className = 'contact-row-item';
+                row.innerHTML = `
+                    <div class="avatar-circle">${u.profilePic ? `<img src="${u.profilePic}">` : u.name.charAt(0)}<div class="online-dot"></div></div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">${u.name}</div>
+                        <div style="font-size: 12px; color: var(--fb-green); font-weight: bold;">● Active Live</div>
+                    </div>
+                    <button class="fb-btn-gray-solid" onclick="toggleFollowUser('${u.name}')">${isFriend ? 'Following' : 'Follow'}</button>
+                    <button class="fb-btn-blue-solid" onclick="openChatWith('${u.email}', '${u.name}')">Message</button>
+                `;
+                listContainer.appendChild(row);
+            });
 
+            // Render Right Sidebar Contacts
+            const rightBar = document.getElementById('right-sidebar-contacts');
+            rightBar.innerHTML = '';
             publicUsers.forEach(u => {
                 const item = document.createElement('div');
-                item.className = 'chat-contact-item';
-                if (currentChatUserEmail === u.email) {
-                    item.classList.add('active');
-                }
+                item.className = 'contact-row-item';
+                item.onclick = () => openChatWith(u.email, u.name);
                 item.innerHTML = `
-                    <span>🟢 ${u.name}</span>
-                    <span style="font-size: 11px; color: #0072ff; font-weight: bold;">Chat</span>
+                    <div class="avatar-circle">${u.profilePic ? `<img src="${u.profilePic}">` : u.name.charAt(0)}<div class="online-dot"></div></div>
+                    <div style="font-weight: 600; font-size: 14px;">${u.name}</div>
                 `;
-                item.onclick = () => selectChatUser(u.email, u.name, item);
-                sidebar.appendChild(item);
+                rightBar.appendChild(item);
             });
+
+            // Render Messenger Sidebar
+            const messengerSidebar = document.getElementById('messenger-contact-list');
+            messengerSidebar.innerHTML = '';
+            publicUsers.forEach(u => {
+                const item = document.createElement('div');
+                item.className = 'contact-row-item' + (currentChatUserEmail === u.email ? ' active' : '');
+                item.onclick = () => openChatWith(u.email, u.name);
+                item.innerHTML = `
+                    <div class="avatar-circle">${u.profilePic ? `<img src="${u.profilePic}">` : u.name.charAt(0)}<div class="online-dot"></div></div>
+                    <div style="font-weight: 600; font-size: 14px;">${u.name}</div>
+                `;
+                messengerSidebar.appendChild(item);
+            });
+
+            if (currentChatUserEmail) {
+                renderMessages(currentUser.email, currentChatUserEmail);
+            }
         }
 
-        function startChatDirectly(email, name) {
+        function toggleFollowUser(name) {
+            let user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            if (!user.friends) user.friends = [];
+            if (user.friends.includes(name)) {
+                user.friends = user.friends.filter(f => f !== name);
+                user.followersCount = Math.max(0, user.followersCount - 1);
+                user.friendsCount = Math.max(0, user.friendsCount - 1);
+            } else {
+                user.friends.push(name);
+                user.followersCount = (user.followersCount || 0) + 1;
+                user.friendsCount = (user.friendsCount || 0) + 1;
+            }
+            sessionStorage.setItem('texus_logged_in', JSON.stringify(user));
+            updateUserRecord(user);
+            updateStatNumbers(user);
+            refreshLiveElements(user);
+        }
+
+        function openChatWith(email, name) {
             currentChatUserEmail = email;
-            switchPage('chat-page', document.querySelectorAll('.nav-btn')[3]);
+            switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2]);
+            document.getElementById('messenger-active-title').innerText = `Messenger Chat with ${name} 🟢`;
+            document.getElementById('messenger-input-container').style.display = 'flex';
             
-            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            loadChatSidebar(currentUser);
-            
-            document.getElementById('active-chat-title').innerText = `Real-time Chat with ${name} 🟢`;
-            document.getElementById('chat-input-box').style.display = 'flex';
-            renderChatMessages();
+            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            refreshLiveElements(user);
         }
 
-        function selectChatUser(email, name, element) {
-            document.querySelectorAll('.chat-contact-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-
-            currentChatUserEmail = email;
-            document.getElementById('active-chat-title').innerText = `Real-time Chat with ${name} 🟢`;
-            document.getElementById('chat-input-box').style.display = 'flex';
-            renderChatMessages();
+        function getChatKey(e1, e2) {
+            return 'fb_chat_' + [e1, e2].sort().join('_');
         }
 
-        function getChatKey(email1, email2) {
-            return 'chat_' + [email1, email2].sort().join('_');
-        }
+        function renderMessages(myEmail, peerEmail) {
+            const key = getChatKey(myEmail, peerEmail);
+            const messages = JSON.parse(localStorage.getItem(key)) || [];
+            const box = document.getElementById('messenger-messages-box');
+            box.innerHTML = '';
 
-        function renderChatMessages() {
-            if (!currentChatUserEmail) return;
-            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            const chatKey = getChatKey(currentUser.email, currentChatUserEmail);
-            
-            let messages = JSON.parse(localStorage.getItem(chatKey)) || [];
-            const chatMessages = document.getElementById('chat-messages');
-            
-            chatMessages.innerHTML = '';
             if (messages.length === 0) {
-                chatMessages.innerHTML = '<div style="color: #888; font-size: 13px; text-align: center; margin-top: auto; margin-bottom: auto;">No messages yet. Send a real-time message below!</div>';
+                box.innerHTML = '<div style="color: var(--fb-text-secondary); text-align: center; margin: auto; font-size: 14px;">Say hello in real-time!</div>';
                 return;
             }
 
-            messages.forEach(msg => {
+            messages.forEach(m => {
                 const bubble = document.createElement('div');
-                bubble.className = 'chat-bubble ' + (msg.sender === currentUser.email ? 'outgoing' : 'incoming');
-                bubble.innerText = msg.text;
-                chatMessages.appendChild(bubble);
+                bubble.className = 'msg-bubble ' + (m.sender === myEmail ? 'outgoing' : 'incoming');
+                bubble.innerText = m.text;
+                box.appendChild(bubble);
             });
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            box.scrollTop = box.scrollHeight;
         }
 
-        function sendRealtimeMessage() {
-            if (!currentChatUserEmail) return alert('Please select a user from the chat list first.');
-            const input = document.getElementById('chat-input');
+        function sendMessengerMessage() {
+            if (!currentChatUserEmail) return;
+            const input = document.getElementById('messenger-msg-input');
             const text = input.value.trim();
             if (!text) return;
 
-            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            const chatKey = getChatKey(currentUser.email, currentChatUserEmail);
+            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            const key = getChatKey(user.email, currentChatUserEmail);
 
-            let messages = JSON.parse(localStorage.getItem(chatKey)) || [];
-            messages.push({ sender: currentUser.email, text: text, timestamp: Date.now() });
-            localStorage.setItem(chatKey, JSON.stringify(messages));
+            let messages = JSON.parse(localStorage.getItem(key)) || [];
+            messages.push({ sender: user.email, text, time: Date.now() });
+            localStorage.setItem(key, JSON.stringify(messages));
 
             input.value = '';
-            renderChatMessages();
+            renderMessages(user.email, currentChatUserEmail);
         }
 
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendRealtimeMessage();
-            }
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendMessengerMessage();
+        }
+
+        function publishPost() {
+            const content = document.getElementById('post-content-input').value.trim();
+            if (!content) return;
+
+            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            let posts = JSON.parse(localStorage.getItem('texus_posts')) || [];
+            posts.unshift({ author: user.name, pic: user.profilePic, text: content, likes: 0 });
+            localStorage.setItem('texus_posts', JSON.stringify(posts));
+
+            document.getElementById('post-content-input').value = '';
+            renderNewsfeed();
+        }
+
+        function renderNewsfeed() {
+            const stream = document.getElementById('newsfeed-stream');
+            let posts = JSON.parse(localStorage.getItem('texus_posts')) || [];
+            
+            // Clear stream except promo video
+            stream.innerHTML = '';
+            posts.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = 'feed-post-card';
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div class="avatar-circle">${p.pic ? `<img src="${p.pic}">` : p.author.charAt(0)}</div>
+                        <div>
+                            <div class="post-author-name">${p.author}</div>
+                            <div class="post-time">Just now</div>
+                        </div>
+                    </div>
+                    <div class="post-body-text">${p.text}</div>
+                    <div class="post-action-bar">
+                        <button class="action-btn" onclick="likePost(${idx})">👍 Like (${p.likes})</button>
+                    </div>
+                `;
+                stream.appendChild(card);
+            });
+        }
+
+        function likePost(idx) {
+            let posts = JSON.parse(localStorage.getItem('texus_posts')) || [];
+            posts[idx].likes = (posts[idx].likes || 0) + 1;
+            localStorage.setItem('texus_posts', JSON.stringify(posts));
+            renderNewsfeed();
         }
 
         function switchPage(pageId, btnElement) {
-            document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
 
             document.getElementById(pageId).classList.add('active');
-            btnElement.classList.add('active');
-
-            if (pageId === 'friends-page') {
-                const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-                document.getElementById('user-search-input').value = '';
-                loadPublicUsers(currentUser);
-            } else if (pageId === 'chat-page') {
-                const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-                loadChatSidebar(currentUser);
+            if (btnElement && btnElement.classList.contains('nav-tab-btn')) {
+                btnElement.classList.add('active');
             }
+
+            if (pageId === 'feed-page') renderNewsfeed();
         }
 
-        function submitPost() {
-            const content = document.getElementById('post-content').value.trim();
-            if (!content) return alert('Post cannot be empty.');
-
-            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            const feed = document.getElementById('newsfeed-container');
-
-            const postCard = document.createElement('div');
-            postCard.className = 'card';
-            postCard.innerHTML = `
-                <div class="post-author">${user ? user.name : 'User'}</div>
-                <div class="post-text">${content}</div>
-                <div class="post-actions">
-                    <button class="like-btn" onclick="toggleLikePost(this, '${user ? user.name : 'User'}')">Like (<span class="like-count">0</span>)</button>
-                </div>
-            `;
-            feed.insertBefore(postCard, feed.children[1]);
-
-            document.getElementById('post-content').value = '';
-            switchPage('feed-page', document.querySelectorAll('.nav-btn')[0]);
-        }
-
-        function toggleLikePost(btnElement, authorName) {
-            const countSpan = btnElement.querySelector('.like-count');
-            let currentLikes = parseInt(countSpan.innerText);
-            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-
-            if (!btnElement.classList.contains('liked')) {
-                btnElement.classList.add('liked');
-                countSpan.innerText = currentLikes + 1;
-                
-                if (currentUser && authorName === currentUser.name) {
-                    currentUser.likesCount = (currentUser.likesCount || 0) + 1;
-                    sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
-                    updatePersistentUserRecord(currentUser);
-                    document.getElementById('stat-likes').innerText = currentUser.likesCount;
-                }
-            } else {
-                btnElement.classList.remove('liked');
-                countSpan.innerText = Math.max(0, currentLikes - 1);
-
-                if (currentUser && authorName === currentUser.name) {
-                    currentUser.likesCount = Math.max(0, (currentUser.likesCount || 1) - 1);
-                    sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
-                    updatePersistentUserRecord(currentUser);
-                    document.getElementById('stat-likes').innerText = currentUser.likesCount;
-                }
-            }
+        function handleGlobalSearch() {
+            // Facebook search filter placeholder logic
         }
     </script>
 </body>
