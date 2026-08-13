@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs - Complete Social Platform</title>
+    <title>TexUs - Ultimate Social Suite</title>
     <style>
         :root {
             --brand-pink: #ff1493;
@@ -429,7 +429,35 @@
         .action-btn:hover { background: var(--fb-bg); }
         .action-btn.liked { color: var(--brand-pink); }
 
-        /* Real-Time Messenger Layout */
+        /* Comment Section Styles */
+        .comments-section {
+            margin-top: 8px;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+        }
+        .comment-item {
+            font-size: 13px;
+            background: var(--fb-input-bg);
+            padding: 6px 10px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+        }
+        .comment-input-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .comment-input-row input {
+            flex: 1;
+            background: var(--fb-input-bg);
+            border: 1px solid var(--fb-border);
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        /* Real-Time Messenger Layout with Voice/Video Call Window */
         .messenger-container {
             display: flex;
             height: calc(100vh - 100px);
@@ -437,10 +465,11 @@
             border-radius: 8px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             overflow: hidden;
+            position: relative;
         }
 
         .messenger-sidebar {
-            width: 300px;
+            width: 280px;
             border-right: 1px solid var(--fb-border);
             overflow-y: auto;
             padding: 10px;
@@ -458,6 +487,9 @@
             font-weight: bold;
             font-size: 15px;
             color: var(--brand-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .messenger-messages {
@@ -506,6 +538,37 @@
             padding: 10px 16px;
             outline: none;
             font-size: 14px;
+        }
+
+        /* Voice/Video Call Overlay */
+        #call-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        .call-video-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .video-box {
+            width: 280px;
+            height: 200px;
+            background: #222;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--brand-pink);
+            position: relative;
+            overflow: hidden;
         }
 
         .contact-row-item {
@@ -577,7 +640,7 @@
         <div class="auth-wrapper">
             <div class="auth-left">
                 <div class="auth-logo-text">TexUs</div>
-                <div class="auth-tagline">TexUs helps you connect, share in real-time, and chat with all active members instantly.</div>
+                <div class="auth-tagline">TexUs brings complete social features together: Global Chat, Voice/Video Calls, Post Shares, Comments & Likes!</div>
             </div>
             <div class="auth-right">
                 <div id="login-form" class="fb-card form-container active">
@@ -618,14 +681,14 @@
                 <div class="logo-badge">TexUs</div>
                 <div class="fb-search-bar">
                     <span>🔍</span>
-                    <input type="text" id="search-input-field" placeholder="Search TexUs users..." oninput="handleGlobalSearch()">
+                    <input type="text" id="search-input-field" placeholder="Search members worldwide..." oninput="handleGlobalSearch()">
                 </div>
             </div>
 
             <div class="fb-header-center">
                 <button class="nav-tab-btn active" onclick="switchPage('feed-page', this)" title="Newsfeed">🏠</button>
-                <button class="nav-tab-btn" onclick="switchPage('friends-page', this)" title="Live Directory">👥</button>
-                <button class="nav-tab-btn" onclick="switchPage('chat-page', this)" title="Messenger Chat">💬</button>
+                <button class="nav-tab-btn" onclick="switchPage('friends-page', this)" title="Global Live Directory">👥</button>
+                <button class="nav-tab-btn" onclick="switchPage('chat-page', this)" title="Messenger & Calls">💬</button>
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -642,8 +705,8 @@
                     <div class="avatar-circle" id="sidebar-mini-avatar" style="width: 32px; height: 32px; font-size: 14px;">U</div>
                     <span id="sidebar-username-text">Profile</span>
                 </div>
-                <div class="sidebar-item" onclick="switchPage('friends-page', document.querySelectorAll('.nav-tab-btn')[1])">👥 Live Directory & Friends</div>
-                <div class="sidebar-item" onclick="switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2])">💬 Real-Time Messenger</div>
+                <div class="sidebar-item" onclick="switchPage('friends-page', document.querySelectorAll('.nav-tab-btn')[1])">👥 Global Live Directory</div>
+                <div class="sidebar-item" onclick="switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2])">💬 Messenger Chats & Calls</div>
                 <div class="sidebar-item" onclick="switchPage('settings-page', this)">⚙️ Settings & Privacy</div>
             </div>
 
@@ -665,10 +728,10 @@
                             <div class="avatar-circle" style="background: var(--brand-gradient); color: white;">T</div>
                             <div>
                                 <div class="post-author-name">TexUs Official</div>
-                                <div class="post-time">Welcome Video • 🟢 Live Stream</div>
+                                <div class="post-time">Welcome Stream • 🟢 Live Worldwide</div>
                             </div>
                         </div>
-                        <div class="post-body-text">Welcome to TexUs! Every registered member appears live across the app instantly for live updates and chat.</div>
+                        <div class="post-body-text">Welcome to TexUs! Post updates, comment, like, share posts, and start real-time video/voice calls instantly.</div>
                         <video controls style="width: 100%; border-radius: 8px; background: #000; max-height: 280px;">
                             <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
                         </video>
@@ -679,22 +742,39 @@
 
                 <div id="friends-page" class="app-page">
                     <div class="feed-post-card">
-                        <h2 style="font-size: 18px; margin-bottom: 5px;">TexUs Live Directory</h2>
-                        <p style="font-size: 13px; color: var(--fb-secondary); margin-bottom: 15px;">Every signed up user appears here in real-time. Follow members or jump straight into messenger chats!</p>
+                        <h2 style="font-size: 18px; margin-bottom: 5px;">TexUs Global Directory</h2>
+                        <p style="font-size: 13px; color: var(--fb-secondary); margin-bottom: 15px;">Connect with members across the globe in real-time. Follow them, chat, or place voice/video calls!</p>
                         <div id="public-live-users-container"></div>
                     </div>
                 </div>
 
                 <div id="chat-page" class="app-page">
                     <div class="messenger-container">
+                        <div id="call-overlay">
+                            <h2 id="call-status-heading" style="margin-bottom: 20px;">Calling...</h2>
+                            <div class="call-video-grid">
+                                <div class="video-box"><span id="call-peer-label">Peer</span></div>
+                                <div class="video-box"><span id="call-my-label">You (Camera On)</span></div>
+                            </div>
+                            <div>
+                                <button class="btn-solid-pink" onclick="endCall()" style="background: #fa383e; padding: 12px 24px; font-size: 16px;">End Call ❌</button>
+                            </div>
+                        </div>
+
                         <div class="messenger-sidebar">
-                            <div style="font-weight: bold; font-size: 15px; margin-bottom: 10px; color: #333;">Active Chats</div>
+                            <div style="font-weight: bold; font-size: 15px; margin-bottom: 10px; color: #333;">Chats & Calls</div>
                             <div id="messenger-contacts-list"></div>
                         </div>
                         <div class="messenger-chat-area">
-                            <div class="messenger-header" id="messenger-header-title">Select a contact to chat in real-time</div>
+                            <div class="messenger-header" id="messenger-header-title">
+                                <span>Select a contact to chat</span>
+                                <div id="call-action-buttons" style="display:none; gap: 8px;">
+                                    <button class="btn-solid-blue" onclick="startCall('voice')" style="padding: 5px 10px; font-size: 12px;">📞 Voice Call</button>
+                                    <button class="btn-solid-pink" onclick="startCall('video')" style="padding: 5px 10px; font-size: 12px;">📹 Video Call</button>
+                                </div>
+                            </div>
                             <div class="messenger-messages" id="messenger-messages-box">
-                                <div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Pick a live member from the left sidebar to start messaging.</div>
+                                <div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Pick a global member from the left sidebar to start messaging.</div>
                             </div>
                             <div class="messenger-input-row" id="messenger-input-wrapper" style="display: none;">
                                 <input type="text" id="messenger-msg-input" placeholder="Type a message..." onkeypress="handleMessengerEnter(event)">
@@ -739,7 +819,7 @@
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--fb-border);">
                             <div>
                                 <div style="font-weight: 600;">Private Account Mode</div>
-                                <div style="font-size: 13px; color: var(--fb-secondary);">Hide profile visibility from public live directory</div>
+                                <div style="font-size: 13px; color: var(--fb-secondary);">Hide profile visibility from global directory</div>
                             </div>
                             <input type="checkbox" id="privacy-mode-toggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="togglePrivacy(this)">
                         </div>
@@ -753,7 +833,7 @@
             </div>
 
             <div class="fb-sidebar-right">
-                <div style="font-weight: bold; color: var(--fb-secondary); font-size: 14px; margin-bottom: 10px;">🟢 Active Live Contacts</div>
+                <div style="font-weight: bold; color: var(--fb-secondary); font-size: 14px; margin-bottom: 10px;">🟢 Global Live Contacts</div>
                 <div id="right-sidebar-contacts"></div>
             </div>
         </div>
@@ -770,7 +850,7 @@
                 initApp(loggedInUser);
             }
 
-            // Real-time loop syncing active users, messages, and state
+            // Real-time synchronization loop across global users
             setInterval(() => {
                 const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
                 if (user) {
@@ -816,11 +896,11 @@
             pendingSignupData = {
                 name, email, password,
                 friends: [], followersCount: 0, friendsCount: 0, likesCount: 0,
-                profilePic: '', bio: 'TexUs active member!', isPrivate: false
+                profilePic: '', bio: 'TexUs global member!', isPrivate: false
             };
 
-            document.getElementById('verify-sent-notice').innerHTML = `A verification code has been dispatched to <b>${email}</b>.`;
-            alert(`[TexUs Email System ✉️]\nVerification code for ${email}: ${currentVerificationCode}`);
+            document.getElementById('verify-sent-notice').innerHTML = `A verification code has been dispatched globally to <b>${email}</b>.`;
+            alert(`[TexUs Global Email System ✉️]\nVerification code for ${email}: ${currentVerificationCode}`);
             document.getElementById('verify-code-input').value = '';
             switchAuthForm('verify');
         }
@@ -971,11 +1051,11 @@
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
             const publicUsers = users.filter(u => u.email !== currentUser.email && !u.isPrivate);
 
-            // Render Public Directory (Friends Page)
+            // Render Global Directory (Friends Page)
             const dirContainer = document.getElementById('public-live-users-container');
             dirContainer.innerHTML = '';
             if (publicUsers.length === 0) {
-                dirContainer.innerHTML = '<p style="color: var(--fb-secondary); font-size: 13px;">No other public users available yet.</p>';
+                dirContainer.innerHTML = '<p style="color: var(--fb-secondary); font-size: 13px;">No other global users available yet.</p>';
             }
             publicUsers.forEach(u => {
                 const isFriend = currentUser.friends && currentUser.friends.includes(u.name);
@@ -985,7 +1065,7 @@
                     <div class="avatar-circle">${u.profilePic ? `<img src="${u.profilePic}">` : u.name.charAt(0)}<div class="online-dot"></div></div>
                     <div style="flex: 1;">
                         <div style="font-weight: 600;">${u.name}</div>
-                        <div style="font-size: 11px; color: #2ecc71; font-weight: bold;">● Live Active</div>
+                        <div style="font-size: 11px; color: #2ecc71; font-weight: bold;">● Global Active</div>
                     </div>
                     <button class="btn-solid-blue" style="background: ${isFriend ? 'var(--brand-pink)' : 'var(--brand-blue)'}; padding: 6px 12px; font-size: 13px;" onclick="toggleFollow('${u.name}')">${isFriend ? 'Following' : 'Follow'}</button>
                     <button class="btn-solid-blue" style="padding: 6px 12px; font-size: 13px;" onclick="openMessengerChat('${u.email}', '${u.name}')">Chat</button>
@@ -1024,6 +1104,7 @@
             if (currentChatUserEmail) {
                 renderChatMessages(currentUser.email, currentChatUserEmail);
             }
+            renderNewsfeed();
         }
 
         function toggleFollow(name) {
@@ -1047,11 +1128,33 @@
         function openMessengerChat(email, name) {
             currentChatUserEmail = email;
             switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2]);
-            document.getElementById('messenger-header-title').innerText = `Real-Time Chat with ${name} 🟢`;
+            document.getElementById('messenger-header-title').querySelector('span').innerText = `Messenger Chat with ${name} 🟢`;
+            document.getElementById('call-action-buttons').style.display = 'flex';
             document.getElementById('messenger-input-wrapper').style.display = 'flex';
 
             const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             refreshAllLiveComponents(user);
+        }
+
+        // Voice and Video Calls simulation handler
+        function startCall(type) {
+            const overlay = document.getElementById('call-overlay');
+            const heading = document.getElementById('call-status-heading');
+            const peerLabel = document.getElementById('call-peer-label');
+            const myLabel = document.getElementById('call-my-label');
+
+            overlay.style.display = 'flex';
+            heading.innerText = type === 'video' ? '📹 Connecting Video Call...' : '📞 Connecting Voice Call...';
+            peerLabel.innerText = currentChatUserEmail;
+            myLabel.innerText = type === 'video' ? 'You (Video Active)' : 'You (Voice Active)';
+
+            setTimeout(() => {
+                heading.innerText = type === 'video' ? '🟢 Video Call Connected Worldwide' : '🟢 Voice Call Connected Worldwide';
+            }, 1500);
+        }
+
+        function endCall() {
+            document.getElementById('call-overlay').style.display = 'none';
         }
 
         function getChatKey(e1, e2) {
@@ -1065,7 +1168,7 @@
             box.innerHTML = '';
 
             if (messages.length === 0) {
-                box.innerHTML = '<div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Send a real-time message now!</div>';
+                box.innerHTML = '<div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Send a message worldwide now!</div>';
                 return;
             }
 
@@ -1105,7 +1208,7 @@
 
             const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             let posts = JSON.parse(localStorage.getItem('texus_posts')) || [];
-            posts.unshift({ author: user.name, pic: user.profilePic, text: content, likes: 0 });
+            posts.unshift({ author: user.name, pic: user.profilePic, text: content, likes: 0, shares: 0, comments: [] });
             localStorage.setItem('texus_posts', JSON.stringify(posts));
 
             document.getElementById('post-text-input').value = '';
@@ -1120,6 +1223,12 @@
             posts.forEach((p, idx) => {
                 const card = document.createElement('div');
                 card.className = 'feed-post-card';
+                
+                let commentsHtml = '';
+                if (p.comments && p.comments.length > 0) {
+                    commentsHtml = p.comments.map(c => `<div class="comment-item"><b>${c.author}:</b> ${c.text}</div>`).join('');
+                }
+
                 card.innerHTML = `
                     <div class="post-header">
                         <div class="avatar-circle">${p.pic ? `<img src="${p.pic}">` : p.author.charAt(0)}</div>
@@ -1130,7 +1239,15 @@
                     </div>
                     <div class="post-body-text">${p.text}</div>
                     <div class="post-action-bar">
-                        <button class="action-btn" onclick="likePost(${idx})">👍 Like (${p.likes})</button>
+                        <button class="action-btn" onclick="likePost(${idx})">👍 Like (${p.likes || 0})</button>
+                        <button class="action-btn" onclick="sharePost(${idx})">🔄 Share (${p.shares || 0})</button>
+                    </div>
+                    <div class="comments-section">
+                        <div id="comments-list-${idx}">${commentsHtml}</div>
+                        <div class="comment-input-row">
+                            <input type="text" id="comment-input-${idx}" placeholder="Write a comment..." onkeypress="handleCommentEnter(event, ${idx})">
+                            <button class="btn-solid-blue" style="padding: 4px 10px; font-size: 12px;" onclick="addComment(${idx})">Reply</button>
+                        </div>
                     </div>
                 `;
                 stream.appendChild(card);
@@ -1142,6 +1259,37 @@
             posts[idx].likes = (posts[idx].likes || 0) + 1;
             localStorage.setItem('texus_posts', JSON.stringify(posts));
             renderNewsfeed();
+        }
+
+        function sharePost(idx) {
+            let posts = JSON.parse(localStorage.getItem('texus_posts')) || [];
+            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            posts[idx].shares = (posts[idx].shares || 0) + 1;
+            
+            // Re-share to feed as a new post
+            posts.unshift({ author: user.name + ' (Shared)', pic: user.profilePic, text: 'Shared post: "' + posts[idx].text + '"', likes: 0, shares: 0, comments: [] });
+            localStorage.setItem('texus_posts', JSON.stringify(posts));
+            alert('Post shared successfully to your feed!');
+            renderNewsfeed();
+        }
+
+        function addComment(idx) {
+            const input = document.getElementById(`comment-input-${idx}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            let posts = JSON.parse(localStorage.getItem('texus_posts')) || [];
+            if (!posts[idx].comments) posts[idx].comments = [];
+            
+            posts[idx].comments.push({ author: user.name, text });
+            localStorage.setItem('texus_posts', JSON.stringify(posts));
+            input.value = '';
+            renderNewsfeed();
+        }
+
+        function handleCommentEnter(e, idx) {
+            if (e.key === 'Enter') addComment(idx);
         }
 
         function switchPage(pageId, btnElement) {
@@ -1157,7 +1305,7 @@
         }
 
         function handleGlobalSearch() {
-            // Live search capability placeholder hook
+            // Global search capability placeholder
         }
     </script>
 </body>
