@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs - WhatsApp Style Edition with Phone Number Connections & Advanced AI</title>
+    <title>TexUs - WhatsApp Style Edition with Phone Authentication & Advanced AI</title>
     <style>
         :root {
             --wa-teal: #00a884;
@@ -37,6 +37,154 @@
             overflow: hidden;
         }
 
+        /* Full Screen Wrapper for Authentication vs Chat App */
+        .app-screen-view {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            top: 0; left: 0;
+            justify-content: center;
+            align-items: center;
+        }
+        .app-screen-view.active {
+            display: flex;
+        }
+
+        /* WhatsApp Web Login / Signup Screen Styling */
+        .wa-auth-wrapper {
+            width: 100%;
+            height: 100vh;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .wa-auth-top-banner {
+            height: 222px;
+            background-color: var(--wa-teal);
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .wa-auth-card-container {
+            margin: auto;
+            z-index: 2;
+            background: #ffffff;
+            width: 100%;
+            max-width: 750px;
+            padding: 48px 60px;
+            border-radius: 3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wa-auth-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-self: flex-start;
+        }
+
+        .wa-auth-logo-circle {
+            width: 42px;
+            height: 42px;
+            background: var(--wa-teal);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .wa-auth-title {
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--wa-text);
+            align-self: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .wa-auth-subtitle {
+            font-size: 14px;
+            color: var(--wa-secondary);
+            align-self: flex-start;
+            margin-bottom: 24px;
+            line-height: 20px;
+        }
+
+        .wa-auth-form-group {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .wa-auth-label {
+            font-size: 13px;
+            color: var(--wa-secondary);
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .wa-auth-input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 15px;
+            border: 1px solid var(--wa-border);
+            border-radius: 4px;
+            outline: none;
+            background: #fff;
+            color: var(--wa-text);
+        }
+
+        .wa-auth-input:focus {
+            border-color: var(--wa-teal);
+            box-shadow: 0 0 0 1px var(--wa-teal);
+        }
+
+        .wa-auth-btn {
+            width: 100%;
+            background-color: var(--wa-teal);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .wa-auth-btn:hover {
+            background-color: var(--wa-dark-teal);
+        }
+
+        .wa-auth-switch-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--wa-secondary);
+            text-align: center;
+        }
+
+        .wa-auth-switch-text span {
+            color: var(--wa-teal);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .wa-auth-switch-text span:hover {
+            text-decoration: underline;
+        }
+
+        /* WhatsApp Web Desktop Chat Frame Container */
         .wa-app-container {
             display: flex;
             width: 100%;
@@ -419,184 +567,291 @@
 </head>
 <body>
 
-    <div class="wa-app-container">
-        <div class="wa-top-banner"></div>
-        <div class="wa-workspace-frame">
-            
-            <div class="wa-nav-rail">
-                <div class="rail-top">
-                    <button class="rail-btn active" onclick="switchAppTab('chats', this)" title="Chats">💬</button>
-                    <button class="rail-btn" onclick="switchAppTab('newchat', this)" title="New Chat by Phone Number">📞</button>
-                    <button class="rail-btn" onclick="switchAppTab('status', this)" title="Status Feeds">⭕</button>
+    <div id="screen-signup" class="app-screen-view active">
+        <div class="wa-auth-wrapper">
+            <div class="wa-auth-top-banner"></div>
+            <div class="wa-auth-card-container">
+                <div class="wa-auth-logo-row">
+                    <div class="wa-auth-logo-circle">💬</div>
+                    <span style="font-weight: 600; font-size: 18px; color: var(--wa-dark-teal);">WHATSAPP WEB REGISTRATION</span>
                 </div>
-                <div class="rail-bottom">
-                    <button class="rail-btn" onclick="switchAppTab('settings', this)" title="Settings">⚙️</button>
-                    <div class="wa-profile-icon" onclick="switchAppTab('settings', document.querySelectorAll('.rail-btn')[3])" id="rail-profile-avatar" style="width: 38px; height: 38px;">U</div>
-                </div>
-            </div>
-
-            <div id="tab-chats" class="app-view active" style="flex-direction: row; flex: 1;">
+                <div class="wa-auth-title">Create your account</div>
+                <div class="wa-auth-subtitle">Enter your name, phone number, and a secure PIN to register on TexUs WhatsApp.</div>
                 
-                <div class="wa-sidebar">
-                    <div class="wa-sidebar-header">
-                        <div class="wa-profile-icon" id="sidebar-user-avatar" onclick="switchAppTab('settings', document.querySelectorAll('.rail-btn')[3])">U</div>
-                        <div class="wa-sidebar-actions">
-                            <span onclick="switchAppTab('status', document.querySelectorAll('.rail-btn')[2])" title="Status">⭕</span>
-                            <span onclick="switchAppTab('newchat', document.querySelectorAll('.rail-btn')[1])" title="New Chat by Phone">➕</span>
-                        </div>
-                    </div>
+                <div class="wa-auth-form-group">
+                    <label class="wa-auth-label">Your Name</label>
+                    <input type="text" id="su-name" class="wa-auth-input" placeholder="e.g., Alex Johnson">
+                </div>
+                <div class="wa-auth-form-group">
+                    <label class="wa-auth-label">Cellphone Number</label>
+                    <input type="text" id="su-phone" class="wa-auth-input" placeholder="e.g., +15550199">
+                </div>
+                <div class="wa-auth-form-group">
+                    <label class="wa-auth-label">Secure PIN / Password</label>
+                    <input type="password" id="su-pin" class="wa-auth-input" placeholder="4-digit or secure pin">
+                </div>
+                <button class="wa-auth-btn" onclick="handleSignUp()">Agree and Continue</button>
+                
+                <div class="wa-auth-switch-text">
+                    Already have an account? <span onclick="switchAuthScreen('login')">Log In</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <div class="wa-search-container">
-                        <div class="wa-search-box">
-                            <span>🔍</span>
-                            <input type="text" placeholder="Search chats or phone numbers" id="chat-search-input">
-                        </div>
-                    </div>
+    <div id="screen-login" class="app-screen-view">
+        <div class="wa-auth-wrapper">
+            <div class="wa-auth-top-banner"></div>
+            <div class="wa-auth-card-container">
+                <div class="wa-auth-logo-row">
+                    <div class="wa-auth-logo-circle">💬</div>
+                    <span style="font-weight: 600; font-size: 18px; color: var(--wa-dark-teal);">WHATSAPP WEB AUTHENTICATION</span>
+                </div>
+                <div class="wa-auth-title">Log into WhatsApp Web</div>
+                <div class="wa-auth-subtitle">Enter your registered cellphone number and PIN to access your chats.</div>
+                
+                <div class="wa-auth-form-group">
+                    <label class="wa-auth-label">Cellphone Number</label>
+                    <input type="text" id="li-phone" class="wa-auth-input" placeholder="e.g., +15550199">
+                </div>
+                <div class="wa-auth-form-group">
+                    <label class="wa-auth-label">Secure PIN / Password</label>
+                    <input type="password" id="li-pin" class="wa-auth-input" placeholder="Your secure pin">
+                </div>
+                <button class="wa-auth-btn" onclick="handleLogin()">Log In</button>
+                
+                <div class="wa-auth-switch-text">
+                    Don't have an account? <span onclick="switchAuthScreen('signup')">Sign Up</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <div class="wa-chats-list" id="wa-chats-sidebar-list">
-                        <div class="wa-chat-item active" onclick="openAIChatSession()">
-                            <div class="avatar-circle ai-avatar">🤖<div class="online-dot"></div></div>
-                            <div class="wa-chat-info">
-                                <div class="wa-chat-name">TexUs Advanced AI Assistant</div>
-                                <div class="wa-chat-preview">Precise, verified correct answers ready...</div>
-                            </div>
-                        </div>
-                        <div id="dynamic-user-chats-list"></div>
+    <div id="screen-app" class="app-screen-view">
+        <div class="wa-app-container">
+            <div class="wa-top-banner"></div>
+            <div class="wa-workspace-frame">
+                
+                <div class="wa-nav-rail">
+                    <div class="rail-top">
+                        <button class="rail-btn active" onclick="switchAppTab('chats', this)" title="Chats">💬</button>
+                        <button class="rail-btn" onclick="switchAppTab('newchat', this)" title="New Chat by Phone Number">📞</button>
+                        <button class="rail-btn" onclick="switchAppTab('status', this)" title="Status Feeds">⭕</button>
+                    </div>
+                    <div class="rail-bottom">
+                        <button class="rail-btn" onclick="switchAppTab('settings', this)" title="Settings">⚙️</button>
+                        <button class="rail-btn" onclick="handleLogout()" title="Log Out" style="color: #fa383e;">🚪</button>
                     </div>
                 </div>
 
-                <div class="wa-chat-area">
-                    <div class="wa-chat-header">
-                        <div class="wa-chat-header-left" id="chat-header-trigger">
-                            <div class="avatar-circle ai-avatar" id="active-chat-avatar">🤖</div>
+                <div id="tab-chats" class="app-view active" style="flex-direction: row; flex: 1;">
+                    
+                    <div class="wa-sidebar">
+                        <div class="wa-sidebar-header">
+                            <div class="wa-profile-icon" id="sidebar-user-avatar" onclick="switchAppTab('settings', document.querySelectorAll('.rail-btn')[3])">U</div>
+                            <div class="wa-sidebar-actions">
+                                <span onclick="switchAppTab('status', document.querySelectorAll('.rail-btn')[2])" title="Status">⭕</span>
+                                <span onclick="switchAppTab('newchat', document.querySelectorAll('.rail-btn')[1])" title="New Chat by Phone">➕</span>
+                            </div>
+                        </div>
+
+                        <div class="wa-search-container">
+                            <div class="wa-search-box">
+                                <span>🔍</span>
+                                <input type="text" placeholder="Search chats or phone numbers" id="chat-search-input">
+                            </div>
+                        </div>
+
+                        <div class="wa-chats-list" id="wa-chats-sidebar-list">
+                            <div class="wa-chat-item active" onclick="openAIChatSession()">
+                                <div class="avatar-circle ai-avatar">🤖<div class="online-dot"></div></div>
+                                <div class="wa-chat-info">
+                                    <div class="wa-chat-name">TexUs Advanced AI Assistant</div>
+                                    <div class="wa-chat-preview">Precise, verified correct answers ready...</div>
+                                </div>
+                            </div>
+                            <div id="dynamic-user-chats-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="wa-chat-area">
+                        <div class="wa-chat-header">
+                            <div class="wa-chat-header-left" id="chat-header-trigger">
+                                <div class="avatar-circle ai-avatar" id="active-chat-avatar">🤖</div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 16px;" id="active-chat-title">TexUs Advanced AI Assistant</div>
+                                    <div style="font-size: 12px; color: var(--wa-secondary);" id="active-chat-status">online (Verified Intelligence)</div>
+                                </div>
+                            </div>
+                            <div class="wa-chat-header-actions">
+                                <span title="Voice Call">📞</span>
+                                <span title="Video Call">📹</span>
+                                <span title="Search">🔍</span>
+                            </div>
+                        </div>
+
+                        <div class="wa-messages-container" id="wa-messages-scroll-box">
+                            <div style="text-align: center; color: var(--wa-secondary); font-size: 13px; background: #fff; padding: 6px 12px; border-radius: 8px; margin: auto; max-width: 320px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.05);">
+                                🔒 Messages and AI answers are secured with verified precision.
+                            </div>
+                        </div>
+
+                        <div class="wa-input-footer">
+                            <span class="wa-footer-icon">😊</span>
+                            <span class="wa-footer-icon">📎</span>
+                            <div class="wa-input-box">
+                                <input type="text" id="wa-message-input-field" placeholder="Type a message or verified query..." onkeypress="handleMessageKeyPress(event)">
+                            </div>
+                            <span class="wa-footer-icon" onclick="sendWAMessage()" style="color: var(--wa-teal); font-size: 24px;">➤</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="tab-newchat" class="app-view">
+                    <div class="view-header">Start Chat by Phone Number</div>
+                    <div class="view-content">
+                        <div class="wa-card" style="max-width: 500px;">
+                            <h3 style="margin-bottom: 10px;">Enter Contact's Cellphone Number</h3>
+                            <p style="font-size: 13px; color: var(--wa-secondary); margin-bottom: 15px;">Connect with other users instantly using their registered phone number just like on WhatsApp.</p>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div>
+                                    <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Phone Number</label>
+                                    <input type="text" id="target-phone-input" class="wa-search-box" style="width: 100%; border: 1px solid var(--wa-border); padding: 10px;" placeholder="e.g., +1234567890">
+                                </div>
+                                <button class="btn-wa" onclick="initiateChatByPhone()">Start Chat</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-status" class="app-view">
+                    <div class="view-header">Status Updates</div>
+                    <div class="view-content">
+                        <div class="wa-card">
+                            <h3 style="margin-bottom: 10px;">Post a Status Update</h3>
+                            <input type="text" id="status-text-input" class="wa-search-box" style="width: 100%; border: 1px solid var(--wa-border); margin-bottom: 10px; padding: 10px;" placeholder="What's on your status?">
+                            <button class="btn-wa" onclick="publishStatus()">Add Status</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-settings" class="app-view">
+                    <div class="view-header">Settings & Profile</div>
+                    <div class="view-content">
+                        <div class="wa-card" style="display: flex; gap: 20px; align-items: center;">
+                            <div class="avatar-circle" id="settings-avatar-display" style="width: 80px; height: 80px; font-size: 28px;" onclick="document.getElementById('settings-file-picker').click()">U</div>
+                            <input type="file" id="settings-file-picker" accept="image/*" style="display:none;" onchange="uploadSettingsPic(event)">
                             <div>
-                                <div style="font-weight: 600; font-size: 16px;" id="active-chat-title">TexUs Advanced AI Assistant</div>
-                                <div style="font-size: 12px; color: var(--wa-secondary);" id="active-chat-status">online (Verified Intelligence)</div>
+                                <h2 id="settings-name-text">User Name</h2>
+                                <p style="font-size: 13px; color: var(--wa-secondary); margin-top: 4px;" id="settings-phone-text">+15550199</p>
                             </div>
                         </div>
-                        <div class="wa-chat-header-actions">
-                            <span title="Voice Call">📞</span>
-                            <span title="Video Call">📹</span>
-                            <span title="Search">🔍</span>
-                        </div>
-                    </div>
-
-                    <div class="wa-messages-container" id="wa-messages-scroll-box">
-                        <div style="text-align: center; color: var(--wa-secondary); font-size: 13px; background: #fff; padding: 6px 12px; border-radius: 8px; margin: auto; max-width: 320px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.05);">
-                            🔒 Messages and AI answers are secured with verified precision.
-                        </div>
-                    </div>
-
-                    <div class="wa-input-footer">
-                        <span class="wa-footer-icon">😊</span>
-                        <span class="wa-footer-icon">📎</span>
-                        <div class="wa-input-box">
-                            <input type="text" id="wa-message-input-field" placeholder="Type a message or verified query..." onkeypress="handleMessageKeyPress(event)">
-                        </div>
-                        <span class="wa-footer-icon" onclick="sendWAMessage()" style="color: var(--wa-teal); font-size: 24px;">➤</span>
-                    </div>
-                </div>
-
-            </div>
-
-            <div id="tab-newchat" class="app-view">
-                <div class="view-header">Start Chat by Phone Number</div>
-                <div class="view-content">
-                    <div class="wa-card" style="max-width: 500px;">
-                        <h3 style="margin-bottom: 10px;">Enter Contact's Cellphone Number</h3>
-                        <p style="font-size: 13px; color: var(--wa-secondary); margin-bottom: 15px;">Connect with other users instantly using their registered phone number just like on WhatsApp.</p>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div>
-                                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Phone Number</label>
-                                <input type="text" id="target-phone-input" class="wa-search-box" style="width: 100%; border: 1px solid var(--wa-border); padding: 10px;" placeholder="e.g., +1234567890">
+                        <div class="wa-card">
+                            <h3 style="margin-bottom: 10px; font-size: 15px;">Phone Number & Bio Settings</h3>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 12px; color: var(--wa-secondary); display: block; margin-bottom: 3px;">Your Phone Number</label>
+                                <input type="text" id="settings-phone-input" class="wa-search-box" style="width: 100%; border: 1px solid var(--wa-border); padding: 8px; margin-bottom: 10px;">
                             </div>
-                            <button class="btn-wa" onclick="initiateChatByPhone()">Start Chat</button>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 12px; color: var(--wa-secondary); display: block; margin-bottom: 3px;">About / Bio</label>
+                                <textarea id="settings-bio-input" style="width: 100%; height: 70px; padding: 8px; border: 1px solid var(--wa-border); border-radius: 6px; resize: none; margin-bottom: 10px;"></textarea>
+                            </div>
+                            <button class="btn-wa" onclick="saveSettingsProfile()">Save Changes</button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="tab-status" class="app-view">
-                <div class="view-header">Status Updates</div>
-                <div class="view-content">
-                    <div class="wa-card">
-                        <h3 style="margin-bottom: 10px;">Post a Status Update</h3>
-                        <input type="text" id="status-text-input" class="wa-search-box" style="width: 100%; border: 1px solid var(--wa-border); margin-bottom: 10px; padding: 10px;" placeholder="What's on your status?">
-                        <button class="btn-wa" onclick="publishStatus()">Add Status</button>
-                    </div>
-                </div>
             </div>
-
-            <div id="tab-settings" class="app-view">
-                <div class="view-header">Settings & Profile</div>
-                <div class="view-content">
-                    <div class="wa-card" style="display: flex; gap: 20px; align-items: center;">
-                        <div class="avatar-circle" id="settings-avatar-display" style="width: 80px; height: 80px; font-size: 28px;" onclick="document.getElementById('settings-file-picker').click()">U</div>
-                        <input type="file" id="settings-file-picker" accept="image/*" style="display:none;" onchange="uploadSettingsPic(event)">
-                        <div>
-                            <h2 id="settings-name-text">User Name</h2>
-                            <p style="font-size: 13px; color: var(--wa-secondary); margin-top: 4px;" id="settings-phone-text">+15550199</p>
-                        </div>
-                    </div>
-                    <div class="wa-card">
-                        <h3 style="margin-bottom: 10px; font-size: 15px;">Phone Number & Bio Settings</h3>
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size: 12px; color: var(--wa-secondary); display: block; margin-bottom: 3px;">Your Phone Number</label>
-                            <input type="text" id="settings-phone-input" class="wa-search-box" style="width: 100%; border: 1px solid var(--wa-border); padding: 8px; margin-bottom: 10px;">
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size: 12px; color: var(--wa-secondary); display: block; margin-bottom: 3px;">About / Bio</label>
-                            <textarea id="settings-bio-input" style="width: 100%; height: 70px; padding: 8px; border: 1px solid var(--wa-border); border-radius: 6px; resize: none; margin-bottom: 10px;"></textarea>
-                        </div>
-                        <button class="btn-wa" onclick="saveSettingsProfile()">Save Changes</button>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
     <script>
-        let currentPeerKey = 'ai_assistant'; // 'ai_assistant' or phone number string
+        let currentPeerKey = 'ai_assistant';
 
         window.onload = function() {
-            let currentUser = JSON.parse(sessionStorage.getItem('texus_wa_user'));
-            if (!currentUser) {
-                currentUser = {
-                    name: "WhatsApp User",
-                    phone: "+15550199",
-                    profilePic: "",
-                    bio: "Hey there! I am using TexUs WhatsApp Edition.",
-                    chats: []
-                };
-                sessionStorage.setItem('texus_wa_user', JSON.stringify(currentUser));
-
-                // Pre-populate some demo contacts if storage is empty
-                let directory = JSON.parse(localStorage.getItem('texus_wa_directory')) || {};
-                if (Object.keys(directory).length === 0) {
-                    directory = {
-                        "+15550101": { name: "Sophia Martinez", phone: "+15550101", bio: "Available", profilePic: "" },
-                        "+15550102": { name: "Liam O'Connor", phone: "+15550102", bio: "At work", profilePic: "" },
-                        "+15550103": { name: "Zoe Patel", phone: "+15550103", bio: "Busy chatting", profilePic: "" }
-                    };
-                    localStorage.setItem('texus_wa_directory', JSON.stringify(directory));
-                }
+            // Check if user is logged in
+            let currentUser = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
+            if (currentUser) {
+                launchAppDashboard(currentUser);
+            } else {
+                switchAuthScreen('signup');
             }
-
-            // Ensure current user is registered in the public phone directory
-            let directory = JSON.parse(localStorage.getItem('texus_wa_directory')) || {};
-            directory[currentUser.phone] = currentUser;
-            localStorage.setItem('texus_wa_directory', JSON.stringify(directory));
-
-            initWaApp(currentUser);
-
-            setInterval(() => {
-                const user = JSON.parse(sessionStorage.getItem('texus_wa_user'));
-                if (user) refreshWaComponents(user);
-            }, 1000);
         };
 
-        function initWaApp(user) {
+        function switchAuthScreen(screenType) {
+            document.querySelectorAll('.app-screen-view').forEach(s => s.classList.remove('active'));
+            if (screenType === 'signup') {
+                document.getElementById('screen-signup').classList.add('active');
+            } else if (screenType === 'login') {
+                document.getElementById('screen-login').classList.add('active');
+            }
+        }
+
+        function handleSignUp() {
+            const name = document.getElementById('su-name').value.trim();
+            const phone = document.getElementById('su-phone').value.trim();
+            const pin = document.getElementById('su-pin').value.trim();
+
+            if (!name || !phone || !pin) {
+                alert('Please fill in all registration fields.');
+                return;
+            }
+
+            let accounts = JSON.parse(localStorage.getItem('texus_wa_accounts')) || {};
+            if (accounts[phone]) {
+                alert('An account with this phone number already exists. Please log in.');
+                switchAuthScreen('login');
+                return;
+            }
+
+            const newUser = {
+                name,
+                phone,
+                pin,
+                profilePic: "",
+                bio: "Hey there! I am using TexUs WhatsApp.",
+                chats: []
+            };
+
+            accounts[phone] = newUser;
+            localStorage.setItem('texus_wa_accounts', JSON.stringify(accounts));
+            sessionStorage.setItem('texus_wa_logged_user', JSON.stringify(newUser));
+
+            launchAppDashboard(newUser);
+        }
+
+        function handleLogin() {
+            const phone = document.getElementById('li-phone').value.trim();
+            const pin = document.getElementById('li-pin').value.trim();
+
+            if (!phone || !pin) {
+                alert('Please enter your phone number and PIN.');
+                return;
+            }
+
+            let accounts = JSON.parse(localStorage.getItem('texus_wa_accounts')) || {};
+            const account = accounts[phone];
+
+            if (!account || account.pin !== pin) {
+                alert('Invalid phone number or PIN. Please check your credentials.');
+                return;
+            }
+
+            sessionStorage.setItem('texus_wa_logged_user', JSON.stringify(account));
+            launchAppDashboard(account);
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('texus_wa_logged_user');
+            document.querySelectorAll('.app-screen-view').forEach(s => s.classList.remove('active'));
+            switchAuthScreen('login');
+        }
+
+        function launchAppDashboard(user) {
+            document.querySelectorAll('.app-screen-view').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-app').classList.add('active');
+
             document.getElementById('settings-name-text').innerText = user.name;
             document.getElementById('settings-phone-text').innerText = user.phone;
             document.getElementById('settings-phone-input').value = user.phone;
@@ -604,11 +859,17 @@
             renderUserAvatars(user);
             refreshWaComponents(user);
             openAIChatSession();
+
+            // Background poll sync
+            setInterval(() => {
+                const activeUser = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
+                if (activeUser) refreshWaComponents(activeUser);
+            }, 1000);
         }
 
         function renderUserAvatars(user) {
             const initial = user.name.charAt(0).toUpperCase();
-            ['rail-profile-avatar', 'sidebar-user-avatar', 'settings-avatar-display'].forEach(id => {
+            ['sidebar-user-avatar', 'settings-avatar-display'].forEach(id => {
                 const el = document.getElementById(id);
                 if (user.profilePic) {
                     el.innerHTML = `<img src="${user.profilePic}">`;
@@ -623,14 +884,13 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(evt) {
-                let user = JSON.parse(sessionStorage.getItem('texus_wa_user'));
+                let user = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
                 user.profilePic = evt.target.result;
-                sessionStorage.setItem('texus_wa_user', JSON.stringify(user));
+                sessionStorage.setItem('texus_wa_logged_user', JSON.stringify(user));
                 
-                // Update directory
-                let directory = JSON.parse(localStorage.getItem('texus_wa_directory')) || {};
-                directory[user.phone] = user;
-                localStorage.setItem('texus_wa_directory', JSON.stringify(directory));
+                let accounts = JSON.parse(localStorage.getItem('texus_wa_accounts')) || {};
+                accounts[user.phone] = user;
+                localStorage.setItem('texus_wa_accounts', JSON.stringify(accounts));
 
                 renderUserAvatars(user);
                 alert('Profile picture updated!');
@@ -639,7 +899,7 @@
         }
 
         function saveSettingsProfile() {
-            let user = JSON.parse(sessionStorage.getItem('texus_wa_user'));
+            let user = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
             const newPhone = document.getElementById('settings-phone-input').value.trim();
             const newBio = document.getElementById('settings-bio-input').value.trim();
             if (!newPhone) {
@@ -647,16 +907,16 @@
                 return;
             }
 
-            let directory = JSON.parse(localStorage.getItem('texus_wa_directory')) || {};
+            let accounts = JSON.parse(localStorage.getItem('texus_wa_accounts')) || {};
             if (newPhone !== user.phone) {
-                delete directory[user.phone];
+                delete accounts[user.phone];
                 user.phone = newPhone;
             }
             user.bio = newBio;
-            sessionStorage.setItem('texus_wa_user', JSON.stringify(user));
+            sessionStorage.setItem('texus_wa_logged_user', JSON.stringify(user));
 
-            directory[user.phone] = user;
-            localStorage.setItem('texus_wa_directory', JSON.stringify(directory));
+            accounts[user.phone] = user;
+            localStorage.setItem('texus_wa_accounts', JSON.stringify(accounts));
 
             document.getElementById('settings-phone-text').innerText = user.phone;
             alert('Profile saved successfully!');
@@ -678,28 +938,29 @@
                 return;
             }
 
-            let user = JSON.parse(sessionStorage.getItem('texus_wa_user'));
+            let user = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
             if (targetPhone === user.phone) {
                 alert("You can't chat with your own phone number.");
                 return;
             }
 
-            let directory = JSON.parse(localStorage.getItem('texus_wa_directory')) || {};
-            if (!directory[targetPhone]) {
-                // Auto-create stub contact in directory if dialing an unregistered phone number for simulation
-                directory[targetPhone] = {
+            let accounts = JSON.parse(localStorage.getItem('texus_wa_accounts')) || {};
+            if (!accounts[targetPhone]) {
+                accounts[targetPhone] = {
                     name: "Contact (" + targetPhone + ")",
                     phone: targetPhone,
                     bio: "Hey there! I am using WhatsApp.",
                     profilePic: ""
                 };
-                localStorage.setItem('texus_wa_directory', JSON.stringify(directory));
+                localStorage.setItem('texus_wa_accounts', JSON.stringify(accounts));
             }
 
             if (!user.chats) user.chats = [];
             if (!user.chats.includes(targetPhone)) {
                 user.chats.push(targetPhone);
-                sessionStorage.setItem('texus_wa_user', JSON.stringify(user));
+                sessionStorage.setItem('texus_wa_logged_user', JSON.stringify(user));
+                accounts[user.phone] = user;
+                localStorage.setItem('texus_wa_accounts', JSON.stringify(accounts));
             }
 
             phoneInput.value = '';
@@ -708,15 +969,14 @@
         }
 
         function refreshWaComponents(currentUser) {
-            let directory = JSON.parse(localStorage.getItem('texus_wa_directory')) || {};
+            let accounts = JSON.parse(localStorage.getItem('texus_wa_accounts')) || {};
             
-            // Render active chats sidebar list
             const listContainer = document.getElementById('dynamic-user-chats-list');
             listContainer.innerHTML = '';
             
             const activeChats = currentUser.chats || [];
             activeChats.forEach(phone => {
-                const contact = directory[phone];
+                const contact = accounts[phone];
                 if (!contact) return;
                 const isSelected = currentPeerKey === phone;
                 const item = document.createElement('div');
@@ -732,7 +992,6 @@
                 listContainer.appendChild(item);
             });
 
-            // Render active messages
             if (currentPeerKey === 'ai_assistant') {
                 renderAIMessages(currentUser.phone);
             } else {
@@ -748,14 +1007,14 @@
             avatarBox.className = 'avatar-circle ai-avatar';
             avatarBox.innerHTML = '🤖';
 
-            const user = JSON.parse(sessionStorage.getItem('texus_wa_user'));
+            const user = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
             renderAIMessages(user.phone);
         }
 
         function openPhoneChatSession(phone) {
             currentPeerKey = phone;
-            let directory = JSON.parse(localStorage.getItem('texus_wa_directory')) || {};
-            const contact = directory[phone] || { name: phone, phone: phone };
+            let accounts = JSON.parse(localStorage.getItem('texus_wa_accounts')) || {};
+            const contact = accounts[phone] || { name: phone, phone: phone };
 
             document.getElementById('active-chat-title').innerText = contact.name;
             document.getElementById('active-chat-status').innerText = `phone: ${contact.phone} • online`;
@@ -763,7 +1022,7 @@
             avatarBox.className = 'avatar-circle';
             avatarBox.innerHTML = contact.profilePic ? `<img src="${contact.profilePic}">` : contact.name.charAt(0);
 
-            const user = JSON.parse(sessionStorage.getItem('texus_wa_user'));
+            const user = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
             renderPhoneChatMessages(user.phone, phone);
         }
 
@@ -813,7 +1072,7 @@
             const text = input.value.trim();
             if (!text) return;
 
-            const user = JSON.parse(sessionStorage.getItem('texus_wa_user'));
+            const user = JSON.parse(sessionStorage.getItem('texus_wa_logged_user'));
             const timeStr = getCurrentTime();
 
             if (currentPeerKey === 'ai_assistant') {
@@ -821,7 +1080,6 @@
                 let msgs = JSON.parse(localStorage.getItem(key)) || [];
                 msgs.push({ sender: 'user', text, time: timeStr });
                 
-                // Advanced AI verification & precision logic giving strictly correct answers
                 const accurateReply = getAdvancedCorrectAIResponse(text);
                 msgs.push({ sender: 'ai', text: accurateReply, time: getCurrentTime() });
 
@@ -839,7 +1097,6 @@
             }
         }
 
-        // Advanced AI response engine tuned for correct answers only
         function getAdvancedCorrectAIResponse(query) {
             const q = query.toLowerCase().trim();
 
@@ -877,7 +1134,7 @@
                 return "Hello! How can I assist you with verified, accurate information today?";
             }
 
-            return `Regarding your inquiry on "${query}": Based on verified data references, the correct answer is derived by verifying factual premises step-by-step. Please feel free to ask specific math, science, history, or technical questions for precise answers!`;
+            return `Regarding your inquiry on "${query}": Based on verified data references, the correct answer is derived by analyzing verifiable premises step-by-step. Feel free to ask specific math, science, history, or technical questions for precise answers!`;
         }
 
         function getCurrentTime() {
