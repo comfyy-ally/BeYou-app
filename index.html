@@ -288,6 +288,31 @@
             color: #444;
         }
 
+        .search-box-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .search-box-container input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-box-container button {
+            padding: 8px 16px;
+            background: #0072ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
         .user-row {
             display: flex;
             justify-content: space-between;
@@ -602,7 +627,11 @@
 
             <div id="friends-page" class="app-page">
                 <div class="card">
-                    <div class="section-title">Public Accounts / Directory</div>
+                    <div class="section-title">Directory & Search Registered Users</div>
+                    <div class="search-box-container">
+                        <input type="text" id="user-search-input" placeholder="Search signed up users by name or email..." oninput="filterPublicUsers()">
+                        <button onclick="filterPublicUsers()">Search</button>
+                    </div>
                     <div id="public-users-container">
                         </div>
                 </div>
@@ -701,7 +730,6 @@
     <script>
         let currentChatFriend = null;
 
-        // Comprehensive world country data with dialing codes for mobile numbers
         const countriesList = [
             { name: "Afghanistan", code: "+93" }, { name: "Albania", code: "+355" }, { name: "Algeria", code: "+213" },
             { name: "Andorra", code: "+376" }, { name: "Angola", code: "+244" }, { name: "Argentina", code: "+54" },
@@ -827,12 +855,10 @@
             document.getElementById('user-display').innerText = user.name;
             document.getElementById('profile-name-title').innerText = `${user.name}'s Profile`;
             
-            // Populate stats
             document.getElementById('stat-followers').innerText = user.followersCount || 0;
             document.getElementById('stat-friends').innerText = user.friendsCount || 0;
             document.getElementById('stat-likes').innerText = user.likesCount || 0;
 
-            // Populate Profile info fields
             document.getElementById('profile-bio-input').value = user.bio || '';
             document.getElementById('profile-mobile-input').value = user.mobileNumber || '';
             document.getElementById('country-code-select').value = user.countryCode || '';
@@ -915,24 +941,41 @@
             loadPublicUsers(currentUser);
         }
 
-        function loadPublicUsers(currentUser) {
+        // Render signed up users with a search query filter implementation
+        function loadPublicUsers(currentUser, searchQuery = '') {
             const container = document.getElementById('public-users-container');
             container.innerHTML = '';
 
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            const publicUsers = users.filter(u => u.email !== currentUser.email && !u.isPrivate);
+            
+            // Filter users: exclude current user, exclude private accounts, and match search query
+            const filteredUsers = users.filter(u => {
+                if (u.email === currentUser.email) return false;
+                if (u.isPrivate) return false;
+                
+                if (searchQuery) {
+                    const query = searchQuery.toLowerCase();
+                    const nameMatch = u.name.toLowerCase().includes(query);
+                    const emailMatch = u.email.toLowerCase().includes(query);
+                    return nameMatch || emailMatch;
+                }
+                return true;
+            });
 
-            if (publicUsers.length === 0) {
-                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No other public accounts found yet.</div>';
+            if (filteredUsers.length === 0) {
+                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No matching signed-up users found.</div>';
                 return;
             }
 
-            publicUsers.forEach(u => {
+            filteredUsers.forEach(u => {
                 const isAlreadyFriend = currentUser.friends && currentUser.friends.includes(u.name);
                 const row = document.createElement('div');
                 row.className = 'user-row';
                 row.innerHTML = `
-                    <span>${u.name} (Public)</span>
+                    <div>
+                        <span style="font-weight: 600; display: block;">${u.name}</span>
+                        <span style="font-size: 12px; color: #666;">${u.email}</span>
+                    </div>
                     <button class="action-btn ${isAlreadyFriend ? 'btn-pink' : 'btn-blue'}" onclick="toggleFriend(this, '${u.name}')">
                         ${isAlreadyFriend ? 'Friends' : 'Follow / Add'}
                     </button>
@@ -941,7 +984,15 @@
             });
         }
 
-        // Follow & Friend Request Logic (Increments Followers/Friends automatically)
+        function filterPublicUsers() {
+            const query = document.getElementById('user-search-input').value.trim();
+            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            if (currentUser) {
+                loadPublicUsers(currentUser, query);
+            }
+        }
+
+        // Follow & Friend Request Logic
         function toggleFriend(btn, friendName) {
             let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             if (!currentUser.friends) currentUser.friends = [];
@@ -951,8 +1002,6 @@
                 btn.className = 'action-btn btn-pink';
                 if (!currentUser.friends.includes(friendName)) {
                     currentUser.friends.push(friendName);
-                    
-                    // Increment Followers and Friends counters
                     currentUser.followersCount = (currentUser.followersCount || 0) + 1;
                     currentUser.friendsCount = (currentUser.friendsCount || 0) + 1;
                 }
@@ -960,8 +1009,6 @@
                 btn.innerText = 'Follow / Add';
                 btn.className = 'action-btn btn-blue';
                 currentUser.friends = currentUser.friends.filter(f => f !== friendName);
-                
-                // Decrement Followers and Friends counters
                 currentUser.followersCount = Math.max(0, (currentUser.followersCount || 1) - 1);
                 currentUser.friendsCount = Math.max(0, (currentUser.friendsCount || 1) - 1);
             }
@@ -969,7 +1016,6 @@
             sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
             updatePersistentUserRecord(currentUser);
             
-            // Update profile stats view dynamically
             document.getElementById('stat-followers').innerText = currentUser.followersCount;
             document.getElementById('stat-friends').innerText = currentUser.friendsCount;
 
@@ -985,7 +1031,6 @@
             }
         }
 
-        // Automatically occurs on the Chat page when users become friends
         function loadChatFriends(currentUser) {
             const sidebar = document.getElementById('chat-friends-list');
             sidebar.innerHTML = '<div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 8px;">CHATS</div>';
@@ -1019,7 +1064,6 @@
             `;
         }
 
-        // Navigation Switcher
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -1029,11 +1073,11 @@
 
             if (pageId === 'friends-page') {
                 const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+                document.getElementById('user-search-input').value = '';
                 loadPublicUsers(currentUser);
             }
         }
 
-        // Posting Function
         function submitPost() {
             const content = document.getElementById('post-content').value.trim();
             if (!content) return alert('Post cannot be empty.');
@@ -1050,13 +1094,12 @@
                     <button class="like-btn" onclick="toggleLikePost(this, '${user ? user.name : 'User'}')">Like (<span class="like-count">0</span>)</button>
                 </div>
             `;
-            feed.insertBefore(postCard, feed.children[1]); // Insert beneath the welcome video card
+            feed.insertBefore(postCard, feed.children[1]);
 
             document.getElementById('post-content').value = '';
             switchPage('feed-page', document.querySelectorAll('.nav-btn')[0]);
         }
 
-        // Likes increment handler
         function toggleLikePost(btnElement, authorName) {
             const countSpan = btnElement.querySelector('.like-count');
             let currentLikes = parseInt(countSpan.innerText);
@@ -1066,7 +1109,6 @@
                 btnElement.classList.add('liked');
                 countSpan.innerText = currentLikes + 1;
                 
-                // If it's the logged-in user's post or global interaction, increment user likes counter
                 if (currentUser && authorName === currentUser.name) {
                     currentUser.likesCount = (currentUser.likesCount || 0) + 1;
                     sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
@@ -1086,7 +1128,6 @@
             }
         }
 
-        // Chatting Function
         function sendMessage() {
             if (!currentChatFriend) return alert('Please select a friend from the chat sidebar first.');
             const input = document.getElementById('chat-input');
