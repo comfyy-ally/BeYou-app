@@ -292,7 +292,7 @@
             margin-bottom: 10px;
         }
 
-        /* Following & Requests Page / Facebook-style Active Feed */
+        /* Following & Public Feed */
         .section-title {
             font-size: 16px;
             font-weight: bold;
@@ -350,7 +350,6 @@
             gap: 12px;
         }
 
-        /* Active Green Badge / Avatar Ring like Facebook Active status */
         .live-avatar-container {
             width: 45px;
             height: 45px;
@@ -403,20 +402,23 @@
             color: white;
         }
 
-        /* Chatting Page layout */
+        /* Chatting Page layout (Real-time Broadcast & Direct Messaging) */
         .chat-layout {
             display: flex;
             gap: 15px;
-            height: 420px;
+            height: 440px;
         }
 
         .chat-sidebar {
-            width: 35%;
+            width: 40%;
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             padding: 10px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         .chat-contact-item {
@@ -424,18 +426,20 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             color: #444;
             transition: background 0.2s;
-            margin-bottom: 5px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            background: #fafbfc;
+            border: 1px solid #eee;
         }
 
         .chat-contact-item:hover, .chat-contact-item.active {
             background: #f0f4ff;
             color: #0072ff;
+            border-color: #bce8f1;
         }
 
         .chat-main-box {
@@ -468,10 +472,11 @@
         }
 
         .chat-bubble {
-            max-width: 70%;
+            max-width: 75%;
             padding: 10px 14px;
             border-radius: 8px;
             font-size: 14px;
+            word-break: break-word;
         }
 
         .chat-bubble.incoming {
@@ -512,7 +517,7 @@
             font-weight: bold;
         }
 
-        /* Profile Styles with Circular Upload Container */
+        /* Profile Styles */
         .profile-circle-container {
             width: 110px;
             height: 110px;
@@ -561,7 +566,6 @@
             margin-top: 2px;
         }
 
-        /* Action buttons */
         .logout-btn {
             background: #ff758c;
             color: white;
@@ -664,8 +668,8 @@
         <div class="nav-tabs">
             <button class="nav-btn active" onclick="switchPage('feed-page', this)">Feed</button>
             <button class="nav-btn" onclick="switchPage('post-page', this)">Post</button>
-            <button class="nav-btn" onclick="switchPage('friends-page', this)">Friends</button>
-            <button class="nav-btn" onclick="switchPage('chat-page', this)">Chat</button>
+            <button class="nav-btn" onclick="switchPage('friends-page', this)">Friends & Live</button>
+            <button class="nav-btn" onclick="switchPage('chat-page', this)">Real-time Chat</button>
             <button class="nav-btn" onclick="switchPage('profile-page', this)">Profile</button>
             <button class="nav-btn" onclick="switchPage('settings-page', this)">Settings</button>
         </div>
@@ -676,7 +680,7 @@
                 <div class="newsfeed" id="newsfeed-container">
                     <div class="card">
                         <div class="post-author">TexUs Official Promotional Video 🎥</div>
-                        <div class="post-text" style="margin-bottom: 8px;">Welcome to TexUs! Connect, share, and chat instantly with friends globally. Check out our app intro!</div>
+                        <div class="post-text" style="margin-bottom: 8px;">Welcome to TexUs! All signed up members appear live across the app for instant connectivity and real-time chat.</div>
                         <div class="welcome-video-container">
                             <video controls>
                                 <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
@@ -686,7 +690,7 @@
                     </div>
                     <div class="card">
                         <div class="post-author">TexUs Official</div>
-                        <div class="post-text">Welcome to the community feed! ✨</div>
+                        <div class="post-text">Welcome to the community feed! ✨ Check out the Friends & Live page to view and message every active user instantly.</div>
                         <div class="post-actions">
                             <button class="like-btn" onclick="toggleLikePost(this, 'TexUs Official')">Like (<span class="like-count">0</span>)</button>
                         </div>
@@ -704,8 +708,8 @@
 
             <div id="friends-page" class="app-page">
                 <div class="card">
-                    <div class="section-title">🟢 Live Active Members on TexUs</div>
-                    <div style="font-size: 13px; color: #666; margin-bottom: 15px;">All signed-up users currently connected to the application are live below, just like Facebook active presence.</div>
+                    <div class="section-title">🟢 All Registered Users Live on TexUs</div>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 15px;">Every person who has signed up is publicly visible here. Click "Chat Instantly" to jump straight into a real-time conversation!</div>
                     
                     <div class="search-box-container">
                         <input type="text" id="user-search-input" placeholder="Search live users by name or email..." oninput="filterPublicUsers()">
@@ -719,16 +723,16 @@
             <div id="chat-page" class="app-page">
                 <div class="chat-layout">
                     <div class="chat-sidebar" id="chat-friends-list">
-                        <div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 8px;">CHATS</div>
+                        <div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 5px;">ALL LIVE USERS (CLICK TO CHAT)</div>
                         </div>
                     <div class="chat-main-box">
-                        <div class="chat-header-info" id="active-chat-title">Select a friend to chat</div>
+                        <div class="chat-header-info" id="active-chat-title">Select a user to start real-time chatting</div>
                         <div class="chat-messages" id="chat-messages">
-                            <div style="color: #888; font-size: 14px; text-align: center; margin-top: auto; margin-bottom: auto;">Choose someone from your friend list to start messaging.</div>
+                            <div style="color: #888; font-size: 14px; text-align: center; margin-top: auto; margin-bottom: auto;">Pick any registered user from the left list to send real-time messages!</div>
                         </div>
                         <div class="chat-input-area" id="chat-input-box" style="display: none;">
-                            <input type="text" id="chat-input" placeholder="Type a message...">
-                            <button onclick="sendMessage()">Send</button>
+                            <input type="text" id="chat-input" placeholder="Type a real-time message..." onkeypress="handleChatKeyPress(event)">
+                            <button onclick="sendRealtimeMessage()">Send</button>
                         </div>
                     </div>
                 </div>
@@ -792,9 +796,7 @@
                     </div>
 
                     <button class="btn" onclick="switchPage('profile-page', document.querySelectorAll('.nav-btn')[4])" style="background: #2ecc71; margin-bottom: 15px;">Edit Profile Information</button>
-
                     <button class="logout-btn" onclick="handleLogout()" style="margin-bottom: 15px;">Log Out</button>
-
                     <button class="danger-btn" onclick="deleteAccount()">Delete / Deactivate Account</button>
                 </div>
             </div>
@@ -807,7 +809,7 @@
     </div>
 
     <script>
-        let currentChatFriend = null;
+        let currentChatUserEmail = null;
         let pendingSignupData = null;
         let currentVerificationCode = null;
 
@@ -839,6 +841,18 @@
             if (loggedInUser) {
                 showAppScreen(loggedInUser);
             }
+            
+            // Real-time synchronization check interval across tabs/users
+            setInterval(() => {
+                const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+                if (currentUser) {
+                    loadPublicUsers(currentUser, document.getElementById('user-search-input').value.trim());
+                    loadChatSidebar(currentUser);
+                    if (currentChatUserEmail) {
+                        renderChatMessages();
+                    }
+                }
+            }, 1000);
         };
 
         function populateCountriesDropdown() {
@@ -910,7 +924,6 @@
             };
 
             document.getElementById('verify-sent-notice').innerHTML = `📧 An email message containing your verification code has been sent straight to <b>${email}</b> to verify if your email address is true or a scam.`;
-            
             alert(`[TexUs Email Delivery System ✉️]\n\nEmail sent to: ${email}\nYour email verification code is: ${currentVerificationCode}`);
             
             document.getElementById('verify-code-input').value = '';
@@ -996,7 +1009,7 @@
             document.getElementById('privacy-mode-toggle').checked = !!user.isPrivate;
             
             loadPublicUsers(user);
-            loadChatFriends(user);
+            loadChatSidebar(user);
         }
 
         function handleLogout() {
@@ -1064,7 +1077,7 @@
             loadPublicUsers(currentUser);
         }
 
-        // Facebook-style live active user display feed on the friends page
+        // Display all signed-up users live on the Friends page
         function loadPublicUsers(currentUser, searchQuery = '') {
             const container = document.getElementById('public-users-container');
             container.innerHTML = '';
@@ -1077,22 +1090,19 @@
                 
                 if (searchQuery) {
                     const query = searchQuery.toLowerCase();
-                    const nameMatch = u.name.toLowerCase().includes(query);
-                    const emailMatch = u.email.toLowerCase().includes(query);
-                    return nameMatch || emailMatch;
+                    return u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query);
                 }
                 return true;
             });
 
             if (filteredUsers.length === 0) {
-                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No live members found.</div>';
+                container.innerHTML = '<div style="color: #777; font-size: 14px; padding: 5px 0;">No other live signed-up members found.</div>';
                 return;
             }
 
             filteredUsers.forEach(u => {
                 const isAlreadyFriend = currentUser.friends && currentUser.friends.includes(u.name);
                 
-                // Avatar representation with live green indicator tag
                 let avatarContent = u.name.charAt(0).toUpperCase();
                 if (u.profilePic) {
                     avatarContent = `<img src="${u.profilePic}" alt="Avatar">`;
@@ -1108,12 +1118,17 @@
                         </div>
                         <div>
                             <span style="font-weight: 600; display: block; color: #222;">${u.name}</span>
-                            <span style="font-size: 12px; color: #2ecc71; font-weight: 600;">● Active Live</span>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: 600;">● Live on TexUs</span>
                         </div>
                     </div>
-                    <button class="action-btn ${isAlreadyFriend ? 'btn-pink' : 'btn-blue'}" onclick="toggleFriend(this, '${u.name}')">
-                        ${isAlreadyFriend ? 'Friends' : 'Follow / Add'}
-                    </button>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="action-btn ${isAlreadyFriend ? 'btn-pink' : 'btn-blue'}" onclick="toggleFriend(this, '${u.name}')">
+                            ${isAlreadyFriend ? 'Following' : 'Follow'}
+                        </button>
+                        <button class="action-btn btn-blue" style="background: #2ecc71;" onclick="startChatDirectly('${u.email}', '${u.name}')">
+                            Chat Instantly
+                        </button>
+                    </div>
                 `;
                 container.appendChild(row);
             });
@@ -1131,8 +1146,8 @@
             let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             if (!currentUser.friends) currentUser.friends = [];
 
-            if (btn.innerText === 'Follow / Add') {
-                btn.innerText = 'Friends';
+            if (btn.innerText === 'Follow') {
+                btn.innerText = 'Following';
                 btn.className = 'action-btn btn-pink';
                 if (!currentUser.friends.includes(friendName)) {
                     currentUser.friends.push(friendName);
@@ -1140,7 +1155,7 @@
                     currentUser.friendsCount = (currentUser.friendsCount || 0) + 1;
                 }
             } else {
-                btn.innerText = 'Follow / Add';
+                btn.innerText = 'Follow';
                 btn.className = 'action-btn btn-blue';
                 currentUser.friends = currentUser.friends.filter(f => f !== friendName);
                 currentUser.followersCount = Math.max(0, (currentUser.followersCount || 1) - 1);
@@ -1152,8 +1167,6 @@
             
             document.getElementById('stat-followers').innerText = currentUser.followersCount;
             document.getElementById('stat-friends').innerText = currentUser.friendsCount;
-
-            loadChatFriends(currentUser);
         }
 
         function updatePersistentUserRecord(updatedUser) {
@@ -1165,37 +1178,104 @@
             }
         }
 
-        function loadChatFriends(currentUser) {
+        // Expose ALL signed-up public users in the chat sidebar list
+        function loadChatSidebar(currentUser) {
             const sidebar = document.getElementById('chat-friends-list');
-            sidebar.innerHTML = '<div style="font-size: 12px; font-weight: bold; color: #888; margin-bottom: 8px;">CHATS</div>';
+            sidebar.innerHTML = '<div style="font-size: 11px; font-weight: bold; color: #888; margin-bottom: 5px;">ALL LIVE USERS (CLICK TO CHAT)</div>';
 
-            const friends = currentUser.friends || [];
-            if (friends.length === 0) {
-                sidebar.innerHTML += '<div style="font-size: 13px; color: #999; padding: 5px;">No active chat friends yet. Add friends from the Live Friends page!</div>';
+            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
+            const publicUsers = users.filter(u => u.email !== currentUser.email && !u.isPrivate);
+
+            if (publicUsers.length === 0) {
+                sidebar.innerHTML += '<div style="font-size: 13px; color: #999; padding: 5px;">No other users available to chat yet.</div>';
                 return;
             }
 
-            friends.forEach(friend => {
+            publicUsers.forEach(u => {
                 const item = document.createElement('div');
                 item.className = 'chat-contact-item';
-                item.innerHTML = `<span style="width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; display: inline-block;"></span> ${friend}`;
-                item.onclick = () => selectChatFriend(friend, item);
+                if (currentChatUserEmail === u.email) {
+                    item.classList.add('active');
+                }
+                item.innerHTML = `
+                    <span>🟢 ${u.name}</span>
+                    <span style="font-size: 11px; color: #0072ff; font-weight: bold;">Chat</span>
+                `;
+                item.onclick = () => selectChatUser(u.email, u.name, item);
                 sidebar.appendChild(item);
             });
         }
 
-        function selectChatFriend(friendName, element) {
+        function startChatDirectly(email, name) {
+            currentChatUserEmail = email;
+            switchPage('chat-page', document.querySelectorAll('.nav-btn')[3]);
+            
+            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            loadChatSidebar(currentUser);
+            
+            document.getElementById('active-chat-title').innerText = `Real-time Chat with ${name} 🟢`;
+            document.getElementById('chat-input-box').style.display = 'flex';
+            renderChatMessages();
+        }
+
+        function selectChatUser(email, name, element) {
             document.querySelectorAll('.chat-contact-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            currentChatFriend = friendName;
-            document.getElementById('active-chat-title').innerText = `Chat with ${friendName} (Live)`;
+            currentChatUserEmail = email;
+            document.getElementById('active-chat-title').innerText = `Real-time Chat with ${name} 🟢`;
             document.getElementById('chat-input-box').style.display = 'flex';
+            renderChatMessages();
+        }
 
+        function getChatKey(email1, email2) {
+            return 'chat_' + [email1, email2].sort().join('_');
+        }
+
+        function renderChatMessages() {
+            if (!currentChatUserEmail) return;
+            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            const chatKey = getChatKey(currentUser.email, currentChatUserEmail);
+            
+            let messages = JSON.parse(localStorage.getItem(chatKey)) || [];
             const chatMessages = document.getElementById('chat-messages');
-            chatMessages.innerHTML = `
-                <div class="chat-bubble incoming">Hey! Connected live with ${friendName}. Say hello!</div>
-            `;
+            
+            chatMessages.innerHTML = '';
+            if (messages.length === 0) {
+                chatMessages.innerHTML = '<div style="color: #888; font-size: 13px; text-align: center; margin-top: auto; margin-bottom: auto;">No messages yet. Send a real-time message below!</div>';
+                return;
+            }
+
+            messages.forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = 'chat-bubble ' + (msg.sender === currentUser.email ? 'outgoing' : 'incoming');
+                bubble.innerText = msg.text;
+                chatMessages.appendChild(bubble);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendRealtimeMessage() {
+            if (!currentChatUserEmail) return alert('Please select a user from the chat list first.');
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            const chatKey = getChatKey(currentUser.email, currentChatUserEmail);
+
+            let messages = JSON.parse(localStorage.getItem(chatKey)) || [];
+            messages.push({ sender: currentUser.email, text: text, timestamp: Date.now() });
+            localStorage.setItem(chatKey, JSON.stringify(messages));
+
+            input.value = '';
+            renderChatMessages();
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendRealtimeMessage();
+            }
         }
 
         function switchPage(pageId, btnElement) {
@@ -1209,6 +1289,9 @@
                 const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
                 document.getElementById('user-search-input').value = '';
                 loadPublicUsers(currentUser);
+            } else if (pageId === 'chat-page') {
+                const currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+                loadChatSidebar(currentUser);
             }
         }
 
@@ -1260,22 +1343,6 @@
                     document.getElementById('stat-likes').innerText = currentUser.likesCount;
                 }
             }
-        }
-
-        function sendMessage() {
-            if (!currentChatFriend) return alert('Please select a friend from the chat sidebar first.');
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const chatMessages = document.getElementById('chat-messages');
-            const bubble = document.createElement('div');
-            bubble.className = 'chat-bubble outgoing';
-            bubble.innerText = text;
-            chatMessages.appendChild(bubble);
-
-            input.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     </script>
 </body>
