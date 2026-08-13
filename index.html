@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs - The Complete Social Platform</title>
+    <title>TexUs - Complete Social Platform with AI Assistant</title>
     <style>
         :root {
             --brand-pink: #ff1493;
             --brand-blue: #0072ff;
             --brand-gradient: linear-gradient(135deg, #0072ff 0%, #ff1493 100%);
+            --ai-gradient: linear-gradient(135deg, #7928ca 0%, #ff0080 100%);
             --fb-bg: #f0f2f5;
             --fb-card: #ffffff;
             --fb-text: #050505;
@@ -215,6 +216,11 @@
             border: 1px solid var(--fb-border);
         }
 
+        .avatar-circle.ai-avatar {
+            background: var(--ai-gradient);
+            color: white;
+        }
+
         .avatar-circle img {
             width: 100%;
             height: 100%;
@@ -381,6 +387,12 @@
             background: var(--brand-gradient);
             color: white;
             align-self: flex-end;
+        }
+
+        .msg-bubble.ai-msg {
+            background: var(--ai-gradient);
+            color: white;
+            align-self: flex-start;
         }
 
         .messenger-input-row {
@@ -563,7 +575,7 @@
                             <div class="post-time">Welcome Stream • 🟢 Live Worldwide</div>
                         </div>
                     </div>
-                    <div class="post-body-text">Welcome to TexUs! Post updates, comment, like, share posts, and start real-time video/voice calls instantly.</div>
+                    <div class="post-body-text">Welcome to TexUs! Now equipped with an AI Assistant in Messenger—ask it anything and get immediate answers!</div>
                     <video controls style="width: 100%; border-radius: 8px; background: #000; max-height: 280px;">
                         <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
                     </video>
@@ -575,7 +587,7 @@
             <div id="friends-page" class="app-page">
                 <div class="feed-post-card">
                     <h2 style="font-size: 18px; margin-bottom: 5px;">TexUs Global Directory</h2>
-                    <p style="font-size: 13px; color: var(--fb-secondary); margin-bottom: 15px;">Connect with members across the globe in real-time. Follow them, chat, or place voice/video calls!</p>
+                    <p style="font-size: 13px; color: var(--fb-secondary); margin-bottom: 15px;">Connect with members or chat with the AI assistant anytime!</p>
                     <div id="public-live-users-container"></div>
                 </div>
             </div>
@@ -595,21 +607,29 @@
 
                     <div class="messenger-sidebar">
                         <div style="font-weight: bold; font-size: 15px; margin-bottom: 10px; color: #333;">Chats & Calls</div>
+                        <div class="contact-row-item" onclick="openAIChat()">
+                            <div class="avatar-circle ai-avatar">🤖<div class="online-dot"></div></div>
+                            <div>
+                                <div style="font-weight: 600;">TexUs AI Assistant</div>
+                                <div style="font-size: 11px; color: var(--brand-pink); font-weight: bold;">✨ Ask me anything</div>
+                            </div>
+                        </div>
+                        <div style="border-bottom: 1px solid var(--fb-border); margin: 8px 0;"></div>
                         <div id="messenger-contacts-list"></div>
                     </div>
                     <div class="messenger-chat-area">
                         <div class="messenger-header" id="messenger-header-title">
-                            <span>Select a contact to chat</span>
+                            <span>Select a contact or AI Assistant to chat</span>
                             <div id="call-action-buttons" style="display:none; gap: 8px;">
                                 <button class="btn-solid-blue" onclick="startCall('voice')" style="padding: 5px 10px; font-size: 12px;">📞 Voice Call</button>
                                 <button class="btn-solid-pink" onclick="startCall('video')" style="padding: 5px 10px; font-size: 12px;">📹 Video Call</button>
                             </div>
                         </div>
                         <div class="messenger-messages" id="messenger-messages-box">
-                            <div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Pick a global member from the left sidebar to start messaging.</div>
+                            <div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Select the AI Assistant or a member to begin messaging.</div>
                         </div>
                         <div class="messenger-input-row" id="messenger-input-wrapper" style="display: none;">
-                            <input type="text" id="messenger-msg-input" placeholder="Type a message..." onkeypress="handleMessengerEnter(event)">
+                            <input type="text" id="messenger-msg-input" placeholder="Type a message or ask AI anything..." onkeypress="handleMessengerEnter(event)">
                             <button class="btn-solid-blue" onclick="sendMessengerMsg()">Send</button>
                         </div>
                     </div>
@@ -661,16 +681,24 @@
         </div>
 
         <div class="fb-sidebar-right">
-            <div style="font-weight: bold; color: var(--fb-secondary); font-size: 14px; margin-bottom: 10px;">🟢 Global Live Contacts</div>
+            <div style="font-weight: bold; color: var(--fb-secondary); font-size: 14px; margin-bottom: 10px;">🤖 TexUs AI Assistant</div>
+            <div class="contact-row-item" onclick="openAIChat()">
+                <div class="avatar-circle ai-avatar">🤖<div class="online-dot"></div></div>
+                <div>
+                    <div style="font-weight: 600; font-size: 14px;">Ask AI Anything</div>
+                    <div style="font-size: 11px; color: var(--fb-secondary);">Always online</div>
+                </div>
+            </div>
+            <div style="font-weight: bold; color: var(--fb-secondary); font-size: 14px; margin: 15px 0 10px 0;">🟢 Global Live Contacts</div>
             <div id="right-sidebar-contacts"></div>
         </div>
     </div>
 
     <script>
         let currentChatUserEmail = null;
+        let isAiChatActive = false;
 
         window.onload = function() {
-            // Automatically initialize a default user profile so the app works instantly without login/signup
             let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             if (!currentUser) {
                 currentUser = {
@@ -681,12 +709,11 @@
                     friendsCount: 3,
                     likesCount: 12,
                     profilePic: "",
-                    bio: "Welcome to TexUs! Connected live worldwide.",
+                    bio: "Welcome to TexUs with AI Assistant!",
                     isPrivate: false
                 };
                 sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
 
-                // Seed some simulated global users if none exist in localStorage
                 let users = JSON.parse(localStorage.getItem('texus_users')) || [];
                 if (users.length === 0) {
                     users = [
@@ -700,7 +727,6 @@
 
             initApp(currentUser);
 
-            // Real-time synchronization loop across global users and components
             setInterval(() => {
                 const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
                 if (user) {
@@ -798,7 +824,6 @@
             let users = JSON.parse(localStorage.getItem('texus_users')) || [];
             const publicUsers = users.filter(u => u.email !== currentUser.email && !u.isPrivate);
 
-            // Render Global Directory (Friends Page)
             const dirContainer = document.getElementById('public-live-users-container');
             dirContainer.innerHTML = '';
             if (publicUsers.length === 0) {
@@ -820,7 +845,6 @@
                 dirContainer.appendChild(row);
             });
 
-            // Render Right Sidebar
             const rightBar = document.getElementById('right-sidebar-contacts');
             rightBar.innerHTML = '';
             publicUsers.forEach(u => {
@@ -834,12 +858,11 @@
                 rightBar.appendChild(item);
             });
 
-            // Render Messenger Sidebar List
             const messengerSidebar = document.getElementById('messenger-contacts-list');
             messengerSidebar.innerHTML = '';
             publicUsers.forEach(u => {
                 const item = document.createElement('div');
-                item.className = 'contact-row-item' + (currentChatUserEmail === u.email ? ' active' : '');
+                item.className = 'contact-row-item' + (!isAiChatActive && currentChatUserEmail === u.email ? ' active' : '');
                 item.onclick = () => openMessengerChat(u.email, u.name);
                 item.innerHTML = `
                     <div class="avatar-circle">${u.profilePic ? `<img src="${u.profilePic}">` : u.name.charAt(0)}<div class="online-dot"></div></div>
@@ -848,7 +871,9 @@
                 messengerSidebar.appendChild(item);
             });
 
-            if (currentChatUserEmail) {
+            if (isAiChatActive) {
+                renderAIChatMessages(currentUser.email);
+            } else if (currentChatUserEmail) {
                 renderChatMessages(currentUser.email, currentChatUserEmail);
             }
             renderNewsfeed();
@@ -873,6 +898,7 @@
         }
 
         function openMessengerChat(email, name) {
+            isAiChatActive = false;
             currentChatUserEmail = email;
             switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2]);
             document.getElementById('messenger-header-title').querySelector('span').innerText = `Messenger Chat with ${name} 🟢`;
@@ -883,25 +909,17 @@
             refreshAllLiveComponents(user);
         }
 
-        // Voice and Video Calls simulation handler
-        function startCall(type) {
-            const overlay = document.getElementById('call-overlay');
-            const heading = document.getElementById('call-status-heading');
-            const peerLabel = document.getElementById('call-peer-label');
-            const myLabel = document.getElementById('call-my-label');
+        // Open AI Assistant Chat Interface
+        function openAIChat() {
+            isAiChatActive = true;
+            currentChatUserEmail = null;
+            switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2]);
+            document.getElementById('messenger-header-title').querySelector('span').innerText = `TexUs AI Assistant 🤖 (Ask me anything!)`;
+            document.getElementById('call-action-buttons').style.display = 'none';
+            document.getElementById('messenger-input-wrapper').style.display = 'flex';
 
-            overlay.style.display = 'flex';
-            heading.innerText = type === 'video' ? '📹 Connecting Video Call...' : '📞 Connecting Voice Call...';
-            peerLabel.innerText = currentChatUserEmail;
-            myLabel.innerText = type === 'video' ? 'You (Video Active)' : 'You (Voice Active)';
-
-            setTimeout(() => {
-                heading.innerText = type === 'video' ? '🟢 Video Call Connected Worldwide' : '🟢 Voice Call Connected Worldwide';
-            }, 1500);
-        }
-
-        function endCall() {
-            document.getElementById('call-overlay').style.display = 'none';
+            const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            renderAIChatMessages(user.email);
         }
 
         function getChatKey(e1, e2) {
@@ -928,25 +946,101 @@
             box.scrollTop = box.scrollHeight;
         }
 
+        function renderAIChatMessages(myEmail) {
+            const key = 'texus_ai_chat_' + myEmail;
+            let messages = JSON.parse(localStorage.getItem(key));
+            if (!messages) {
+                messages = [
+                    { sender: 'ai', text: "Hello! I am your TexUs AI Assistant. You can ask me anything—coding questions, facts, brainstorming, or help with social posting!" }
+                ];
+                localStorage.setItem(key, JSON.stringify(messages));
+            }
+
+            const box = document.getElementById('messenger-messages-box');
+            box.innerHTML = '';
+
+            messages.forEach(m => {
+                const bubble = document.createElement('div');
+                bubble.className = 'msg-bubble ' + (m.sender === 'user' ? 'outgoing' : 'ai-msg');
+                bubble.innerText = m.text;
+                box.appendChild(bubble);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
         function sendMessengerMsg() {
-            if (!currentChatUserEmail) return;
             const input = document.getElementById('messenger-msg-input');
             const text = input.value.trim();
             if (!text) return;
 
             const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            const key = getChatKey(user.email, currentChatUserEmail);
 
-            let messages = JSON.parse(localStorage.getItem(key)) || [];
-            messages.push({ sender: user.email, text, time: Date.now() });
-            localStorage.setItem(key, JSON.stringify(messages));
+            if (isAiChatActive) {
+                const key = 'texus_ai_chat_' + user.email;
+                let messages = JSON.parse(localStorage.getItem(key)) || [];
+                messages.push({ sender: 'user', text, time: Date.now() });
+                
+                // Generate AI response
+                const aiReply = generateAIResponse(text);
+                messages.push({ sender: 'ai', text: aiReply, time: Date.now() + 100 });
 
-            input.value = '';
-            renderChatMessages(user.email, currentChatUserEmail);
+                localStorage.setItem(key, JSON.stringify(messages));
+                input.value = '';
+                renderAIChatMessages(user.email);
+            } else if (currentChatUserEmail) {
+                const key = getChatKey(user.email, currentChatUserEmail);
+                let messages = JSON.parse(localStorage.getItem(key)) || [];
+                messages.push({ sender: user.email, text, time: Date.now() });
+                localStorage.setItem(key, JSON.stringify(messages));
+
+                input.value = '';
+                renderChatMessages(user.email, currentChatUserEmail);
+            }
+        }
+
+        // Smart simulated AI responder function for answering any user queries
+        function generateAIResponse(query) {
+            const q = query.toLowerCase();
+            if (q.includes('hello') || q.includes('hi') || q.includes('hey')) {
+                return "Hello! How can I help you today?";
+            } else if (q.includes('how are you')) {
+                return "I'm doing great, running smoothly on the TexUs platform! What's on your mind?";
+            } else if (q.includes('name')) {
+                return "I am the TexUs AI Assistant, built right into your messaging suite.";
+            } else if (q.includes('weather')) {
+                return "I don't have real-time live weather feeds connected right now, but I hope it's wonderful wherever you are!";
+            } else if (q.includes('joke')) {
+                return "Why do programmers prefer dark mode? Because light attracts bugs! 😄";
+            } else if (q.includes('help') || q.includes('what can you do')) {
+                return "You can ask me anything! Try asking me general knowledge questions, programming help, creative ideas, or advice.";
+            } else {
+                return `That's an interesting question about "${query}". As your AI assistant, I recommend breaking it down step-by-step, researching key references, or trying out new solutions right here on TexUs! Let me know if you need specific details.`;
+            }
         }
 
         function handleMessengerEnter(e) {
             if (e.key === 'Enter') sendMessengerMsg();
+        }
+
+        // Voice and Video Calls simulation handler
+        function startCall(type) {
+            const overlay = document.getElementById('call-overlay');
+            const heading = document.getElementById('call-status-heading');
+            const peerLabel = document.getElementById('call-peer-label');
+            const myLabel = document.getElementById('call-my-label');
+
+            overlay.style.display = 'flex';
+            heading.innerText = type === 'video' ? '📹 Connecting Video Call...' : '📞 Connecting Voice Call...';
+            peerLabel.innerText = currentChatUserEmail;
+            myLabel.innerText = type === 'video' ? 'You (Video Active)' : 'You (Voice Active)';
+
+            setTimeout(() => {
+                heading.innerText = type === 'video' ? '🟢 Video Call Connected Worldwide' : '🟢 Voice Call Connected Worldwide';
+            }, 1500);
+        }
+
+        function endCall() {
+            document.getElementById('call-overlay').style.display = 'none';
         }
 
         function publishPost() {
