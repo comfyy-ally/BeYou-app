@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs - Ultimate Social Suite</title>
+    <title>TexUs - The Complete Social Platform</title>
     <style>
         :root {
             --brand-pink: #ff1493;
@@ -27,145 +27,7 @@
         body {
             background-color: var(--fb-bg);
             color: var(--fb-text);
-        }
-
-        /* --- AUTHENTICATION SCREEN --- */
-        #auth-screen {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(0, 114, 255, 0.08) 0%, rgba(255, 20, 147, 0.08) 100%);
-        }
-
-        .auth-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 980px;
-            width: 100%;
-            gap: 40px;
-            margin-bottom: 60px;
-        }
-
-        .auth-left {
-            flex: 1;
-            padding-bottom: 50px;
-        }
-
-        .auth-logo-text {
-            background: var(--brand-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 64px;
-            font-weight: bold;
-            letter-spacing: -2px;
-            margin-bottom: 10px;
-        }
-
-        .auth-tagline {
-            font-size: 26px;
-            line-height: 32px;
-            color: #1c1e21;
-        }
-
-        .auth-right {
-            width: 396px;
-            flex-shrink: 0;
-        }
-
-        .fb-card {
-            background-color: var(--fb-card);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            border-top: 4px solid var(--brand-blue);
-        }
-
-        .form-container {
-            display: none;
-        }
-
-        .form-container.active {
-            display: block;
-        }
-
-        .fb-input {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 16px;
-            border: 1px solid var(--fb-border);
-            border-radius: 6px;
-            margin-bottom: 12px;
-            outline: none;
-            background: var(--fb-input-bg);
-        }
-
-        .fb-input:focus {
-            border-color: var(--brand-blue);
-            background: #fff;
-            box-shadow: 0 0 0 2px rgba(0, 114, 255, 0.15);
-        }
-
-        .fb-btn-primary {
-            width: 100%;
-            background: var(--brand-gradient);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 12px;
-            cursor: pointer;
-            margin-bottom: 16px;
-            transition: opacity 0.2s;
-        }
-
-        .fb-btn-primary:hover {
-            opacity: 0.9;
-        }
-
-        .fb-btn-secondary {
-            background-color: var(--brand-pink);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            padding: 10px 20px;
-            cursor: pointer;
-            display: inline-block;
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        .fb-divider {
-            border-bottom: 1px solid var(--fb-border);
-            margin: 20px 0;
-        }
-
-        .switch-link {
-            color: var(--brand-blue);
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .switch-link:hover {
-            text-decoration: underline;
-        }
-
-        .message {
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        .error { color: #fa383e; }
-        .success { color: #2ecc71; }
-
-        /* --- APP DASHBOARD SCREEN --- */
-        #app-screen {
-            display: none;
             flex-direction: column;
             min-height: 100vh;
         }
@@ -220,7 +82,7 @@
         .nav-tab-btn {
             background: none;
             border: none;
-            width: 100px;
+            width: 80px;
             height: 100%;
             cursor: pointer;
             display: flex;
@@ -427,7 +289,6 @@
         }
 
         .action-btn:hover { background: var(--fb-bg); }
-        .action-btn.liked { color: var(--brand-pink); }
 
         /* Comment Section Styles */
         .comments-section {
@@ -457,7 +318,7 @@
             outline: none;
         }
 
-        /* Real-Time Messenger Layout with Voice/Video Call Window */
+        /* Real-Time Messenger Layout with Voice/Video Call Overlay */
         .messenger-container {
             display: flex;
             height: calc(100vh - 100px);
@@ -613,6 +474,17 @@
             object-fit: cover;
         }
 
+        .fb-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            border: 1px solid var(--fb-border);
+            border-radius: 6px;
+            margin-bottom: 12px;
+            outline: none;
+            background: var(--fb-input-bg);
+        }
+
         .btn-solid-blue {
             background: var(--brand-blue);
             color: white;
@@ -636,221 +508,199 @@
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="auth-wrapper">
-            <div class="auth-left">
-                <div class="auth-logo-text">TexUs</div>
-                <div class="auth-tagline">TexUs brings complete social features together: Global Chat, Voice/Video Calls, Post Shares, Comments & Likes!</div>
-            </div>
-            <div class="auth-right">
-                <div id="login-form" class="fb-card form-container active">
-                    <h2 style="margin-bottom: 15px; color: #333;">Sign In</h2>
-                    <input type="email" id="login-email" class="fb-input" placeholder="Email address">
-                    <input type="password" id="login-password" class="fb-input" placeholder="Password">
-                    <button class="fb-btn-primary" onclick="handleLogin()">Log In</button>
-                    <p id="login-msg" class="message"></p>
-                    <div class="fb-divider"></div>
-                    <button class="fb-btn-secondary" onclick="switchAuthForm('signup')">Create new account</button>
-                </div>
-
-                <div id="signup-form" class="fb-card form-container">
-                    <h2 style="margin-bottom: 5px;">Sign Up</h2>
-                    <p style="color: var(--fb-secondary); font-size: 14px; margin-bottom: 15px;">It's quick and easy.</p>
-                    <input type="text" id="signup-name" class="fb-input" placeholder="Full name">
-                    <input type="email" id="signup-email" class="fb-input" placeholder="Email address">
-                    <input type="password" id="signup-password" class="fb-input" placeholder="New password">
-                    <button class="fb-btn-primary" onclick="handleSignupRequestCode()">Send Email Verification</button>
-                    <p id="signup-msg" class="message"></p>
-                    <p style="margin-top: 15px; font-size: 14px;">Already have an account? <span class="switch-link" onclick="switchAuthForm('login')">Log In</span></p>
-                </div>
-
-                <div id="verify-form" class="fb-card form-container">
-                    <h2 style="margin-bottom: 10px;">Email Verification</h2>
-                    <p id="verify-sent-notice" style="font-size: 13px; color: var(--fb-secondary); margin-bottom: 15px; text-align: left;"></p>
-                    <input type="text" id="verify-code-input" class="fb-input" placeholder="4-digit code" maxlength="4" style="text-align: center; letter-spacing: 4px; font-size: 18px;">
-                    <button class="fb-btn-primary" onclick="handleVerifyAndCompleteSignup()">Confirm & Complete</button>
-                    <p id="verify-msg" class="message"></p>
-                </div>
+    <header class="fb-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-badge">TexUs</div>
+            <div class="fb-search-bar">
+                <span>🔍</span>
+                <input type="text" id="search-input-field" placeholder="Search members worldwide..." oninput="handleGlobalSearch()">
             </div>
         </div>
-    </div>
 
-    <div id="app-screen">
-        <header class="fb-header">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="logo-badge">TexUs</div>
-                <div class="fb-search-bar">
-                    <span>🔍</span>
-                    <input type="text" id="search-input-field" placeholder="Search members worldwide..." oninput="handleGlobalSearch()">
-                </div>
+        <div class="fb-header-center">
+            <button class="nav-tab-btn active" onclick="switchPage('feed-page', this)" title="Newsfeed">🏠</button>
+            <button class="nav-tab-btn" onclick="switchPage('friends-page', this)" title="Global Live Directory">👥</button>
+            <button class="nav-tab-btn" onclick="switchPage('chat-page', this)" title="Messenger & Calls">💬</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="user-mini-profile" onclick="switchPage('profile-page', document.querySelectorAll('.nav-tab-btn')[0])">
+                <div class="avatar-circle" id="header-mini-avatar" style="width: 28px; height: 28px; font-size: 12px;">U</div>
+                <span id="header-username-text">User</span>
             </div>
+        </div>
+    </header>
 
-            <div class="fb-header-center">
-                <button class="nav-tab-btn active" onclick="switchPage('feed-page', this)" title="Newsfeed">🏠</button>
-                <button class="nav-tab-btn" onclick="switchPage('friends-page', this)" title="Global Live Directory">👥</button>
-                <button class="nav-tab-btn" onclick="switchPage('chat-page', this)" title="Messenger & Calls">💬</button>
+    <div class="fb-workspace">
+        <div class="fb-sidebar-left">
+            <div class="sidebar-item" onclick="switchPage('profile-page', this)">
+                <div class="avatar-circle" id="sidebar-mini-avatar" style="width: 32px; height: 32px; font-size: 14px;">U</div>
+                <span id="sidebar-username-text">Profile</span>
             </div>
+            <div class="sidebar-item" onclick="switchPage('friends-page', document.querySelectorAll('.nav-tab-btn')[1])">👥 Global Live Directory</div>
+            <div class="sidebar-item" onclick="switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2])">💬 Messenger Chats & Calls</div>
+            <div class="sidebar-item" onclick="switchPage('settings-page', this)">⚙️ Settings & Privacy</div>
+        </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div class="user-mini-profile" onclick="switchPage('profile-page', document.querySelectorAll('.nav-tab-btn')[0])">
-                    <div class="avatar-circle" id="header-mini-avatar" style="width: 28px; height: 28px; font-size: 12px;">U</div>
-                    <span id="header-username-text">User</span>
-                </div>
-            </div>
-        </header>
-
-        <div class="fb-workspace">
-            <div class="fb-sidebar-left">
-                <div class="sidebar-item" onclick="switchPage('profile-page', this)">
-                    <div class="avatar-circle" id="sidebar-mini-avatar" style="width: 32px; height: 32px; font-size: 14px;">U</div>
-                    <span id="sidebar-username-text">Profile</span>
-                </div>
-                <div class="sidebar-item" onclick="switchPage('friends-page', document.querySelectorAll('.nav-tab-btn')[1])">👥 Global Live Directory</div>
-                <div class="sidebar-item" onclick="switchPage('chat-page', document.querySelectorAll('.nav-tab-btn')[2])">💬 Messenger Chats & Calls</div>
-                <div class="sidebar-item" onclick="switchPage('settings-page', this)">⚙️ Settings & Privacy</div>
-            </div>
-
-            <div class="fb-main-content">
-                
-                <div id="feed-page" class="app-page active">
-                    <div class="post-box">
-                        <div class="post-input-box">
-                            <div class="avatar-circle" id="post-user-avatar">U</div>
-                            <input type="text" id="post-text-input" placeholder="What's on your mind?">
-                        </div>
-                        <div style="display: flex; justify-content: flex-end;">
-                            <button class="btn-solid-blue" onclick="publishPost()">Post</button>
-                        </div>
+        <div class="fb-main-content">
+            
+            <div id="feed-page" class="app-page active">
+                <div class="post-box">
+                    <div class="post-input-box">
+                        <div class="avatar-circle" id="post-user-avatar">U</div>
+                        <input type="text" id="post-text-input" placeholder="What's on your mind?">
                     </div>
-
-                    <div class="feed-post-card">
-                        <div class="post-header">
-                            <div class="avatar-circle" style="background: var(--brand-gradient); color: white;">T</div>
-                            <div>
-                                <div class="post-author-name">TexUs Official</div>
-                                <div class="post-time">Welcome Stream • 🟢 Live Worldwide</div>
-                            </div>
-                        </div>
-                        <div class="post-body-text">Welcome to TexUs! Post updates, comment, like, share posts, and start real-time video/voice calls instantly.</div>
-                        <video controls style="width: 100%; border-radius: 8px; background: #000; max-height: 280px;">
-                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                        </video>
-                    </div>
-
-                    <div id="newsfeed-stream-container"></div>
-                </div>
-
-                <div id="friends-page" class="app-page">
-                    <div class="feed-post-card">
-                        <h2 style="font-size: 18px; margin-bottom: 5px;">TexUs Global Directory</h2>
-                        <p style="font-size: 13px; color: var(--fb-secondary); margin-bottom: 15px;">Connect with members across the globe in real-time. Follow them, chat, or place voice/video calls!</p>
-                        <div id="public-live-users-container"></div>
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button class="btn-solid-blue" onclick="publishPost()">Post</button>
                     </div>
                 </div>
 
-                <div id="chat-page" class="app-page">
-                    <div class="messenger-container">
-                        <div id="call-overlay">
-                            <h2 id="call-status-heading" style="margin-bottom: 20px;">Calling...</h2>
-                            <div class="call-video-grid">
-                                <div class="video-box"><span id="call-peer-label">Peer</span></div>
-                                <div class="video-box"><span id="call-my-label">You (Camera On)</span></div>
-                            </div>
-                            <div>
-                                <button class="btn-solid-pink" onclick="endCall()" style="background: #fa383e; padding: 12px 24px; font-size: 16px;">End Call ❌</button>
-                            </div>
-                        </div>
-
-                        <div class="messenger-sidebar">
-                            <div style="font-weight: bold; font-size: 15px; margin-bottom: 10px; color: #333;">Chats & Calls</div>
-                            <div id="messenger-contacts-list"></div>
-                        </div>
-                        <div class="messenger-chat-area">
-                            <div class="messenger-header" id="messenger-header-title">
-                                <span>Select a contact to chat</span>
-                                <div id="call-action-buttons" style="display:none; gap: 8px;">
-                                    <button class="btn-solid-blue" onclick="startCall('voice')" style="padding: 5px 10px; font-size: 12px;">📞 Voice Call</button>
-                                    <button class="btn-solid-pink" onclick="startCall('video')" style="padding: 5px 10px; font-size: 12px;">📹 Video Call</button>
-                                </div>
-                            </div>
-                            <div class="messenger-messages" id="messenger-messages-box">
-                                <div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Pick a global member from the left sidebar to start messaging.</div>
-                            </div>
-                            <div class="messenger-input-row" id="messenger-input-wrapper" style="display: none;">
-                                <input type="text" id="messenger-msg-input" placeholder="Type a message..." onkeypress="handleMessengerEnter(event)">
-                                <button class="btn-solid-blue" onclick="sendMessengerMsg()">Send</button>
-                            </div>
+                <div class="feed-post-card">
+                    <div class="post-header">
+                        <div class="avatar-circle" style="background: var(--brand-gradient); color: white;">T</div>
+                        <div>
+                            <div class="post-author-name">TexUs Official</div>
+                            <div class="post-time">Welcome Stream • 🟢 Live Worldwide</div>
                         </div>
                     </div>
+                    <div class="post-body-text">Welcome to TexUs! Post updates, comment, like, share posts, and start real-time video/voice calls instantly.</div>
+                    <video controls style="width: 100%; border-radius: 8px; background: #000; max-height: 280px;">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    </video>
                 </div>
 
-                <div id="profile-page" class="app-page">
-                    <div class="feed-post-card" style="padding: 0; overflow: hidden;">
-                        <div class="profile-cover">
-                            <div class="profile-avatar-container" onclick="document.getElementById('profile-pic-input').click()">
-                                <img id="profile-avatar-img" src="" alt="Avatar" style="display:none;">
-                                <div id="profile-avatar-fallback" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 42px; color: var(--brand-blue); font-weight: bold;">U</div>
-                            </div>
-                        </div>
-                        <input type="file" id="profile-pic-input" accept="image/*" style="display:none;" onchange="uploadProfilePic(event)">
-
-                        <div style="padding: 40px 20px 20px 20px;">
-                            <h2 id="profile-name-heading" style="font-size: 22px; margin-bottom: 5px;">User Name</h2>
-                            <p id="profile-email-sub" style="color: var(--fb-secondary); font-size: 13px; margin-bottom: 15px;"></p>
-
-                            <div style="display: flex; gap: 20px; font-weight: 600; color: var(--fb-secondary); font-size: 14px; border-bottom: 1px solid var(--fb-border); padding-bottom: 12px; margin-bottom: 15px;">
-                                <div>Followers: <span id="stat-followers" style="color: var(--fb-text);">0</span></div>
-                                <div>Friends: <span id="stat-friends" style="color: var(--fb-text);">0</span></div>
-                                <div>Likes: <span id="stat-likes" style="color: var(--fb-text);">0</span></div>
-                            </div>
-
-                            <div style="margin-bottom: 15px;">
-                                <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px;">Bio / Status</label>
-                                <textarea id="profile-bio-textarea" class="fb-input" style="height: 70px; resize: none;"></textarea>
-                                <button class="btn-solid-pink" onclick="saveProfileBio()">Save Bio</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="settings-page" class="app-page">
-                    <div class="feed-post-card">
-                        <h2 style="font-size: 18px; margin-bottom: 15px;">Settings & Privacy</h2>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--fb-border);">
-                            <div>
-                                <div style="font-weight: 600;">Private Account Mode</div>
-                                <div style="font-size: 13px; color: var(--fb-secondary);">Hide profile visibility from global directory</div>
-                            </div>
-                            <input type="checkbox" id="privacy-mode-toggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="togglePrivacy(this)">
-                        </div>
-                        <div style="margin-top: 20px;">
-                            <button class="btn-solid-pink" onclick="handleLogout()" style="width: 100%; margin-bottom: 10px;">Log Out</button>
-                            <button class="fb-btn-primary" style="background: #fa383e;" onclick="deleteUserAccount()">Delete Account</button>
-                        </div>
-                    </div>
-                </div>
-
+                <div id="newsfeed-stream-container"></div>
             </div>
 
-            <div class="fb-sidebar-right">
-                <div style="font-weight: bold; color: var(--fb-secondary); font-size: 14px; margin-bottom: 10px;">🟢 Global Live Contacts</div>
-                <div id="right-sidebar-contacts"></div>
+            <div id="friends-page" class="app-page">
+                <div class="feed-post-card">
+                    <h2 style="font-size: 18px; margin-bottom: 5px;">TexUs Global Directory</h2>
+                    <p style="font-size: 13px; color: var(--fb-secondary); margin-bottom: 15px;">Connect with members across the globe in real-time. Follow them, chat, or place voice/video calls!</p>
+                    <div id="public-live-users-container"></div>
+                </div>
             </div>
+
+            <div id="chat-page" class="app-page">
+                <div class="messenger-container">
+                    <div id="call-overlay">
+                        <h2 id="call-status-heading" style="margin-bottom: 20px;">Calling...</h2>
+                        <div class="call-video-grid">
+                            <div class="video-box"><span id="call-peer-label">Peer</span></div>
+                            <div class="video-box"><span id="call-my-label">You (Camera On)</span></div>
+                        </div>
+                        <div>
+                            <button class="btn-solid-pink" onclick="endCall()" style="background: #fa383e; padding: 12px 24px; font-size: 16px;">End Call ❌</button>
+                        </div>
+                    </div>
+
+                    <div class="messenger-sidebar">
+                        <div style="font-weight: bold; font-size: 15px; margin-bottom: 10px; color: #333;">Chats & Calls</div>
+                        <div id="messenger-contacts-list"></div>
+                    </div>
+                    <div class="messenger-chat-area">
+                        <div class="messenger-header" id="messenger-header-title">
+                            <span>Select a contact to chat</span>
+                            <div id="call-action-buttons" style="display:none; gap: 8px;">
+                                <button class="btn-solid-blue" onclick="startCall('voice')" style="padding: 5px 10px; font-size: 12px;">📞 Voice Call</button>
+                                <button class="btn-solid-pink" onclick="startCall('video')" style="padding: 5px 10px; font-size: 12px;">📹 Video Call</button>
+                            </div>
+                        </div>
+                        <div class="messenger-messages" id="messenger-messages-box">
+                            <div style="color: var(--fb-secondary); text-align: center; margin: auto; font-size: 14px;">Pick a global member from the left sidebar to start messaging.</div>
+                        </div>
+                        <div class="messenger-input-row" id="messenger-input-wrapper" style="display: none;">
+                            <input type="text" id="messenger-msg-input" placeholder="Type a message..." onkeypress="handleMessengerEnter(event)">
+                            <button class="btn-solid-blue" onclick="sendMessengerMsg()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile-page" class="app-page">
+                <div class="feed-post-card" style="padding: 0; overflow: hidden;">
+                    <div class="profile-cover">
+                        <div class="profile-avatar-container" onclick="document.getElementById('profile-pic-input').click()">
+                            <img id="profile-avatar-img" src="" alt="Avatar" style="display:none;">
+                            <div id="profile-avatar-fallback" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 42px; color: var(--brand-blue); font-weight: bold;">U</div>
+                        </div>
+                    </div>
+                    <input type="file" id="profile-pic-input" accept="image/*" style="display:none;" onchange="uploadProfilePic(event)">
+
+                    <div style="padding: 40px 20px 20px 20px;">
+                        <h2 id="profile-name-heading" style="font-size: 22px; margin-bottom: 5px;">User Name</h2>
+                        <p id="profile-email-sub" style="color: var(--fb-secondary); font-size: 13px; margin-bottom: 15px;"></p>
+
+                        <div style="display: flex; gap: 20px; font-weight: 600; color: var(--fb-secondary); font-size: 14px; border-bottom: 1px solid var(--fb-border); padding-bottom: 12px; margin-bottom: 15px;">
+                            <div>Followers: <span id="stat-followers" style="color: var(--fb-text);">0</span></div>
+                            <div>Friends: <span id="stat-friends" style="color: var(--fb-text);">0</span></div>
+                            <div>Likes: <span id="stat-likes" style="color: var(--fb-text);">0</span></div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px;">Bio / Status</label>
+                            <textarea id="profile-bio-textarea" class="fb-input" style="height: 70px; resize: none;"></textarea>
+                            <button class="btn-solid-pink" onclick="saveProfileBio()">Save Bio</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-page" class="app-page">
+                <div class="feed-post-card">
+                    <h2 style="font-size: 18px; margin-bottom: 15px;">Settings & Privacy</h2>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--fb-border);">
+                        <div>
+                            <div style="font-weight: 600;">Private Account Mode</div>
+                            <div style="font-size: 13px; color: var(--fb-secondary);">Hide profile visibility from global directory</div>
+                        </div>
+                        <input type="checkbox" id="privacy-mode-toggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="togglePrivacy(this)">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="fb-sidebar-right">
+            <div style="font-weight: bold; color: var(--fb-secondary); font-size: 14px; margin-bottom: 10px;">🟢 Global Live Contacts</div>
+            <div id="right-sidebar-contacts"></div>
         </div>
     </div>
 
     <script>
         let currentChatUserEmail = null;
-        let pendingSignupData = null;
-        let currentVerificationCode = null;
 
         window.onload = function() {
-            const loggedInUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-            if (loggedInUser) {
-                initApp(loggedInUser);
+            // Automatically initialize a default user profile so the app works instantly without login/signup
+            let currentUser = JSON.parse(sessionStorage.getItem('texus_logged_in'));
+            if (!currentUser) {
+                currentUser = {
+                    name: "TexUs User",
+                    email: "user@texus.app",
+                    friends: [],
+                    followersCount: 5,
+                    friendsCount: 3,
+                    likesCount: 12,
+                    profilePic: "",
+                    bio: "Welcome to TexUs! Connected live worldwide.",
+                    isPrivate: false
+                };
+                sessionStorage.setItem('texus_logged_in', JSON.stringify(currentUser));
+
+                // Seed some simulated global users if none exist in localStorage
+                let users = JSON.parse(localStorage.getItem('texus_users')) || [];
+                if (users.length === 0) {
+                    users = [
+                        { name: "Alex Johnson", email: "alex@texus.app", profilePic: "", bio: "Exploring TexUs!", isPrivate: false },
+                        { name: "Maria Garcia", email: "maria@texus.app", profilePic: "", bio: "Hello world!", isPrivate: false },
+                        { name: "Sam Chen", email: "sam@texus.app", profilePic: "", bio: "Code and coffee.", isPrivate: false }
+                    ];
+                    localStorage.setItem('texus_users', JSON.stringify(users));
+                }
             }
 
-            // Real-time synchronization loop across global users
+            initApp(currentUser);
+
+            // Real-time synchronization loop across global users and components
             setInterval(() => {
                 const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
                 if (user) {
@@ -859,97 +709,7 @@
             }, 1000);
         };
 
-        function switchAuthForm(type) {
-            document.getElementById('login-form').classList.remove('active');
-            document.getElementById('signup-form').classList.remove('active');
-            document.getElementById('verify-form').classList.remove('active');
-
-            document.getElementById('login-msg').innerText = '';
-            document.getElementById('signup-msg').innerText = '';
-            document.getElementById('verify-msg').innerText = '';
-
-            if (type === 'signup') document.getElementById('signup-form').classList.add('active');
-            else if (type === 'verify') document.getElementById('verify-form').classList.add('active');
-            else document.getElementById('login-form').classList.add('active');
-        }
-
-        function handleSignupRequestCode() {
-            const name = document.getElementById('signup-name').value.trim();
-            const email = document.getElementById('signup-email').value.trim();
-            const password = document.getElementById('signup-password').value.trim();
-            const msg = document.getElementById('signup-msg');
-
-            if (!name || !email || !password) {
-                msg.className = 'message error';
-                msg.innerText = 'Please complete all fields.';
-                return;
-            }
-
-            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            if (users.some(u => u.email === email)) {
-                msg.className = 'message error';
-                msg.innerText = 'Email already registered.';
-                return;
-            }
-
-            currentVerificationCode = Math.floor(1000 + Math.random() * 9000).toString();
-            pendingSignupData = {
-                name, email, password,
-                friends: [], followersCount: 0, friendsCount: 0, likesCount: 0,
-                profilePic: '', bio: 'TexUs global member!', isPrivate: false
-            };
-
-            document.getElementById('verify-sent-notice').innerHTML = `A verification code has been dispatched globally to <b>${email}</b>.`;
-            alert(`[TexUs Global Email System ✉️]\nVerification code for ${email}: ${currentVerificationCode}`);
-            document.getElementById('verify-code-input').value = '';
-            switchAuthForm('verify');
-        }
-
-        function handleVerifyAndCompleteSignup() {
-            const code = document.getElementById('verify-code-input').value.trim();
-            const msg = document.getElementById('verify-msg');
-
-            if (code !== currentVerificationCode) {
-                msg.className = 'message error';
-                msg.innerText = 'Incorrect verification code.';
-                return;
-            }
-
-            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            users.push(pendingSignupData);
-            localStorage.setItem('texus_users', JSON.stringify(users));
-
-            msg.className = 'message success';
-            msg.innerText = 'Verified successfully!';
-            setTimeout(() => {
-                pendingSignupData = null;
-                switchAuthForm('login');
-                document.getElementById('login-msg').className = 'message success';
-                document.getElementById('login-msg').innerText = 'Registration complete! Please log in.';
-            }, 1200);
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            const msg = document.getElementById('login-msg');
-
-            let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-            const user = users.find(u => u.email === email && u.password === password);
-
-            if (user) {
-                sessionStorage.setItem('texus_logged_in', JSON.stringify(user));
-                initApp(user);
-            } else {
-                msg.className = 'message error';
-                msg.innerText = 'Invalid email or password.';
-            }
-        }
-
         function initApp(user) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'flex';
-
             document.getElementById('header-username-text').innerText = user.name;
             document.getElementById('sidebar-username-text').innerText = user.name;
             document.getElementById('profile-name-heading').innerText = user.name;
@@ -992,22 +752,6 @@
             }
         }
 
-        function handleLogout() {
-            sessionStorage.removeItem('texus_logged_in');
-            document.getElementById('app-screen').style.display = 'none';
-            document.getElementById('auth-screen').style.display = 'flex';
-        }
-
-        function deleteUserAccount() {
-            if (confirm('Permanently delete your account?')) {
-                const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
-                let users = JSON.parse(localStorage.getItem('texus_users')) || [];
-                users = users.filter(u => u.email !== user.email);
-                localStorage.setItem('texus_users', JSON.stringify(users));
-                handleLogout();
-            }
-        }
-
         function uploadProfilePic(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1043,6 +787,9 @@
             const idx = users.findIndex(u => u.email === updated.email);
             if (idx !== -1) {
                 users[idx] = updated;
+                localStorage.setItem('texus_users', JSON.stringify(users));
+            } else {
+                users.push(updated);
                 localStorage.setItem('texus_users', JSON.stringify(users));
             }
         }
@@ -1266,7 +1013,6 @@
             const user = JSON.parse(sessionStorage.getItem('texus_logged_in'));
             posts[idx].shares = (posts[idx].shares || 0) + 1;
             
-            // Re-share to feed as a new post
             posts.unshift({ author: user.name + ' (Shared)', pic: user.profilePic, text: 'Shared post: "' + posts[idx].text + '"', likes: 0, shares: 0, comments: [] });
             localStorage.setItem('texus_posts', JSON.stringify(posts));
             alert('Post shared successfully to your feed!');
