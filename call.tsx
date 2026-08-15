@@ -20,7 +20,6 @@ export const CallScreen: React.FC<CallProps> = ({
   const [callDuration, setCallDuration] = useState<number>(0);
   const [socket, setSocket] = useState<Socket | null>(null);
 
-  // Connect to the signaling server on port 3000
   useEffect(() => {
     const newSocket = io('http://localhost:3000');
     setSocket(newSocket);
@@ -31,7 +30,6 @@ export const CallScreen: React.FC<CallProps> = ({
 
     newSocket.on('call-signal', (data) => {
       console.log('Received signal from peer:', data);
-      // Future WebRTC signaling logic will go here
     });
 
     return () => {
