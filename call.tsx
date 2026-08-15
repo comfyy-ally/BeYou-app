@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client';
 import './CallScreen.css';
 
 interface CallProps {
@@ -17,6 +18,26 @@ export const CallScreen: React.FC<CallProps> = ({
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isVideoOff, setIsVideoOff] = useState<boolean>(false);
   const [callDuration, setCallDuration] = useState<number>(0);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  // Connect to the signaling server on port 3000
+  useEffect(() => {
+    const newSocket = io('http://localhost:3000');
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
+      console.log('Connected to signaling server with ID:', newSocket.id);
+    });
+
+    newSocket.on('call-signal', (data) => {
+      console.log('Received signal from peer:', data);
+      // Future WebRTC signaling logic will go here
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
