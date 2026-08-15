@@ -26,6 +26,26 @@ export const CallScreen: React.FC<CallProps> = ({
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    async function setupMedia() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: callType === 'video',
+          audio: true,
+        });
+        
+        const localVideoElement = document.getElementById('local-video') as HTMLVideoElement;
+        if (localVideoElement) {
+          localVideoElement.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing media devices.', error);
+      }
+    }
+
+    setupMedia();
+  }, [callType]);
+
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -50,6 +70,7 @@ export const CallScreen: React.FC<CallProps> = ({
               <img src={callerAvatar} alt={callerName} className="avatar-large" />
             </div>
             <div className="local-video-preview">
+              <video id="local-video" autoPlay playsInline muted className="local-video-element" />
               <span className="preview-label">You</span>
             </div>
           </div>
@@ -68,7 +89,7 @@ export const CallScreen: React.FC<CallProps> = ({
           onClick={() => setIsMuted(!isMuted)}
           title={isMuted ? 'Unmute' : 'Mute'}
         >
-          {isMuted ? '🔇' : '🎤'}
+          <span>{isMuted ? '🔇' : '🎤'}</span>
         </button>
 
         {callType === 'video' && (
@@ -77,7 +98,7 @@ export const CallScreen: React.FC<CallProps> = ({
             onClick={() => setIsVideoOff(!isVideoOff)}
             title={isVideoOff ? 'Turn Video On' : 'Turn Video Off'}
           >
-            {isVideoOff ? '📷❌' : '📹'}
+            <span>{isVideoOff ? '📷❌' : '📹'}</span>
           </button>
         )}
 
@@ -86,7 +107,7 @@ export const CallScreen: React.FC<CallProps> = ({
           onClick={onEndCall}
           title="End Call"
         >
-         <span>📞❌</span>
+          <span>📞❌</span>
         </button>
       </div>
     </div>
