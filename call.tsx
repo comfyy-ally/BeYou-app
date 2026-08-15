@@ -1,35 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
-import './CallScreen.css';
 
-interface CallProps {
-  callerName: string;
-  callerAvatar: string;
-  callType: 'audio' | 'video';
-  onEndCall: () => void;
-}
-
-export const CallScreen: React.FC<CallProps> = ({
-  callerName,
-  callerAvatar,
-  callType,
-  onEndCall,
-}) => {
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isVideoOff, setIsVideoOff] = useState<boolean>(false);
-  const [callDuration, setCallDuration] = useState<number>(0);
+export const ChatComponent: React.FC = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [message, setMessage] = useState('');
+  const [chatLog, setChatLog] = useState<string[]>([]);
 
   useEffect(() => {
     const newSocket = io('http://localhost:3000');
     setSocket(newSocket);
 
-    newSocket.on('connect', () => {
-      console.log('Connected to signaling server with ID:', newSocket.id);
-    });
-
-    newSocket.on('call-signal', (data) => {
-      console.log('Received signal from peer:', data);
+    newSocket.on('chat-message', (msg: string) => {
+      setChatLog((prev) => [...prev, msg]);
     });
 
     return () => {
@@ -37,100 +19,34 @@ export const CallScreen: React.FC<CallProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCallDuration((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    async function setupMedia() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: callType === 'video',
-          audio: true,
-        });
-        
-        const localVideoElement = document.getElementById('local-video') as HTMLVideoElement;
-        if (localVideoElement) {
-          localVideoElement.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing media devices.', error);
-      }
+  const sendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (socket && message.trim()) {
+      socket.emit('chat-message', message);
+      setMessage('');
     }
-
-    setupMedia();
-  }, [callType]);
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
-    <div className="call-screen-container">
-      <div className="call-header">
-        <div className="call-info">
-          <h2>{callerName}</h2>
-          <p className="call-status">
-            {callDuration > 0 ? formatTime(callDuration) : 'Connecting...'}
-          </p>
-        </div>
+    <div style={{ padding: '20px', maxWidth: '400px', margin: 'auto' }}>
+      <h3>Live Socket Chat Test</h3>
+      <div style={{ border: '1px solid #ccc', height: '200px', overflowY: 'scroll', marginBottom: '10px', padding: '10px' }}>
+        {chatLog.map((msg, index) => (
+          <div key={index}>{msg}</div>
+        ))}
       </div>
-
-      <div className="call-media-viewport">
-        {callType === 'video' && !isVideoOff ? (
-          <div className="video-grid">
-            <div className="remote-video-placeholder">
-              <img src={callerAvatar} alt={callerName} className="avatar-large" />
-            </div>
-            <div className="local-video-preview">
-              <video id="local-video" autoPlay playsInline muted className="local-video-element" />
-              <span className="preview-label">You</span>
-            </div>
-          </div>
-        ) : (
-          <div className="audio-only-view">
-            <div className="avatar-ring">
-              <img src={callerAvatar} alt={callerName} className="avatar-large" />
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="call-controls-bar">
-        <button
-          className={`control-btn ${isMuted ? 'active' : ''}`}
-          onClick={() => setIsMuted(!isMuted)}
-          title={isMuted ? 'Unmute' : 'Mute'}
-        >
-          <span>{isMuted ? '🔇' : '🎤'}</span>
-        </button>
-
-        {callType === 'video' && (
-          <button
-            className={`control-btn ${isVideoOff ? 'active' : ''}`}
-            onClick={() => setIsVideoOff(!isVideoOff)}
-            title={isVideoOff ? 'Turn Video On' : 'Turn Video Off'}
-          >
-            <span>{isVideoOff ? '📷❌' : '📹'}</span>
-          </button>
-        )}
-
-        <button
-          className="control-btn end-call-btn"
-          onClick={onEndCall}
-          title="End Call"
-        >
-          <span>📞❌</span>
-        </button>
-      </div>
+      <form onSubmit={sendMessage} style={{ display: 'flex', gap: '10px' }}>
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type a message..."
+          style={{ flex: 1, padding: '8px' }}
+        />
+        <button type="submit" style={{ padding: '8px 16px' }}>Send</button>
+      </form>
     </div>
   );
 };
 
-export default CallScreen;
+export default ChatComponent;

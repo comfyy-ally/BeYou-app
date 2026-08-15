@@ -12,24 +12,13 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  console.log('A user connected:', socket.id);
 
-  // Listen for call signaling offers/answers
-  socket.on('call-signal', (data) => {
-    socket.broadcast.emit('call-signal', data);
-  });
-
-  // Listen for chat messages
   socket.on('chat-message', (msg) => {
-    io.emit('chat-message', msg);
-  });
-
-  socket.on('disconnect', () => {
-    console.log(`User disconnected: ${socket.id}`);
+    io.emit('chat-message', msg); // Broadcasts message to all connected clients
   });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Signaling server running on port ${PORT}`);
+server.listen(3000, () => {
+  console.log('Signaling server is running on http://localhost:3000');
 });
