@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs - WhatsApp Style Edition with Phone Authentication & Advanced AI</title>
+    <title>TexUs - chatting app with Phone Authentication & Advanced AI</title>
     <style>
         :root {
             --wa-teal: #00a884;
@@ -51,7 +51,7 @@
             display: flex;
         }
 
-        /* WhatsApp Web Login / Signup Screen Styling */
+        /* TexUs Web Login / Signup Screen Styling */
         .wa-auth-wrapper {
             width: 100%;
             height: 100vh;
@@ -153,7 +153,7 @@
         .wa-auth-btn {
             width: 100%;
             background-color: var(--wa-teal);
-            color: white;
+            color: hwb(337 2% 4%)24 1% 1%);
             border: none;
             padding: 12px;
             border-radius: 4px;
@@ -184,14 +184,14 @@
             text-decoration: underline;
         }
 
-        /* WhatsApp Web Desktop Chat Frame Container */
+        /* TexUs Web Desktop Chat Frame Container */
         .wa-app-container {
             display: flex;
             width: 100%;
             max-width: 1600px;
             height: 100vh;
             background-color: var(--wa-bg);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 20px rgba(1, 210, 196, 0.15);
             position: relative;
         }
 
@@ -1160,3 +1160,33 @@
     </script>
 </body>
 </html>
+
+<div class="stream-container" style="text-align: center; padding: 20px;">
+    <h2>Featured Movies & Videos</h2>
+    
+    <!-- Video Player -->
+    <video id="moviePlayer" width="100%" max-width="600px" controls>
+        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Watch Time Display for You to Track -->
+    <p>Total Watch Time: <span id="watchTimeCounter">0</span> minutes</p>
+</div>
+
+<script>
+    // Simple script to track active minutes watched
+    let watchSeconds = 0;
+    const video = document.getElementById('moviePlayer');
+    const counterDisplay = document.getElementById('watchTimeCounter');
+
+    // This checks every second if the video is actively playing
+    setInterval(() => {
+        if (!video.paused && !video.ended) {
+            watchSeconds++;
+            // Update the counter every full minute
+            let minutes = Math.floor(watchSeconds / 60);
+            counterDisplay.innerText = minutes;
+        }
+    }, 1000);
+</script>
