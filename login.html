@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TexUs - Sign In & Verification</title>
+    <link rel="stylesheet" href="CallScreen.css">
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .auth-card {
+            background: #1a1a24;
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #2a2a3b;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff3366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #e02e5b;
+        }
+        .hidden { display: none; }
+        .contact-list {
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
+            background: #121218;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h1 style="color: #ff3366; font-family: cursive;">TexUs</h1>
+        <h2>Welcome</h2>
+
+        <!-- Step 1: Phone Number Input & Contacts Permission -->
+        <div id="step1">
+            <p style="color: #aaa; font-size: 0.9rem;">Sign in using your mobile contact number</p>
+            <input type="tel" id="phoneNumber" placeholder="Enter phone number (e.g., +1234567890)" />
+            
+            <button id="requestContactsBtn">Sync Contacts & Continue</button>
+            
+            <div id="contactsContainer" class="hidden">
+                <p style="font-size: 0.85rem; color: #4cd137; margin: 5px 0;">Contacts synced successfully!</p>
+                <div id="contactsList" class="contact-list"></div>
+            </div>
+        </div>
+
+        <!-- Step 2: SMS Verification Code Input -->
+        <div id="step2" class="hidden">
+            <p style="color: #aaa; font-size: 0.9rem;">We sent a verification SMS to <span id="displayNum" style="color: #fff; font-weight: bold;"></span></p>
+            <input type="text" id="otpCode" placeholder="Enter 4-digit code" maxlength="4" />
+            <button id="verifyOtpBtn">Verify Code</button>
+        </div>
+    </div>
+
+    <script>
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const requestContactsBtn = document.getElementById('requestContactsBtn');
+        const contactsContainer = document.getElementById('contactsContainer');
+        const contactsList = document.getElementById('contactsList');
+        const displayNum = document.getElementById('displayNum');
+        const otpCodeInput = document.getElementById('otpCode');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+
+        let userPhoneNumber = '';
+
+        // Step 1: Request access to device contacts using the modern Web API
+        requestContactsBtn.addEventListener('click', async () => {
+            userPhoneNumber = phoneNumberInput.value.trim();
+
+            if (!userPhoneNumber) {
+                alert('Please enter a valid phone number first.');
+                return;
+            }
+
+            // Check if the browser supports the Contact Picker API (supported on mobile Chrome/Android and some modern environments)
+            if ('contacts' in navigator && 'Navigator' in window) {
+                const props = ['name', 'tel', 'email'];
+                const opts = { multiple: true };
+
+                try {
+                    const contacts = await navigator.contacts.select(props, opts);
+                    contactsContainer.classList.remove('hidden');
+                    contactsList.innerHTML = '';
+                    
+                    if (contacts.length > 0) {
+                        contacts.forEach(contact => {
+                            const item = document.div = document.createElement('div');
+                            item.innerText = `${contact.name || 'Unknown'}: ${contact.tel ? contact.tel[0] : 'No number'}`;
+                            contactsList.appendChild(item);
+                        });
+                    } else {
+                        contactsList.innerText = 'No contacts selected.';
+                    }
+                } catch (ex) {
+                    console.log('Contact selection cancelled or not supported:', ex);
+                }
+            } else {
+                // Fallback notice for desktop browsers that don't support device contacts picker natively
+                console.log('Contact Picker API not supported on this browser desktop client. Simulating sync.');
+                contactsContainer.classList.remove('hidden');
+                contactsList.innerHTML = '<div>Demo Contact: Sarah (555-0192)</div><div>Demo Contact: Mike (555-8392)</div>';
+            }
+
+            // Trigger SMS verification step after a brief pause
+            setTimeout(() => {
+                triggerSmsVerification(userPhoneNumber);
+            }, 1000);
+        });
+
+        // Function to simulate sending an SMS verification code via backend server
+        function triggerSmsVerification(phone) {
+            displayNum.innerText = phone;
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+
+            // In production, you would fetch your backend API endpoint to dispatch an SMS (via Twilio, etc.)
+            // Example simulated code log:
+            console.log(`[SMS Gateway] Sending OTP verification code '1234' to ${phone}`);
+            alert('Simulated SMS Sent! Check your console/debugger for the verification code: 1234');
+        }
+
+        // Step 2: Verify the entered code
+        verifyOtpBtn.addEventListener('click', () => {
+            const enteredCode = otpCodeInput.value.trim();
+
+            // For testing purposes, we hardcode '1234' as the correct verification code
+            if (enteredCode === '1234') {
+                alert('Phone number successfully verified! Welcome to TexUs.');
+                window.location.href = 'stream.html'; // Redirect to stream app upon success
+            } else {
+                alert('Invalid code. Please enter the correct verification code (1234).');
+            }
+        });
+    </script>
+</body>
+</html>
