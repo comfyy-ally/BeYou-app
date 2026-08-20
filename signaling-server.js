@@ -1,24 +1,40 @@
-const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 
-const app = express();
-const server = http.createServer(app);
+const server = http.createServer();
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+    console.log('TexUs user connected for calls:', socket.id);
 
-  socket.on('chat-message', (msg) => {
-    io.emit('chat-message', msg); // Broadcasts message to all connected clients
-  });
+    socket.on('join-room', (roomId) => {
+        socket.join(roomId);
+        socket.to(roomId).emit('user-connected', socket.id);
+    });
+
+    socket.on('offer', (data) => {
+        socket.to(data.room).emit('offer', data.offer);
+    });
+
+    socket.on('answer', (data) => {
+        socket.to(data.room).emit('answer', data.answer);
+    });
+
+    socket.on('ice-candidate', (data) => {
+        socket.to(data.room).emit('ice-candidate', data.candidate);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('TexUs user disconnected from calls:', socket.id);
+    });
 });
 
-server.listen(3000, () => {
-  console.log('Signaling server is running on http://localhost:3000');
+const SIGNAL_PORT = 3001;
+server.listen(SIGNAL_PORT, () => {
+    console.log(`TexUs signaling server running on http://localhost:${SIGNAL_PORT}`);
 });

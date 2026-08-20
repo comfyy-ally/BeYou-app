@@ -1,15 +1,15 @@
 {
-  "name": "beyou-app",
+  "name": "texus",
   "version": "1.0.0",
+  "description": "TexUs video streaming and social media app",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "signal": "node signaling-server.js"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-session": "^1.18.0"
+    "socket.io": "^4.7.5",
+    "cors": "^2.8.5"
   }
 }

@@ -1,137 +1,28 @@
 const express = require('express');
 const cors = require('cors');
-const session = require('express-session');
-const bcrypt = require('bcryptjs');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Middleware
+app.use(cors());
 app.use(express.json());
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
 
-// Session Setup
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'beyou_super_secret_key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24, // 1 day
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-  }
-}));
-
-// Serve Static Frontend Files
-app.use(express.static(path.join(__dirname, '.')));
-
-// In-Memory Database Arrays (replaces MongoDB)
-const users = [];
-const messages = [];
-
-// --- AUTHENTICATION ROUTES ---
-
-app.post('/signup', async (req, res) => {
-  try {
-    const { name, email, phone, password } = req.body;
-    
-    const existingUser = users.find(u => u.email === email);
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists with this email.' });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = {
-      _id: Date.now().toString(),
-      name, 
-      email, 
-      phone, 
-      password: hashedPassword,
-      bio: '',
-      followers: [],
-      following: [],
-      friendRequests: [],
-      friends: []
-    };
-    
-    users.push(newUser);
-
-    req.session.userId = newUser._id;
-    req.session.user = { id: newUser._id, name: newUser.name, email: newUser.email };
-
-    res.status(201).json({ message: 'User registered and logged in successfully!' });
-  } catch (err) {
-    console.error('Signup error details:', err);
-    res.status(500).json({ error: 'Server error during signup.' });
-  }
+// Explicitly serve index.html for the root URL route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// Serve static frontend files (like CSS, images, client scripts)
+app.use(express.static(path.join(__dirname)));
 
-    const user = users.find(u => u.email === email);
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid email or password.' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid email or password.' });
-    }
-
-    req.session.userId = user._id;
-    req.session.user = { id: user._id, name: user.name, email: user.email };
-
-    res.status(200).json({ message: 'Logged in successfully!' });
-  } catch (err) {
-    console.error('Login error details:', err);
-    res.status(500).json({ error: 'Server error during login.' });
-  }
+// API endpoint to log watch time or metrics
+app.post('/api/log-watch', (req, res) => {
+    const { userId, minutesWatched } = req.body;
+    console.log(`[TexUs] User ${userId} watched for ${minutesWatched} minutes.`);
+    res.status(200).json({ success: true, message: 'Watch time logged successfully.' });
 });
 
-app.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ error: 'Could not log out.' });
-    }
-    res.clearCookie('connect.sid');
-    res.status(200).json({ message: 'Logged out successfully.' });
-  });
-});
-
-app.get('/profile', (req, res) => {
-  try {
-    if (!req.session.userId) {
-      return res.status(401).json({ error: 'Unauthorized. Please log in.' });
-    }
-
-    const user = users.find(u => u._id === req.session.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found.' });
-    }
-
-    const { password, ...userProfile } = user;
-    res.status(200).json(userProfile);
-  } catch (err) {
-    console.error('Profile error details:', err);
-    res.status(500).json({ error: 'Server error fetching profile.' });
-  }
-});
-
-// Fallback route to load your frontend webpage
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`BeYou server running on port ${PORT}`);
-});
+    console.log(`TexUs main server running on http://localhost:${PORT}`);
+})

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TexUs - Stream</title>
+    <link rel="stylesheet" href="CallScreen.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <h1 style="font-family: cursive; color: #ff3366;">TexUs</h1>
+        </div>
+
+        <div class="video-feed">
+            <div class="video-card" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <video 
+                    id="moviePlayer"
+                    class="feed-video" 
+                    src="https://www.w3schools.com/html/mov_bbb.mp4" 
+                    controls
+                    style="width: 100%; max-height: 70vh; object-fit: contain;"
+                ></video>
+                
+                <div class="video-overlay">
+                    <h3>@texus_official</h3>
+                    <p>Streaming Movie Hub | Total Watch Time: <strong id="watchTimeCounter">0</strong> min</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let watchSeconds = 0;
+        const video = document.getElementById('moviePlayer');
+        const counterDisplay = document.getElementById('watchTimeCounter');
+
+        // Track watch time when the video is playing
+        setInterval(() => {
+            if (!video.paused && !video.ended) {
+                watchSeconds++;
+                let minutes = Math.floor(watchSeconds / 60);
+                counterDisplay.innerText = minutes;
+
+                // Send metrics to your server.js API every minute
+                if (watchSeconds % 60 === 0) {
+                    fetch('http://localhost:3000/api/log-watch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: 'creator_admin', minutesWatched: minutes })
+                    }).catch(err => console.log('Log error:', err));
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
