@@ -1,69 +1,49 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
-
+const fs = require('fs');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
-app.use(cors());
 app.use(express.json());
-
-// In-memory database simulation
-const usersDatabase = []; // Stores { username, email, phone }
-const verificationCodes = {}; // Stores active OTP codes by phone
-
 app.use(express.static(path.join(__dirname)));
 
-// Default route goes to Login page
+// Automatically load stream.html when visiting the root URL
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
+  res.sendFile(path.join(__dirname, 'stream.html'));
 });
 
-// Register Endpoint
-app.post('/api/register', (req, res) => {
-    const { username, email, phone } = req.body;
+// Helper files paths
+const postsFile = path.join(__dirname, 'posts.json');
 
-    // Check if user already exists
-    const existingUser = usersDatabase.find(u => u.phone === phone || u.email === email);
-    if (existingUser) {
-        return res.status(400).json({ success: false, message: 'Account with this email or phone already exists!' });
-    }
+// Ensure storage files exist
+if (!fs.existsSync(postsFile)) {
+  fs.writeFileSync(postsFile, JSON.stringify([]));
+}
 
-    usersDatabase.push({ username, email, phone });
-    console.log(`[TexUs Database] New user registered: ${username} (${phone})`);
-    res.status(200).json({ success: true, message: 'Account created successfully!' });
-});
+// API to track watch time and save to file
+app.post('/api/track-watch-time', (req, res) => {
+  const { userId, minutesWatched } = req.body;
+  const earningsPerMinute = 0.01; // Your rate per minute
+  const totalEarned = minutesWatched * earningsPerMinute;
 
-// Login / Send OTP Endpoint
-app.post('/api/login-send-otp', (req, res) => {
-    const { phone } = req.body;
+  try {
+    const data = JSON.parse(fs.readFileSync(postsFile, 'utf8'));
+    data.push({
+      userId,
+      minutesWatched,
+      earnings: totalEarned,
+      timestamp: new Date().toISOString()
+    });
+    fs.writeFileSync(postsFile, JSON.stringify(data, null, 2));
 
-    // Check if user is registered
-    const userExists = usersDatabase.find(u => u.phone === phone);
-    if (!userExists) {
-        return res.status(404).json({ success: false, message: 'Phone number not found. Please create an account first.' });
-    }
-
-    // Generate random 4-digit code
-    const randomCode = Math.floor(1000 + Math.random() * 9000).toString();
-    verificationCodes[phone] = randomCode;
-
-    console.log(`[TexUs SMS Gateway] Generated verification code ${randomCode} for ${phone}`);
-    res.status(200).json({ success: true, debugCode: randomCode });
-});
-
-// Verify OTP Endpoint
-app.post('/api/verify-login', (req, res) => {
-    const { phone, code } = req.body;
-
-    if (verificationCodes[phone] && verificationCodes[phone] === code) {
-        delete verificationCodes[phone];
-        res.status(200).json({ success: true, message: 'Login successful!' });
-    } else {
-        res.status(400).json({ success: false, message: 'Invalid verification code.' });
-    }
+    console.log(`User ${userId} watched ${minutesWatched} mins. Earned: $${totalEarned.toFixed(2)}`);
+    res.json({ success: true, totalEarned });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.listen(PORT, () => {
-    console.log(`TexUs main server running on http://localhost:${PORT}`);
-})
+  console.log(`TexUs app is running on http://localhost:${PORT}`);
+});
