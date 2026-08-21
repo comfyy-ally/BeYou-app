@@ -3,53 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs Video Stream</title>
-    <link rel="stylesheet" href="CallScreen.css">
+    <title>Welcome to BeYou App</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        .welcome-card {
+            background: rgba(30, 41, 59, 0.85);
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #38ef7d;
+        }
+        p {
+            color: #94a3b8;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- App Brand Header in Cursive -->
-        <div class="app-header">
-            <h1>TexUs</h1>
-        </div>
 
-        <!-- TikTok-style Vertical Feed -->
-        <div class="video-feed" id="videoFeed">
-            <div class="video-card">
-                <video class="feed-video" src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline></video>
-                <div class="video-overlay">
-                    <h3>@creator_official</h3>
-                    <p>Check out this amazing movie clip on TexUs! #streaming #texus</p>
-                </div>
-            </div>
-        </div>
+    <div class="welcome-card">
+        <h1>BeYou App</h1>
+        <p>Connect, stream, and share with your friends.</p>
+        <a href="login.html" class="btn">Enter App / Login</a>
     </div>
 
-    <script>
-        const videos = document.querySelectorAll('.feed-video');
-        
-        videos.forEach(video => {
-            video.addEventListener('click', () => {
-                if (video.paused) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
-            });
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const vid = entry.target;
-                if (entry.isIntersecting) {
-                    vid.play().catch(() => {});
-                } else {
-                    vid.pause();
-                }
-            });
-        }, { threshold: 0.6 });
-
-        videos.forEach(v => observer.observe(v));
-    </script>
 </body>
 </html>

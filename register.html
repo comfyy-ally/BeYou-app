@@ -3,106 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeYou App - Register</title>
+    <title>BeYou - Register</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .register-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        h2 {
-            margin-bottom: 24px;
-            color: #333;
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-            font-size: 14px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #38ef7d;
-            border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        button:hover {
-            background-color: #2dd16c;
-        }
-        .footer-text {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-        .footer-text a {
-            color: #11998e;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .footer-text a:hover {
-            text-decoration: underline;
-        }
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
+        .card { background: #1e293b; padding: 30px; border-radius: 10px; width: 100%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { text-align: center; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #475569; border-radius: 5px; background: #0f172a; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #10b981; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #059669; }
+        .link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .link a { color: #3b82f6; text-decoration: none; }
+        .error { color: #ef4444; font-size: 13px; text-align: center; margin-top: 5px; }
     </style>
 </head>
 <body>
-
-    <div class="register-card">
-        <h2>📝 Create Account</h2>
+    <div class="card">
+        <h2>📝 Register</h2>
         <form id="registerForm">
-            <div class="input-group">
-                <label for="newUsername">Username</label>
-                <input type="text" id="newUsername" required placeholder="Choose a username">
-            </div>
-            <div class="input-group">
-                <label for="newPassword">Password</label>
-                <input type="password" id="newPassword" required placeholder="Create a password">
-            </div>
+            <input type="text" id="regUsername" placeholder="Choose Username" required>
+            <input type="password" id="regPassword" placeholder="Choose Password" required>
             <button type="submit">Sign Up</button>
+            <div id="errorMsg" class="error"></div>
         </form>
-        <div class="footer-text">
-            Already have an account? <a href="login.html">Login here</a>
+        <div class="link">
+            Already have an account? <a href="login.html">Log In</a>
         </div>
     </div>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert('Registration successful! Redirecting to login.');
-            window.location.href = 'login.html';
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Registration successful! Please log in.');
+                window.location.href = 'login.html';
+            } else {
+                document.getElementById('errorMsg').innerText = data.message;
+            }
         });
     </script>
 </body>
