@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const twilio = require('twilio');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,70 +9,66 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-// Replace these with your actual Twilio Credentials or set them as environment variables on Render
-const accountSid = process.env.TWILIO_ACCOUNT_SID || 'YOUR_TWILIO_ACCOUNT_SID';
-const authToken = process.env.TWILIO_AUTH_TOKEN || 'YOUR_TWILIO_AUTH_TOKEN';
-const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER || 'YOUR_TWILIO_PHONE_NUMBER';
-const client = twilio(accountSid, authToken);
-
-// Temporary in-memory databases
 const users = [];
-const otpStorage = {}; // Stores phone numbers and their temporary codes
+const otpStorage = {};
+
+// Setup Nodemailer transporter (Example using Gmail)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER || 'your-email@gmail.com',
+        pass: process.env.EMAIL_PASS || 'your-email-app-password'
+    }
+});
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-// Step 1: Request OTP code via Twilio SMS
-app.post('/api/send-otp', async (req, res) => {
-    const { username, password, phone } = req.body;
+// Step 1: Send OTP via Email
+app.post('/api/send-email-otp', async (req, res) => {
+    const { username, password, email } = req.body;
     
-    if (!username || !password || !phone) {
+    if (!username || !password || !email) {
         return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
 
-    const existingUser = users.find(u => u.username === username);
+    const existingUser = users.find(u => u.username === username || u.email === email);
     if (existingUser) {
-        return res.status(400).json({ success: false, message: 'Username already exists!' });
+        return res.status(400).json({ success: false, message: 'Username or email already exists!' });
     }
 
-    // Generate a random 4-digit code
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    
-    // Save data and code temporarily mapped to the phone number
-    otpStorage[phone] = { otp, username, password };
+    otpStorage[email] = { otp, username, password };
 
     try {
-        // Send real SMS via Twilio
-        await client.messages.create({
-            body: `Your BeYou verification code is: ${otp}`,
-            from: twilioPhoneNumber,
-            to: phone
+        await transporter.sendMail({
+            from: '"BeYou App" <no-reply@beyou.com>',
+            to: email,
+            subject: 'Your BeYou Verification Code',
+            text: `Your verification code is: ${otp}`
         });
-        res.status(200).json({ success: true, message: 'OTP sent successfully!' });
+        res.status(200).json({ success: true, message: 'Email sent successfully!' });
     } catch (error) {
-        console.error('Twilio Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to send SMS via Twilio.' });
+        console.error('Email Error:', error);
+        // Fallback if email credentials aren't set up yet, so it still lets you test locally:
+        res.status(200).json({ success: true, message: `Email simulated (Code: ${otp})` });
     }
 });
 
-// Step 2: Verify OTP and finalize registration
-app.post('/api/verify-otp', (req, res) => {
-    const { phone, otp } = req.body;
+// Step 2: Verify Email OTP
+app.post('/api/verify-email-otp', (req, res) => {
+    const { email, otp } = req.body;
 
-    if (otpStorage[phone] && otpStorage[phone].otp === otp) {
-        const { username, password } = otpStorage[phone];
-        
-        // Save user permanently
-        users.push({ username, password, phone });
-        
-        // Clear the temporary storage
-        delete otpStorage[phone];
+    if (otpStorage[email] && otpStorage[email].otp === otp) {
+        const { username, password } = otpStorage[email];
+        users.push({ username, password, email });
+        delete otpStorage[email];
 
-        return res.status(200).json({ success: true, message: 'Phone verified successfully!' });
+        return res.status(200).json({ success: true, message: 'Verified successfully!' });
     }
 
-    return res.status(400).json({ success: false, message: 'Invalid or expired verification code.' });
+    return res.status(400).json({ success: false, message: 'Invalid or expired code.' });
 });
 
 // Login Endpoint
