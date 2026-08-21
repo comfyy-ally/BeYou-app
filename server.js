@@ -1,40 +1,81 @@
 const express = require('express');
 const path = require('path');
-const app = express();
+const twilio = require('twilio');
 
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve all your static files (HTML, CSS, JS) from the current folder
 app.use(express.static(__dirname));
 
-// Simple in-memory user list (stores registered users while server is running)
-const users = [];
+// Replace these with your actual Twilio Credentials or set them as environment variables on Render
+const accountSid = process.env.TWILIO_ACCOUNT_SID || 'YOUR_TWILIO_ACCOUNT_SID';
+const authToken = process.env.TWILIO_AUTH_TOKEN || 'YOUR_TWILIO_AUTH_TOKEN';
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER || 'YOUR_TWILIO_PHONE_NUMBER';
+const client = twilio(accountSid, authToken);
 
-// 1. Force the root URL ('/') to load the Login/Lock screen first
+// Temporary in-memory databases
+const users = [];
+const otpStorage = {}; // Stores phone numbers and their temporary codes
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-// 2. Handle Register Form Submissions
-app.post('/api/register', (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
+// Step 1: Request OTP code via Twilio SMS
+app.post('/api/send-otp', async (req, res) => {
+    const { username, password, phone } = req.body;
+    
+    if (!username || !password || !phone) {
         return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
-    
+
     const existingUser = users.find(u => u.username === username);
     if (existingUser) {
         return res.status(400).json({ success: false, message: 'Username already exists!' });
     }
 
-    users.push({ username, password });
-    return res.status(200).json({ success: true, message: 'Registered successfully!' });
+    // Generate a random 4-digit code
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    
+    // Save data and code temporarily mapped to the phone number
+    otpStorage[phone] = { otp, username, password };
+
+    try {
+        // Send real SMS via Twilio
+        await client.messages.create({
+            body: `Your BeYou verification code is: ${otp}`,
+            from: twilioPhoneNumber,
+            to: phone
+        });
+        res.status(200).json({ success: true, message: 'OTP sent successfully!' });
+    } catch (error) {
+        console.error('Twilio Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to send SMS via Twilio.' });
+    }
 });
 
-// 3. Handle Login Form Submissions
+// Step 2: Verify OTP and finalize registration
+app.post('/api/verify-otp', (req, res) => {
+    const { phone, otp } = req.body;
+
+    if (otpStorage[phone] && otpStorage[phone].otp === otp) {
+        const { username, password } = otpStorage[phone];
+        
+        // Save user permanently
+        users.push({ username, password, phone });
+        
+        // Clear the temporary storage
+        delete otpStorage[phone];
+
+        return res.status(200).json({ success: true, message: 'Phone verified successfully!' });
+    }
+
+    return res.status(400).json({ success: false, message: 'Invalid or expired verification code.' });
+});
+
+// Login Endpoint
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username && u.password === password);
@@ -46,7 +87,6 @@ app.post('/api/login', (req, res) => {
     return res.status(200).json({ success: true, message: 'Login successful!' });
 });
 
-// Fallback to login page
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
