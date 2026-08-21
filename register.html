@@ -3,102 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TexUs - Create Account</title>
+    <title>BeYou App - Register</title>
     <style>
-        body { 
-            background: #0f0f13; 
-            color: white; 
-            font-family: Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .card { 
-            background: #1a1a24; 
-            padding: 30px; 
-            border-radius: 15px; 
-            width: 100%; 
-            max-width: 380px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5); 
-            text-align: center; 
+        .register-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
         }
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            background: #2a2a3b; 
-            border: 1px solid #444; 
-            color: white; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
+        h2 {
+            margin-bottom: 24px;
+            color: #333;
         }
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            background: #ff3366; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 10px; 
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #38ef7d;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
         button:hover {
-            background: #e02e5b;
+            background-color: #2dd16c;
         }
-        a { 
-            color: #ff3366; 
-            text-decoration: none; 
-            font-size: 0.9rem; 
-            display: block; 
-            margin-top: 15px; 
+        .footer-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .footer-text a {
+            color: #11998e;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .footer-text a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1 style="color: #ff3366; font-family: cursive;">TexUs</h1>
-        <h2>Create Account</h2>
-        <input type="text" id="username" placeholder="Username" />
-        <input type="email" id="email" placeholder="Email Address" />
-        <input type="tel" id="phone" placeholder="Cellphone Number (e.g. 0821234567)" />
-        <button id="registerBtn">Sign Up</button>
-        <a href="login.html">Already have an account? Login</a>
+
+    <div class="register-card">
+        <h2>📝 Create Account</h2>
+        <form id="registerForm">
+            <div class="input-group">
+                <label for="newUsername">Username</label>
+                <input type="text" id="newUsername" required placeholder="Choose a username">
+            </div>
+            <div class="input-group">
+                <label for="newPassword">Password</label>
+                <input type="password" id="newPassword" required placeholder="Create a password">
+            </div>
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="footer-text">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
     </div>
 
     <script>
-        document.getElementById('registerBtn').addEventListener('click', async () => {
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-
-            if (!username || !email || !phone) {
-                alert('Please fill in all fields.');
-                return;
-            }
-
-            try {
-                // Connected to your live Render backend URL
-                const response = await fetch('https://beyou-app.onrender.com/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, phone })
-                });
-                
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    alert('Account created successfully! Please log in.');
-                    window.location.href = 'login.html';
-                } else {
-                    alert('Error: ' + (data.message || 'Unknown server error'));
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Network error: Could not connect to the live server.');
-            }
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Registration successful! Redirecting to login.');
+            window.location.href = 'login.html';
         });
     </script>
 </body>
