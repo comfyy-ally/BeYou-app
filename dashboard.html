@@ -157,7 +157,7 @@
             padding: 0;
         }
 
-        /* Viral Post Feed Card */
+        /* Feed Post Card */
         .feed-post {
             background-color: #1e293b;
             border-radius: 12px;
@@ -175,15 +175,6 @@
             font-weight: bold;
             font-size: 14px;
             color: #ffffff;
-        }
-        .viral-tag {
-            background-color: #ec4899;
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 10px;
-            letter-spacing: 0.5px;
         }
         .post-actions-row {
             display: flex;
@@ -364,19 +355,18 @@
                     noPostsMsg.remove();
                 }
 
-                // Create new post card dynamically
+                // Create new post card dynamically with live counter states
                 const postCard = document.createElement('div');
                 postCard.className = 'feed-post';
                 postCard.innerHTML = `
                     <div class="post-header">
                         <span class="post-user">👤 You</span>
-                        <span class="viral-tag">🚀 Going Viral</span>
                     </div>
                     <p style="font-size: 14px; line-height: 1.4; color: #e2e8f0;">${escapeHtml(postText)}</p>
                     <div class="post-actions-row">
-                        <button class="feed-action-btn" onclick="likePost(this)">❤️ 1 Like</button>
-                        <button class="feed-action-btn" onclick="alert('Opened comments section.')">💬 0 Comments</button>
-                        <button class="feed-action-btn" onclick="alert('Post shared successfully!')">↗️ Share</button>
+                        <button class="feed-action-btn like-btn" data-likes="0" onclick="handleLike(this)">❤️ 0 Likes</button>
+                        <button class="feed-action-btn comment-btn" data-comments="0" onclick="handleComment(this)">💬 0 Comments</button>
+                        <button class="feed-action-btn share-btn" data-shares="0" onclick="handleShare(this)">↗️ 0 Shares</button>
                     </div>
                 `;
                 feedContainer.prepend(postCard);
@@ -384,12 +374,38 @@
             }
         }
 
+        function handleLike(btn) {
+            let likes = parseInt(btn.getAttribute('data-likes')) || 0;
+            likes += 1;
+            btn.setAttribute('data-likes', likes);
+            btn.innerHTML = `❤️ ${likes} ${likes === 1 ? 'Like' : 'Likes'}`;
+            btn.style.color = '#ec4899';
+        }
+
+        function handleComment(btn) {
+            let comments = parseInt(btn.getAttribute('data-comments')) || 0;
+            const newCommentText = prompt("Write a comment:");
+            if (newCommentText && newCommentText.trim() !== "") {
+                comments += 1;
+                btn.setAttribute('data-comments', comments);
+                btn.innerHTML = `💬 ${comments} ${comments === 1 ? 'Comment' : 'Comments'}`;
+                alert("Comment added successfully!");
+            }
+        }
+
+        function handleShare(btn) {
+            let shares = parseInt(btn.getAttribute('data-shares')) || 0;
+            shares += 1;
+            btn.setAttribute('data-shares', shares);
+            btn.innerHTML = `↗️ ${shares} ${shares === 1 ? 'Share' : 'Shares'}`;
+            alert("Post shared successfully!");
+        }
+
         function createStoryPrompt() {
             const storyText = prompt("Share a fun story update:");
             if (storyText && storyText.trim() !== "") {
                 const storiesContainer = document.getElementById('storiesContainer');
 
-                // Create new story card dynamically
                 const storyCard = document.createElement('div');
                 storyCard.className = 'story-card';
                 storyCard.style.background = 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), #1e293b';
@@ -398,18 +414,12 @@
                     <p class="story-name">You: ${escapeHtml(storyText)}</p>
                 `;
                 storyCard.onclick = function() {
-                    alert(`Viewing your story: "${storyText}" - Starting to trend! 🌟`);
+                    alert(`Viewing your story: "${storyText}"`);
                 };
 
-                // Append right after the "+ Create story" card
                 storiesContainer.appendChild(storyCard);
                 alert("Your story has been added successfully! ✨");
             }
-        }
-
-        function likePost(btn) {
-            btn.style.color = '#ec4899';
-            btn.innerText = '❤️ Liked & Boosted!';
         }
 
         function escapeHtml(text) {
