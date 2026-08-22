@@ -67,7 +67,7 @@
             overflow-x: auto;
             padding-bottom: 10px;
             margin-bottom: 15px;
-            scrollbar-width: none; /* Hide scrollbar for clean look */
+            scrollbar-width: none;
         }
         .stories-container::-webkit-scrollbar {
             display: none;
@@ -264,58 +264,17 @@
             </div>
 
             <!-- Stories Row -->
-            <div class="stories-container">
-                <!-- Create Story Button Card -->
+            <div class="stories-container" id="storiesContainer">
+                <!-- Create Story Button Card (Always First) -->
                 <div class="story-card create-story" onclick="createStoryPrompt()">
                     <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
                     <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
                 </div>
-
-                <!-- Viral Story Card 1 -->
-                <div class="story-card" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80') center/cover;" onclick="viewStory('Alex_99', '14.2K')">
-                    <div class="story-badge">🔥 14K</div>
-                    <p class="story-name">Alex_99</p>
-                </div>
-
-                <!-- Viral Story Card 2 -->
-                <div class="story-card" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80') center/cover;" onclick="viewStory('Sarah_Dev', '25.8K')">
-                    <div class="story-badge">🔥 25K</div>
-                    <p class="story-name">Sarah_Dev</p>
-                </div>
-
-                <!-- Viral Story Card 3 -->
-                <div class="story-card" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80') center/cover;" onclick="viewStory('Marcus_Vibes', '9.4K')">
-                    <div class="story-badge">🔥 9K</div>
-                    <p class="story-name">Marcus_Vibes</p>
-                </div>
             </div>
 
-            <!-- Viral Post Feed Item 1 -->
-            <div class="feed-post">
-                <div class="post-header">
-                    <span class="post-user">👤 Sarah_Dev</span>
-                    <span class="viral-tag">🔥 Trending Viral</span>
-                </div>
-                <p style="font-size: 14px; line-height: 1.4; color: #e2e8f0;">Just joined TexUs and I'm already loving the community vibes here! Who else is coding late tonight? 💻✨</p>
-                <div class="post-actions-row">
-                    <button class="feed-action-btn" onclick="likePost(this)">❤️ 1.4K Likes</button>
-                    <button class="feed-action-btn" onclick="alert('Opened comments section.')">💬 312 Comments</button>
-                    <button class="feed-action-btn" onclick="alert('Post shared successfully!')">↗️ Share</button>
-                </div>
-            </div>
-
-            <!-- Viral Post Feed Item 2 -->
-            <div class="feed-post">
-                <div class="post-header">
-                    <span class="post-user">👤 Alex_99</span>
-                    <span class="viral-tag">🚀 Going Viral</span>
-                </div>
-                <p style="font-size: 14px; line-height: 1.4; color: #e2e8f0;">Fun fact about me: I can code an entire web app while drinking iced coffee! What's your hidden superpower? ☕😄</p>
-                <div class="post-actions-row">
-                    <button class="feed-action-btn" onclick="likePost(this)">❤️ 3.8K Likes</button>
-                    <button class="feed-action-btn" onclick="alert('Opened comments section.')">💬 845 Comments</button>
-                    <button class="feed-action-btn" onclick="alert('Post shared successfully!')">↗️ Share</button>
-                </div>
+            <!-- Dynamic Feed Posts Container -->
+            <div id="feedPostsContainer">
+                <p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">No posts yet. Be the first to share something fun above! ✨</p>
             </div>
         </div>
 
@@ -396,26 +355,65 @@
         }
 
         function createPostPrompt() {
-            const postText = prompt("Tell us something fun about yourself or share your story!");
-            if (postText) {
-                alert("Boom! Your post is live and starting to go viral! 🚀🔥");
+            const postText = prompt("Tell us something fun about yourself!");
+            if (postText && postText.trim() !== "") {
+                const feedContainer = document.getElementById('feedPostsContainer');
+                const noPostsMsg = document.getElementById('noPostsMessage');
+                
+                if (noPostsMsg) {
+                    noPostsMsg.remove();
+                }
+
+                // Create new post card dynamically
+                const postCard = document.createElement('div');
+                postCard.className = 'feed-post';
+                postCard.innerHTML = `
+                    <div class="post-header">
+                        <span class="post-user">👤 You</span>
+                        <span class="viral-tag">🚀 Going Viral</span>
+                    </div>
+                    <p style="font-size: 14px; line-height: 1.4; color: #e2e8f0;">${escapeHtml(postText)}</p>
+                    <div class="post-actions-row">
+                        <button class="feed-action-btn" onclick="likePost(this)">❤️ 1 Like</button>
+                        <button class="feed-action-btn" onclick="alert('Opened comments section.')">💬 0 Comments</button>
+                        <button class="feed-action-btn" onclick="alert('Post shared successfully!')">↗️ Share</button>
+                    </div>
+                `;
+                feedContainer.prepend(postCard);
+                alert("Boom! Your post is live on the feed! 🚀🔥");
             }
         }
 
         function createStoryPrompt() {
-            const storyText = prompt("What's your fun story update today?");
-            if (storyText) {
-                alert("Your story has been added to the reel bar with viral potential! ✨");
-            }
-        }
+            const storyText = prompt("Share a fun story update:");
+            if (storyText && storyText.trim() !== "") {
+                const storiesContainer = document.getElementById('storiesContainer');
 
-        function viewStory(username, views) {
-            alert(`Viewing ${username}'s viral story! It currently has ${views} views. 🌟`);
+                // Create new story card dynamically
+                const storyCard = document.createElement('div');
+                storyCard.className = 'story-card';
+                storyCard.style.background = 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), #1e293b';
+                storyCard.innerHTML = `
+                    <div class="story-badge">🔥 New</div>
+                    <p class="story-name">You: ${escapeHtml(storyText)}</p>
+                `;
+                storyCard.onclick = function() {
+                    alert(`Viewing your story: "${storyText}" - Starting to trend! 🌟`);
+                };
+
+                // Append right after the "+ Create story" card
+                storiesContainer.appendChild(storyCard);
+                alert("Your story has been added successfully! ✨");
+            }
         }
 
         function likePost(btn) {
             btn.style.color = '#ec4899';
             btn.innerText = '❤️ Liked & Boosted!';
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
         async function loadUsers() {
