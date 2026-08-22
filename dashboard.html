@@ -11,66 +11,46 @@
             color: #ffffff;
             margin: 0;
             display: flex;
+            flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 240px;
+
+        /* Top Header with Cursive Branding */
+        .top-header {
+            text-align: center;
+            padding: 15px;
             background-color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 10;
         }
         .app-title {
             font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
             font-size: 32px;
             font-weight: bold;
-            margin-bottom: 30px;
-            text-align: center;
             letter-spacing: 2px;
+            margin: 0;
         }
-        .tex-part { color: #ec4899; }
-        .us-part { color: #10b981; }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 16px;
-            text-align: left;
-            padding: 12px 15px;
-            margin: 5px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .nav-btn:hover, .nav-btn.active {
-            background-color: #334155;
-            color: #10b981;
-            font-weight: bold;
-        }
-        .logout-btn {
-            margin-top: auto;
-            color: #ef4444;
-        }
+        .tex-part { color: #ec4899; } /* Pink */
+        .us-part { color: #10b981; } /* Lime */
 
         /* Main Content Area */
         .content {
             flex: 1;
-            padding: 40px;
+            padding: 20px;
             overflow-y: auto;
+            padding-bottom: 80px; /* Space for bottom nav */
         }
         .page {
             display: none;
+            max-width: 600px;
+            margin: 0 auto;
         }
         .page.active {
             display: block;
         }
         h2 {
             color: #10b981;
-            margin-top: 0;
         }
         .card {
             background-color: #1e293b;
@@ -79,21 +59,50 @@
             margin-top: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65px;
+            background-color: #1e293b;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+        }
+        .nav-btn span {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            color: #10b981;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
+    <!-- Top Header -->
+    <div class="top-header">
         <div class="app-title">
             <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
-        <button class="nav-btn active" onclick="switchPage('home', this)">🏠 Home</button>
-        <button class="nav-btn" onclick="switchPage('friends', this)">👥 Make Friends</button>
-        <button class="nav-btn" onclick="switchPage('chat', this)">💬 Chat</button>
-        <button class="nav-btn" onclick="switchPage('profile', this)">👤 Profile</button>
-        <button class="nav-btn" onclick="switchPage('settings', this)">⚙️ Settings</button>
-        <button class="nav-btn logout-btn" onclick="logout()">🚪 Logout</button>
     </div>
 
     <!-- Main Content Pages -->
@@ -111,9 +120,15 @@
             <h2>Make Friends</h2>
             <div class="card">
                 <p>Discover new people to connect with:</p>
-                <ul>
-                    <li>Alex_99 <button style="margin-left:10px; background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Add Friend</button></li>
-                    <li style="margin-top:10px;">Sarah_Dev <button style="margin-left:10px; background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Add Friend</button></li>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        Alex_99 
+                        <button style="background:#10b981; border:none; color:white; padding:5px 12px; border-radius:4px; cursor:pointer;">Add Friend</button>
+                    </li>
+                    <li style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        Sarah_Dev 
+                        <button style="background:#10b981; border:none; color:white; padding:5px 12px; border-radius:4px; cursor:pointer;">Add Friend</button>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -136,7 +151,6 @@
         <div id="profile" class="page">
             <h2>My Profile</h2>
             <div class="card">
-                <p><strong>Username:</strong> <span id="profileUsername">User</span></p>
                 <p><strong>Status:</strong> Exploring TexUs 🚀</p>
             </div>
         </div>
@@ -147,18 +161,35 @@
             <div class="card">
                 <p>App Theme: <strong>Dark Mode (Active)</strong></p>
                 <p>Notifications: Enabled</p>
+                <button onclick="logout()" style="background:#ef4444; border:none; color:white; padding:8px 15px; border-radius:5px; cursor:pointer; margin-top:15px; font-weight:bold;">Logout</button>
             </div>
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-btn active" onclick="switchPage('home', this)">
+            <span>🏠</span> Home
+        </button>
+        <button class="nav-btn" onclick="switchPage('friends', this)">
+            <span>👥</span> Friends
+        </button>
+        <button class="nav-btn" onclick="switchPage('chat', this)">
+            <span>💬</span> Chat
+        </button>
+        <button class="nav-btn" onclick="switchPage('profile', this)">
+            <span>👤</span> Profile
+        </button>
+        <button class="nav-btn" onclick="switchPage('settings', this)">
+            <span>⚙️</span> Settings
+        </button>
+    </div>
+
     <script>
         function switchPage(pageId, btnElement) {
-            // Hide all pages
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Remove active class from buttons
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
-            // Show target page and activate button
             document.getElementById(pageId).classList.add('active');
             btnElement.classList.add('active');
         }
