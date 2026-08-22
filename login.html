@@ -3,35 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeYou - Login Lock Screen</title>
+    <title>Login - TexUs</title>
     <style>
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
-        .card { background: #1e293b; padding: 30px; border-radius: 10px; width: 100%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h2 { text-align: center; margin-bottom: 20px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #475569; border-radius: 5px; background: #0f172a; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #3b82f6; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #2563eb; }
-        .link { text-align: center; margin-top: 15px; font-size: 14px; }
-        .link a { color: #3b82f6; text-decoration: none; }
-        .error { color: #ef4444; font-size: 13px; text-align: center; margin-top: 5px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            text-align: center;
+        }
+        .app-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: white;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 11px;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #059669;
+        }
+        #errorMsg {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .register-link {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .register-link a {
+            color: #10b981;
+            text-decoration: none;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>🔒 BeYou Lock Screen</h2>
+
+    <div class="container">
+        <div class="app-title">
+            🔒 TexUs
+        </div>
+
         <form id="loginForm">
             <input type="text" id="username" placeholder="Username" required>
             <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">Log In</button>
-            <div id="errorMsg" class="error"></div>
+            <p id="errorMsg"></p>
+            <button type="submit">Login</button>
         </form>
-        <div class="link">
-            Don't have an account? <a href="register.html">Register</a>
+
+        <div class="register-link">
+            Don't have an account? <a href="/register.html">Register here</a>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -44,8 +111,8 @@
 
             const data = await response.json();
             if (data.success) {
-                // Redirects to your video stream / main app page after successful login
-                window.location.href = 'stream.html';
+                alert('Login successful!');
+                // You can redirect to your main app dashboard page here later
             } else {
                 document.getElementById('errorMsg').innerText = data.message;
             }
