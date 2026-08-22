@@ -122,6 +122,13 @@ app.post('/api/login', (req, res) => {
     return res.status(200).json({ success: true, message: 'Login successful!' });
 });
 
+// Get all registered users for the Friends list
+app.get('/api/users', (req, res) => {
+    const users = getUsers();
+    const publicUsers = users.map(u => ({ username: u.username }));
+    res.json(publicUsers);
+});
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });

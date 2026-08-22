@@ -39,7 +39,7 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            padding-bottom: 80px; /* Space for bottom nav */
+            padding-bottom: 80px;
         }
         .page {
             display: none;
@@ -120,15 +120,8 @@
             <h2>Make Friends</h2>
             <div class="card">
                 <p>Discover new people to connect with:</p>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                        Alex_99 
-                        <button style="background:#10b981; border:none; color:white; padding:5px 12px; border-radius:4px; cursor:pointer;">Add Friend</button>
-                    </li>
-                    <li style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                        Sarah_Dev 
-                        <button style="background:#10b981; border:none; color:white; padding:5px 12px; border-radius:4px; cursor:pointer;">Add Friend</button>
-                    </li>
+                <ul id="userList" style="list-style: none; padding: 0; margin-top: 15px;">
+                    <p style="color: #94a3b8; font-size: 14px;">Loading users...</p>
                 </ul>
             </div>
         </div>
@@ -138,7 +131,7 @@
             <h2>Messages</h2>
             <div class="card" style="height: 300px; display: flex; flex-direction: column; justify-content: space-between;">
                 <div style="overflow-y: auto; flex:1;">
-                    <p><strong>Alex:</strong> Hey! Welcome to TexUs.</p>
+                    <p><strong>Community:</strong> Welcome to TexUs chat!</p>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
                     <input type="text" placeholder="Type a message..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;">
@@ -192,11 +185,44 @@
             
             document.getElementById(pageId).classList.add('active');
             btnElement.classList.add('active');
+
+            if (pageId === 'friends') {
+                loadUsers();
+            }
+        }
+
+        async function loadUsers() {
+            const userListContainer = document.getElementById('userList');
+            try {
+                const response = await fetch('/api/users');
+                const users = await response.json();
+
+                if (users.length === 0) {
+                    userListContainer.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">No other users found yet.</p>';
+                    return;
+                }
+
+                userListContainer.innerHTML = '';
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155;';
+                    li.innerHTML = `
+                        <span>👤 ${user.username}</span>
+                        <button onclick="alert('Friend request sent to ${user.username}!')" style="background:#10b981; border:none; color:white; padding:5px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">Add Friend</button>
+                    `;
+                    userListContainer.appendChild(li);
+                });
+            } catch (err) {
+                userListContainer.innerHTML = '<p style="color: #ef4444;">Failed to load users.</p>';
+            }
         }
 
         function logout() {
             window.location.href = '/login.html';
         }
+
+        // Load users on initial dashboard open just in case
+        loadUsers();
     </script>
 </body>
 </html>
