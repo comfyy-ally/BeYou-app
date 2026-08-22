@@ -108,6 +108,7 @@
             font-weight: bold;
             padding: 2px 8px;
             border-radius: 6px;
+            z-index: 2;
         }
         .story-name {
             font-size: 12px;
@@ -115,6 +116,16 @@
             color: white;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             margin: 0;
+            z-index: 2;
+        }
+        .story-media {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
         }
 
         /* Post Creator Box */
@@ -186,7 +197,7 @@
             font-size: 14px;
             color: #ffffff;
         }
-        .post-image-container {
+        .post-media-container {
             margin-top: 10px;
             margin-bottom: 10px;
             border-radius: 8px;
@@ -197,7 +208,7 @@
             justify-content: center;
             align-items: center;
         }
-        .post-image-container img {
+        .post-media-container img, .post-media-container video {
             width: 100%;
             height: auto;
             max-height: 350px;
@@ -276,19 +287,20 @@
 
             <!-- Post Creator Box -->
             <div class="post-creator">
-                <!-- Clickable Avatar that redirects to Profile Page -->
                 <div class="user-avatar" onclick="goToProfile()" title="View Profile">👤</div>
                 <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
                 
-                <!-- Hidden file input to handle picture uploading -->
-                <input type="file" id="imageUploadInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-                <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Upload Photo">📷</button>
+                <input type="file" id="imageUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleImageUpload(event)">
+                <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Upload Photo or Video">📷</button>
             </div>
 
             <!-- Stories Row -->
             <div class="stories-container" id="storiesContainer">
+                <!-- Hidden file input for story media upload -->
+                <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
+                
                 <!-- Create Story Button Card (Always First) -->
-                <div class="story-card create-story" onclick="createStoryPrompt()">
+                <div class="story-card create-story" onclick="document.getElementById('storyUploadInput').click()">
                     <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
                     <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
                 </div>
@@ -389,7 +401,7 @@
         function createPostPrompt() {
             const postText = prompt("Tell us something fun about yourself!");
             if (postText && postText.trim() !== "") {
-                appendPostToFeed(postText, null);
+                appendPostToFeed(postText, null, null);
             }
         }
 
@@ -398,17 +410,17 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const imageUrl = e.target.result;
-                    const caption = prompt("Add a caption for your photo:");
-                    appendPostToFeed(caption ? caption : "", imageUrl);
+                    const mediaUrl = e.target.result;
+                    const isVideo = file.type.startsWith('video');
+                    const caption = prompt("Add a caption for your post:");
+                    appendPostToFeed(caption ? caption : "", mediaUrl, isVideo);
                 }
                 reader.readAsDataURL(file);
             }
-            // Reset input so the same image can be chosen again if needed
             event.target.value = '';
         }
 
-        function appendPostToFeed(text, imageUrl) {
+        function appendPostToFeed(text, mediaUrl, isVideo) {
             const feedContainer = document.getElementById('feedPostsContainer');
             const noPostsMsg = document.getElementById('noPostsMessage');
             
@@ -419,14 +431,22 @@
             const postCard = document.createElement('div');
             postCard.className = 'feed-post';
             
-            let imageContentHtml = imageUrl ? `<div class="post-image-container"><img src="${imageUrl}" alt="Uploaded Post Image"></div>` : '';
-            let textContentHtml = text ? `<p style="font-size: 14px; line-height: 1.4; color: #e2e8f0; margin-top: ${imageUrl ? '5px' : '0'};">${escapeHtml(text)}</p>` : '';
+            let mediaContentHtml = '';
+            if (mediaUrl) {
+                if (isVideo) {
+                    mediaContentHtml = `<div class="post-media-container"><video src="${mediaUrl}" controls></video></div>`;
+                } else {
+                    mediaContentHtml = `<div class="post-media-container"><img src="${mediaUrl}" alt="Post Media"></div>`;
+                }
+            }
+
+            let textContentHtml = text ? `<p style="font-size: 14px; line-height: 1.4; color: #e2e8f0; margin-top: ${mediaUrl ? '5px' : '0'};">${escapeHtml(text)}</p>` : '';
 
             postCard.innerHTML = `
                 <div class="post-header">
                     <span class="post-user">👤 You</span>
                 </div>
-                ${imageContentHtml}
+                ${mediaContentHtml}
                 ${textContentHtml}
                 <div class="post-actions-row">
                     <button class="feed-action-btn like-btn" data-likes="0" onclick="handleLike(this)">❤️ 0 Likes</button>
@@ -435,7 +455,40 @@
                 </div>
             `;
             feedContainer.prepend(postCard);
-            alert("Boom! Your post is live on the feed! 🚀🔥");
+            alert("Boom! Your post is live on the feed for everyone to see! 🚀🔥");
+        }
+
+        function handleStoryUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const mediaUrl = e.target.result;
+                    const isVideo = file.type.startsWith('video');
+                    const storiesContainer = document.getElementById('storiesContainer');
+
+                    const storyCard = document.createElement('div');
+                    storyCard.className = 'story-card';
+                    
+                    let mediaHtml = isVideo ? 
+                        `<video class="story-media" src="${mediaUrl}"></video>` : 
+                        `<img class="story-media" src="${mediaUrl}" alt="Story">`;
+
+                    storyCard.innerHTML = `
+                        ${mediaHtml}
+                        <div class="story-badge">🔥 New</div>
+                        <p class="story-name">You</p>
+                    `;
+                    storyCard.onclick = function() {
+                        alert("Opening your story!");
+                    };
+
+                    storiesContainer.appendChild(storyCard);
+                    alert("Your story has been added successfully! ✨");
+                }
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
         }
 
         function handleLike(btn) {
@@ -463,27 +516,6 @@
             btn.setAttribute('data-shares', shares);
             btn.innerHTML = `↗️ ${shares} ${shares === 1 ? 'Share' : 'Shares'}`;
             alert("Post shared successfully!");
-        }
-
-        function createStoryPrompt() {
-            const storyText = prompt("Share a fun story update:");
-            if (storyText && storyText.trim() !== "") {
-                const storiesContainer = document.getElementById('storiesContainer');
-
-                const storyCard = document.createElement('div');
-                storyCard.className = 'story-card';
-                storyCard.style.background = 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), #1e293b';
-                storyCard.innerHTML = `
-                    <div class="story-badge">🔥 New</div>
-                    <p class="story-name">You: ${escapeHtml(storyText)}</p>
-                `;
-                storyCard.onclick = function() {
-                    alert(`Viewing your story: "${storyText}"`);
-                };
-
-                storiesContainer.appendChild(storyCard);
-                alert("Your story has been added successfully! ✨");
-            }
         }
 
         function escapeHtml(text) {
