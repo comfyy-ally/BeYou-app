@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TexUs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 240px;
+            background-color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .app-title {
+            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .tex-part { color: #ec4899; }
+        .us-part { color: #10b981; }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 16px;
+            text-align: left;
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background-color: #334155;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .logout-btn {
+            margin-top: auto;
+            color: #ef4444;
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        h2 {
+            color: #10b981;
+            margin-top: 0;
+        }
+        .card {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="app-title">
+            <span class="tex-part">Tex</span><span class="us-part">Us</span>
+        </div>
+        <button class="nav-btn active" onclick="switchPage('home', this)">🏠 Home</button>
+        <button class="nav-btn" onclick="switchPage('friends', this)">👥 Make Friends</button>
+        <button class="nav-btn" onclick="switchPage('chat', this)">💬 Chat</button>
+        <button class="nav-btn" onclick="switchPage('profile', this)">👤 Profile</button>
+        <button class="nav-btn" onclick="switchPage('settings', this)">⚙️ Settings</button>
+        <button class="nav-btn logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <!-- Main Content Pages -->
+    <div class="content">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <h2>Home Feed</h2>
+            <div class="card">
+                <p>Welcome back to TexUs! Check out what's happening in your community today.</p>
+            </div>
+        </div>
+
+        <!-- Make Friends Page -->
+        <div id="friends" class="page">
+            <h2>Make Friends</h2>
+            <div class="card">
+                <p>Discover new people to connect with:</p>
+                <ul>
+                    <li>Alex_99 <button style="margin-left:10px; background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Add Friend</button></li>
+                    <li style="margin-top:10px;">Sarah_Dev <button style="margin-left:10px; background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Add Friend</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Chat Page -->
+        <div id="chat" class="page">
+            <h2>Messages</h2>
+            <div class="card" style="height: 300px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="overflow-y: auto; flex:1;">
+                    <p><strong>Alex:</strong> Hey! Welcome to TexUs.</p>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" placeholder="Type a message..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;">
+                    <button style="background:#10b981; border:none; color:white; padding: 10px 20px; border-radius:5px; cursor:pointer;">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile" class="page">
+            <h2>My Profile</h2>
+            <div class="card">
+                <p><strong>Username:</strong> <span id="profileUsername">User</span></p>
+                <p><strong>Status:</strong> Exploring TexUs 🚀</p>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings" class="page">
+            <h2>Settings</h2>
+            <div class="card">
+                <p>App Theme: <strong>Dark Mode (Active)</strong></p>
+                <p>Notifications: Enabled</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchPage(pageId, btnElement) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Remove active class from buttons
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            // Show target page and activate button
+            document.getElementById(pageId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        function logout() {
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

@@ -82,10 +82,12 @@
 <body>
 
     <div class="container">
+        <!-- Custom Cursive Branding -->
         <div class="app-title">
             <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
 
+        <!-- Login Form -->
         <form id="loginForm">
             <input type="text" id="username" placeholder="Username" required>
             <input type="password" id="password" placeholder="Password" required>
@@ -114,7 +116,8 @@
 
             const data = await response.json();
             if (data.success) {
-                alert('Login successful!');
+                // Automatically redirect to your 5-page dashboard hub
+                window.location.href = '/dashboard.html';
             } else {
                 document.getElementById('errorMsg').innerText = data.message;
             }
