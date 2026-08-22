@@ -39,7 +39,7 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
         }
         .page {
             display: none;
@@ -54,74 +54,155 @@
         }
         .card {
             background-color: #1e293b;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 15px 20px;
+            border-radius: 12px;
             margin-top: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        /* Reel Layout Styles */
-        .reel-container {
-            position: relative;
-            width: 100%;
-            max-width: 320px; /* Slim vertical width like a real */
-            height: 480px; /* Vertical reel aspect ratio height */
-            margin: 0 auto;
-            background: #000;
+        /* Stories Row Styles */
+        .stories-container {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            scrollbar-width: none; /* Hide scrollbar for clean look */
+        }
+        .stories-container::-webkit-scrollbar {
+            display: none;
+        }
+        .story-card {
+            min-width: 110px;
+            height: 180px;
+            background-color: #334155;
             border-radius: 12px;
+            flex-shrink: 0;
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-        }
-        .reel-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        /* Vertical Action Buttons on the Right */
-        .reel-actions {
-            position: absolute;
-            right: 15px;
-            bottom: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            z-index: 5;
+            justify-content: flex-end;
+            padding: 10px;
+            transition: transform 0.2s;
         }
-        .action-btn {
-            background: rgba(0, 0, 0, 0.6);
-            border: none;
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
+        .story-card:hover {
+            transform: scale(1.03);
+        }
+        .story-card.create-story {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px dashed #10b981;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            font-size: 18px;
+            text-align: center;
         }
-        .action-btn:hover {
-            background: rgba(16, 185, 129, 0.8);
-            transform: scale(1.1);
-        }
-        .action-count {
-            font-size: 11px;
-            margin-top: 2px;
-            font-weight: bold;
-        }
-        .reel-caption {
+        .story-badge {
             position: absolute;
-            left: 15px;
-            bottom: 20px;
-            right: 80px;
+            top: 8px;
+            left: 8px;
+            background-color: #3b82f6;
             color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            z-index: 5;
-            pointer-events: none;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+        .story-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            margin: 0;
+        }
+
+        /* Post Creator Box */
+        .post-creator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #1e293b;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .post-input-mock {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            padding: 10px 15px;
+            border-radius: 20px;
+            color: #94a3b8;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .photo-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* Viral Post Feed Card */
+        .feed-post {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .post-user {
+            font-weight: bold;
+            font-size: 14px;
+            color: #ffffff;
+        }
+        .viral-tag {
+            background-color: #ec4899;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+        }
+        .post-actions-row {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #334155;
+            margin-top: 12px;
+            padding-top: 10px;
+        }
+        .feed-action-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .feed-action-btn:hover {
+            color: #10b981;
         }
 
         /* Bottom Navigation Bar */
@@ -174,40 +255,66 @@
         <!-- Home Page -->
         <div id="home" class="page active">
             <h2>Home Feed</h2>
-            
-            <!-- Reel Advertisement Card -->
-            <div class="card" style="text-align: center;">
-                <h3 style="color: #ec4899; margin-top: 0;">TexUs Spotlight 🎬</h3>
-                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Cartoon friends hanging out at the park and texting!</p>
-                
-                <!-- Vertical Reel Container -->
-                <div class="reel-container">
-                    <video class="reel-video" autoplay muted loop playsinline>
-                        <source src="/texus-intro.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
 
-                    <!-- Caption Overlay -->
-                    <div class="reel-caption">
-                        <p style="margin: 0; font-weight: bold; font-size: 14px;">@TexUsOfficial</p>
-                        <p style="margin: 4px 0 0 0; font-size: 12px; color: #cbd5e1;">Hanging at the park & connecting instantly! 🌳✨</p>
-                    </div>
+            <!-- Post Creator Box -->
+            <div class="post-creator">
+                <div class="user-avatar">👤</div>
+                <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
+                <button class="photo-btn" onclick="createPostPrompt()" title="Upload Photo">📷</button>
+            </div>
 
-                    <!-- Right Side Action Buttons -->
-                    <div class="reel-actions">
-                        <button class="action-btn" onclick="toggleLike(this)" title="Like">
-                            ❤️
-                            <span class="action-count" id="likeCount">1.2K</span>
-                        </button>
-                        <button class="action-btn" onclick="alert('Comments: Looks amazing! Love this app 🚀')" title="Comment">
-                            💬
-                            <span class="action-count">348</span>
-                        </button>
-                        <button class="action-btn" onclick="alert('Reel link copied to clipboard! Share it with friends.')" title="Share">
-                            🔗
-                            <span class="action-count">Share</span>
-                        </button>
-                    </div>
+            <!-- Stories Row -->
+            <div class="stories-container">
+                <!-- Create Story Button Card -->
+                <div class="story-card create-story" onclick="createStoryPrompt()">
+                    <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
+                    <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
+                </div>
+
+                <!-- Viral Story Card 1 -->
+                <div class="story-card" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80') center/cover;" onclick="viewStory('Alex_99', '14.2K')">
+                    <div class="story-badge">🔥 14K</div>
+                    <p class="story-name">Alex_99</p>
+                </div>
+
+                <!-- Viral Story Card 2 -->
+                <div class="story-card" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80') center/cover;" onclick="viewStory('Sarah_Dev', '25.8K')">
+                    <div class="story-badge">🔥 25K</div>
+                    <p class="story-name">Sarah_Dev</p>
+                </div>
+
+                <!-- Viral Story Card 3 -->
+                <div class="story-card" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80') center/cover;" onclick="viewStory('Marcus_Vibes', '9.4K')">
+                    <div class="story-badge">🔥 9K</div>
+                    <p class="story-name">Marcus_Vibes</p>
+                </div>
+            </div>
+
+            <!-- Viral Post Feed Item 1 -->
+            <div class="feed-post">
+                <div class="post-header">
+                    <span class="post-user">👤 Sarah_Dev</span>
+                    <span class="viral-tag">🔥 Trending Viral</span>
+                </div>
+                <p style="font-size: 14px; line-height: 1.4; color: #e2e8f0;">Just joined TexUs and I'm already loving the community vibes here! Who else is coding late tonight? 💻✨</p>
+                <div class="post-actions-row">
+                    <button class="feed-action-btn" onclick="likePost(this)">❤️ 1.4K Likes</button>
+                    <button class="feed-action-btn" onclick="alert('Opened comments section.')">💬 312 Comments</button>
+                    <button class="feed-action-btn" onclick="alert('Post shared successfully!')">↗️ Share</button>
+                </div>
+            </div>
+
+            <!-- Viral Post Feed Item 2 -->
+            <div class="feed-post">
+                <div class="post-header">
+                    <span class="post-user">👤 Alex_99</span>
+                    <span class="viral-tag">🚀 Going Viral</span>
+                </div>
+                <p style="font-size: 14px; line-height: 1.4; color: #e2e8f0;">Fun fact about me: I can code an entire web app while drinking iced coffee! What's your hidden superpower? ☕😄</p>
+                <div class="post-actions-row">
+                    <button class="feed-action-btn" onclick="likePost(this)">❤️ 3.8K Likes</button>
+                    <button class="feed-action-btn" onclick="alert('Opened comments section.')">💬 845 Comments</button>
+                    <button class="feed-action-btn" onclick="alert('Post shared successfully!')">↗️ Share</button>
                 </div>
             </div>
         </div>
@@ -288,17 +395,27 @@
             }
         }
 
-        let isLiked = false;
-        function toggleLike(btn) {
-            const countSpan = document.getElementById('likeCount');
-            isLiked = !isLiked;
-            if (isLiked) {
-                btn.style.background = '#ec4899'; // Pink highlight for liked state
-                countSpan.innerText = '1.3K';
-            } else {
-                btn.style.background = 'rgba(0, 0, 0, 0.6)';
-                countSpan.innerText = '1.2K';
+        function createPostPrompt() {
+            const postText = prompt("Tell us something fun about yourself or share your story!");
+            if (postText) {
+                alert("Boom! Your post is live and starting to go viral! 🚀🔥");
             }
+        }
+
+        function createStoryPrompt() {
+            const storyText = prompt("What's your fun story update today?");
+            if (storyText) {
+                alert("Your story has been added to the reel bar with viral potential! ✨");
+            }
+        }
+
+        function viewStory(username, views) {
+            alert(`Viewing ${username}'s viral story! It currently has ${views} views. 🌟`);
+        }
+
+        function likePost(btn) {
+            btn.style.color = '#ec4899';
+            btn.innerText = '❤️ Liked & Boosted!';
         }
 
         async function loadUsers() {
