@@ -1,91 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeYou - Register with Email</title>
-    <style>
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
-        .card { background: #1e293b; padding: 30px; border-radius: 10px; width: 100%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h2 { text-align: center; margin-bottom: 20px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #475569; border-radius: 5px; background: #0f172a; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #10b981; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #059669; }
-        .link { text-align: center; margin-top: 15px; font-size: 14px; }
-        .link a { color: #3b82f6; text-decoration: none; }
-        .error { color: #ef4444; font-size: 13px; text-align: center; margin-top: 5px; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>📝 Register</h2>
-        
-        <!-- Step 1: Details -->
-        <form id="registerForm">
-            <input type="text" id="regUsername" placeholder="Choose Username" required>
-            <input type="password" id="regPassword" placeholder="Choose Password" required>
-            <input type="email" id="regEmail" placeholder="Enter Your Email" required>
-            <button type="submit">Send Verification Email</button>
-            <div id="errorMsg" class="error"></div>
-        </form>
-
-        <!-- Step 2: Code Verification -->
-        <form id="verifyForm" class="hidden">
-            <p style="font-size: 14px; color: #94a3b8; text-align: center;">Enter the 4-digit code sent to your email:</p>
-            <input type="text" id="otpCode" placeholder="Enter Code" required>
-            <button type="submit">Verify & Complete Signup</button>
-            <div id="verifyErrorMsg" class="error"></div>
-        </form>
-
-        <div class="link">
-            Already have an account? <a href="login.html">Log In</a>
-        </div>
-    </div>
-
-    <script>
-        let userEmail = '';
-
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('regUsername').value;
-            const password = document.getElementById('regPassword').value;
-            userEmail = document.getElementById('regEmail').value;
-
-            const response = await fetch('/api/send-email-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, email: userEmail })
-            });
-
             const data = await response.json();
             if (data.success) {
-                alert('Verification code sent to your email! Check your inbox.');
+                // If a fallback code is provided due to provider restrictions, show it clearly
+                if (data.fallbackCode) {
+                    alert(data.message);
+                } else {
+                    alert('Verification code sent to your email! Check your inbox.');
+                }
                 document.getElementById('registerForm').classList.add('hidden');
                 document.getElementById('verifyForm').classList.remove('hidden');
             } else {
                 document.getElementById('errorMsg').innerText = data.message;
             }
-        });
 
-        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const otp = document.getElementById('otpCode').value;
-
-            const response = await fetch('/api/verify-email-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, otp })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                alert('Email verified successfully! Please log in.');
-                window.location.href = 'login.html';
-            } else {
-                document.getElementById('verifyErrorMsg').innerText = data.message;
-            }
-        });
-    </script>
-</body>
-</html>

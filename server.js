@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,23 +9,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
+// Initialize Resend with your environment variable API key
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const users = [];
 const otpStorage = {};
-
-// Setup Nodemailer transporter (Example using Gmail)
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER || 'your-email@gmail.com',
-        pass: process.env.EMAIL_PASS || 'your-email-app-password'
-    }
-});
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-// Step 1: Send OTP via Email
+// Step 1: Send Verification Code
 app.post('/api/send-email-otp', async (req, res) => {
     const { username, password, email } = req.body;
     
@@ -42,21 +36,43 @@ app.post('/api/send-email-otp', async (req, res) => {
     otpStorage[email] = { otp, username, password };
 
     try {
-        await transporter.sendMail({
-            from: '"BeYou App" <no-reply@beyou.com>',
-            to: email,
+        // Attempt to send via Resend API to real inbox
+        const data = await resend.emails.send({
+            from: 'BeYou App <onboarding@resend.dev>',
+            to: [email],
             subject: 'Your BeYou Verification Code',
-            text: `Your verification code is: ${otp}`
+            html: `<div style="font-family: Arial, sans-serif; padding: 20px; background: #0f172a; color: white; border-radius: 8px;">
+                     <h2>BeYou Security Verification</h2>
+                     <p>Your secure verification code is:</p>
+                     <h1 style="color: #10b981; letter-spacing: 3px;">${otp}</h1>
+                     <p style="font-size: 12px; color: #94a3b8;">If you didn't request this, please ignore this email.</p>
+                   </div>`
         });
-        res.status(200).json({ success: true, message: 'Email sent successfully!' });
+
+        console.log('Resend Response:', data);
+        
+        // If Resend returns an error object
+        if (data.error) {
+            console.log('API Restriction Notice - Displaying code locally for test safety:', otp);
+            return res.status(200).json({ 
+                success: true, 
+                fallbackCode: otp, 
+                message: `Notice: Free tier restricts external emails. Use code: ${otp}` 
+            });
+        }
+
+        return res.status(200).json({ success: true, message: 'Verification email sent successfully to your inbox!' });
     } catch (error) {
-        console.error('Email Error:', error);
-        // Fallback if email credentials aren't set up yet, so it still lets you test locally:
-        res.status(200).json({ success: true, message: `Email simulated (Code: ${otp})` });
+        console.error('Email sending exception:', error);
+        return res.status(200).json({ 
+            success: true, 
+            fallbackCode: otp, 
+            message: `Generated Code (Sandbox Mode): ${otp}` 
+        });
     }
 });
 
-// Step 2: Verify Email OTP
+// Step 2: Verify Code and Save User
 app.post('/api/verify-email-otp', (req, res) => {
     const { email, otp } = req.body;
 
