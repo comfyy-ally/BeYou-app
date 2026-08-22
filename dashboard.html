@@ -161,6 +161,10 @@
             font-size: 22px;
             cursor: pointer;
             padding: 0;
+            transition: transform 0.2s;
+        }
+        .photo-btn:hover {
+            transform: scale(1.15);
         }
 
         /* Feed Post Card */
@@ -181,6 +185,23 @@
             font-weight: bold;
             font-size: 14px;
             color: #ffffff;
+        }
+        .post-image-container {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 350px;
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .post-image-container img {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: cover;
         }
         .post-actions-row {
             display: flex;
@@ -258,7 +279,10 @@
                 <!-- Clickable Avatar that redirects to Profile Page -->
                 <div class="user-avatar" onclick="goToProfile()" title="View Profile">👤</div>
                 <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
-                <button class="photo-btn" onclick="createPostPrompt()" title="Upload Photo">📷</button>
+                
+                <!-- Hidden file input to handle picture uploading -->
+                <input type="file" id="imageUploadInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Upload Photo">📷</button>
             </div>
 
             <!-- Stories Row -->
@@ -346,7 +370,6 @@
             
             document.getElementById(pageId).classList.add('active');
             
-            // Highlight the correct bottom navigation button if passed, or find it by ID
             if (btnElement) {
                 btnElement.classList.add('active');
             } else {
@@ -366,29 +389,53 @@
         function createPostPrompt() {
             const postText = prompt("Tell us something fun about yourself!");
             if (postText && postText.trim() !== "") {
-                const feedContainer = document.getElementById('feedPostsContainer');
-                const noPostsMsg = document.getElementById('noPostsMessage');
-                
-                if (noPostsMsg) {
-                    noPostsMsg.remove();
-                }
-
-                const postCard = document.createElement('div');
-                postCard.className = 'feed-post';
-                postCard.innerHTML = `
-                    <div class="post-header">
-                        <span class="post-user">👤 You</span>
-                    </div>
-                    <p style="font-size: 14px; line-height: 1.4; color: #e2e8f0;">${escapeHtml(postText)}</p>
-                    <div class="post-actions-row">
-                        <button class="feed-action-btn like-btn" data-likes="0" onclick="handleLike(this)">❤️ 0 Likes</button>
-                        <button class="feed-action-btn comment-btn" data-comments="0" onclick="handleComment(this)">💬 0 Comments</button>
-                        <button class="feed-action-btn share-btn" data-shares="0" onclick="handleShare(this)">↗️ 0 Shares</button>
-                    </div>
-                `;
-                feedContainer.prepend(postCard);
-                alert("Boom! Your post is live on the feed! 🚀🔥");
+                appendPostToFeed(postText, null);
             }
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageUrl = e.target.result;
+                    const caption = prompt("Add a caption for your photo:");
+                    appendPostToFeed(caption ? caption : "", imageUrl);
+                }
+                reader.readAsDataURL(file);
+            }
+            // Reset input so the same image can be chosen again if needed
+            event.target.value = '';
+        }
+
+        function appendPostToFeed(text, imageUrl) {
+            const feedContainer = document.getElementById('feedPostsContainer');
+            const noPostsMsg = document.getElementById('noPostsMessage');
+            
+            if (noPostsMsg) {
+                noPostsMsg.remove();
+            }
+
+            const postCard = document.createElement('div');
+            postCard.className = 'feed-post';
+            
+            let imageContentHtml = imageUrl ? `<div class="post-image-container"><img src="${imageUrl}" alt="Uploaded Post Image"></div>` : '';
+            let textContentHtml = text ? `<p style="font-size: 14px; line-height: 1.4; color: #e2e8f0; margin-top: ${imageUrl ? '5px' : '0'};">${escapeHtml(text)}</p>` : '';
+
+            postCard.innerHTML = `
+                <div class="post-header">
+                    <span class="post-user">👤 You</span>
+                </div>
+                ${imageContentHtml}
+                ${textContentHtml}
+                <div class="post-actions-row">
+                    <button class="feed-action-btn like-btn" data-likes="0" onclick="handleLike(this)">❤️ 0 Likes</button>
+                    <button class="feed-action-btn comment-btn" data-comments="0" onclick="handleComment(this)">💬 0 Comments</button>
+                    <button class="feed-action-btn share-btn" data-shares="0" onclick="handleShare(this)">↗️ 0 Shares</button>
+                </div>
+            `;
+            feedContainer.prepend(postCard);
+            alert("Boom! Your post is live on the feed! 🚀🔥");
         }
 
         function handleLike(btn) {
