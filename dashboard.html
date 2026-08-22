@@ -110,8 +110,24 @@
         <!-- Home Page -->
         <div id="home" class="page active">
             <h2>Home Feed</h2>
+            
+            <!-- Promotional Video Card -->
+            <div class="card" style="text-align: center;">
+                <h3 style="color: #ec4899; margin-top: 0;">Welcome to TexUs! 🚀</h3>
+                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 15px;">Watch how easy it is to connect with friends anywhere.</p>
+                
+                <!-- Video Container -->
+                <div style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000;">
+                    <video controls style="width: 100%; max-height: 350px; display: block;">
+                        <source src="/texus-intro.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+
+            <!-- Additional Feed Post Example -->
             <div class="card">
-                <p>Welcome back to TexUs! Check out what's happening in your community today.</p>
+                <p><strong>TexUs Official:</strong> Thanks for joining our community! Stay tuned for more updates and exciting features. ✨</p>
             </div>
         </div>
 
@@ -221,7 +237,6 @@
             window.location.href = '/login.html';
         }
 
-        // Load users on initial dashboard open just in case
         loadUsers();
     </script>
 </body>
