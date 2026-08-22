@@ -269,6 +269,11 @@
             font-weight: bold;
         }
     </style>
+
+    <!-- Import Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 </head>
 <body>
 
@@ -296,7 +301,6 @@
 
             <!-- Stories Row -->
             <div class="stories-container" id="storiesContainer">
-                <!-- Hidden file input for story media upload -->
                 <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
                 
                 <!-- Create Story Button Card (Always First) -->
@@ -308,7 +312,7 @@
 
             <!-- Dynamic Feed Posts Container -->
             <div id="feedPostsContainer">
-                <p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">No posts yet. Be the first to share something fun above! ✨</p>
+                <p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">Loading live feed...</p>
             </div>
         </div>
 
@@ -376,6 +380,22 @@
     </div>
 
     <script>
+        // --- YOUR FIREBASE CONFIGURATION (INCLUDED) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvR0Eo",
+            authDomain: "texus-5c99e.firebaseapp.com",
+            projectId: "texus-5c99e",
+            storageBucket: "texus-5c99e.firebasestorage.app",
+            messagingSenderId: "1040040305137",
+            appId: "1:1040040305137:web:86f4f717204378a22da450",
+            measurementId: "G-KCF9J53BGH"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -398,127 +418,198 @@
             switchPage('profile', document.getElementById('nav-profile'));
         }
 
+        // --- UPLOAD POST TO FIRESTORE ---
         function createPostPrompt() {
             const postText = prompt("Tell us something fun about yourself!");
             if (postText && postText.trim() !== "") {
-                appendPostToFeed(postText, null, null);
+                savePostToFirebase(postText, null, false);
             }
         }
 
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const mediaUrl = e.target.result;
-                    const isVideo = file.type.startsWith('video');
-                    const caption = prompt("Add a caption for your post:");
-                    appendPostToFeed(caption ? caption : "", mediaUrl, isVideo);
-                }
-                reader.readAsDataURL(file);
+                const caption = prompt("Add a caption for your post:") || "";
+                const isVideo = file.type.startsWith('video');
+                
+                const storageRef = storage.ref('posts/' + Date.now() + '_' + file.name);
+                const uploadTask = storageRef.put(file);
+
+                uploadTask.on('state_changed', 
+                    null, 
+                    (error) => {
+                        alert("Upload failed: " + error.message);
+                    }, 
+                    () => {
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            savePostToFirebase(caption, downloadURL, isVideo);
+                        });
+                    }
+                );
             }
             event.target.value = '';
         }
 
-        function appendPostToFeed(text, mediaUrl, isVideo) {
-            const feedContainer = document.getElementById('feedPostsContainer');
-            const noPostsMsg = document.getElementById('noPostsMessage');
-            
-            if (noPostsMsg) {
-                noPostsMsg.remove();
-            }
-
-            const postCard = document.createElement('div');
-            postCard.className = 'feed-post';
-            
-            let mediaContentHtml = '';
-            if (mediaUrl) {
-                if (isVideo) {
-                    mediaContentHtml = `<div class="post-media-container"><video src="${mediaUrl}" controls></video></div>`;
-                } else {
-                    mediaContentHtml = `<div class="post-media-container"><img src="${mediaUrl}" alt="Post Media"></div>`;
-                }
-            }
-
-            let textContentHtml = text ? `<p style="font-size: 14px; line-height: 1.4; color: #e2e8f0; margin-top: ${mediaUrl ? '5px' : '0'};">${escapeHtml(text)}</p>` : '';
-
-            postCard.innerHTML = `
-                <div class="post-header">
-                    <span class="post-user">👤 You</span>
-                </div>
-                ${mediaContentHtml}
-                ${textContentHtml}
-                <div class="post-actions-row">
-                    <button class="feed-action-btn like-btn" data-likes="0" onclick="handleLike(this)">❤️ 0 Likes</button>
-                    <button class="feed-action-btn comment-btn" data-comments="0" onclick="handleComment(this)">💬 0 Comments</button>
-                    <button class="feed-action-btn share-btn" data-shares="0" onclick="handleShare(this)">↗️ 0 Shares</button>
-                </div>
-            `;
-            feedContainer.prepend(postCard);
-            alert("Boom! Your post is live on the feed for everyone to see! 🚀🔥");
+        function savePostToFirebase(text, mediaUrl, isVideo) {
+            db.collection("posts").add({
+                text: text,
+                mediaUrl: mediaUrl || "",
+                isVideo: isVideo || false,
+                username: "You",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                likes: 0,
+                comments: 0,
+                shares: 0
+            })
+            .then(() => {
+                alert("Boom! Your post is live on the feed for everyone to see! 🚀🔥");
+            })
+            .catch((error) => {
+                alert("Error adding post: " + error.message);
+            });
         }
 
+        // --- UPLOAD STORY TO FIRESTORE ---
         function handleStoryUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const mediaUrl = e.target.result;
-                    const isVideo = file.type.startsWith('video');
-                    const storiesContainer = document.getElementById('storiesContainer');
+                const isVideo = file.type.startsWith('video');
+                const storageRef = storage.ref('stories/' + Date.now() + '_' + file.name);
+                const uploadTask = storageRef.put(file);
 
+                uploadTask.on('state_changed', 
+                    null, 
+                    (error) => {
+                        alert("Story upload failed: " + error.message);
+                    }, 
+                    () => {
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            db.collection("stories").add({
+                                mediaUrl: downloadURL,
+                                isVideo: isVideo,
+                                username: "You",
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            }).then(() => {
+                                alert("Your story has been added successfully! ✨");
+                            });
+                        });
+                    }
+                );
+            }
+            event.target.value = '';
+        }
+
+        // --- REAL-TIME LISTENERS FOR LIVE SYNC ACROSS DEVICES ---
+        function loadLiveFeed() {
+            const feedContainer = document.getElementById('feedPostsContainer');
+            
+            db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+                feedContainer.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    feedContainer.innerHTML = '<p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">No posts yet. Be the first to share something fun above! ✨</p>';
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const post = doc.data();
+                    const postId = doc.id;
+
+                    const postCard = document.createElement('div');
+                    postCard.className = 'feed-post';
+                    
+                    let mediaContentHtml = '';
+                    if (post.mediaUrl) {
+                        if (post.isVideo) {
+                            mediaContentHtml = `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>`;
+                        } else {
+                            mediaContentHtml = `<div class="post-media-container"><img src="${post.mediaUrl}" alt="Post Media"></div>`;
+                        }
+                    }
+
+                    let textContentHtml = post.text ? `<p style="font-size: 14px; line-height: 1.4; color: #e2e8f0; margin-top: ${post.mediaUrl ? '5px' : '0'};">${escapeHtml(post.text)}</p>` : '';
+
+                    postCard.innerHTML = `
+                        <div class="post-header">
+                            <span class="post-user">👤 ${escapeHtml(post.username)}</span>
+                        </div>
+                        ${mediaContentHtml}
+                        ${textContentHtml}
+                        <div class="post-actions-row">
+                            <button class="feed-action-btn" onclick="handleLike('${postId}', ${post.likes})">❤️ ${post.likes || 0} Likes</button>
+                            <button class="feed-action-btn" onclick="handleComment('${postId}')">💬 ${post.comments || 0} Comments</button>
+                            <button class="feed-action-btn" onclick="handleShare('${postId}')">↗️ ${post.shares || 0} Shares</button>
+                        </div>
+                    `;
+                    feedContainer.appendChild(postCard);
+                });
+            });
+        }
+
+        function loadLiveStories() {
+            const storiesContainer = document.getElementById('storiesContainer');
+
+            db.collection("stories").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+                const createStoryCard = storiesContainer.querySelector('.create-story');
+                storiesContainer.innerHTML = '';
+                storiesContainer.appendChild(createStoryCard);
+
+                snapshot.forEach((doc) => {
+                    const story = doc.data();
                     const storyCard = document.createElement('div');
                     storyCard.className = 'story-card';
                     
-                    let mediaHtml = isVideo ? 
-                        `<video class="story-media" src="${mediaUrl}"></video>` : 
-                        `<img class="story-media" src="${mediaUrl}" alt="Story">`;
+                    let mediaHtml = story.isVideo ? 
+                        `<video class="story-media" src="${story.mediaUrl}"></video>` : 
+                        `<img class="story-media" src="${story.mediaUrl}" alt="Story">`;
 
                     storyCard.innerHTML = `
                         ${mediaHtml}
                         <div class="story-badge">🔥 New</div>
-                        <p class="story-name">You</p>
+                        <p class="story-name">${escapeHtml(story.username)}</p>
                     `;
-                    storyCard.onclick = function() {
-                        alert("Opening your story!");
-                    };
-
                     storiesContainer.appendChild(storyCard);
-                    alert("Your story has been added successfully! ✨");
+                });
+            });
+        }
+
+        function handleLike(postId, currentLikes) {
+            db.collection("posts").doc(postId).update({
+                likes: (currentLikes || 0) + 1
+            });
+        }
+
+        function handleComment(postId) {
+            const commentText = prompt("Write a comment:");
+            if (commentText && commentText.trim() !== "") {
+                const postRef = db.collection("posts").doc(postId);
+                db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(postRef);
+                    if (doc.exists) {
+                        const newComments = (doc.data().comments || 0) + 1;
+                        transaction.update(postRef, { comments: newComments });
+                    }
+                }).then(() => {
+                    alert("Comment added!");
+                });
+            }
+        }
+
+        function handleShare(postId) {
+            const postRef = db.collection("posts").doc(postId);
+            db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(postRef);
+                if (doc.exists) {
+                    const newShares = (doc.data().shares || 0) + 1;
+                    transaction.update(postRef, { shares: newShares });
                 }
-                reader.readAsDataURL(file);
-            }
-            event.target.value = '';
-        }
-
-        function handleLike(btn) {
-            let likes = parseInt(btn.getAttribute('data-likes')) || 0;
-            likes += 1;
-            btn.setAttribute('data-likes', likes);
-            btn.innerHTML = `❤️ ${likes} ${likes === 1 ? 'Like' : 'Likes'}`;
-            btn.style.color = '#ec4899';
-        }
-
-        function handleComment(btn) {
-            let comments = parseInt(btn.getAttribute('data-comments')) || 0;
-            const newCommentText = prompt("Write a comment:");
-            if (newCommentText && newCommentText.trim() !== "") {
-                comments += 1;
-                btn.setAttribute('data-comments', comments);
-                btn.innerHTML = `💬 ${comments} ${comments === 1 ? 'Comment' : 'Comments'}`;
-                alert("Comment added successfully!");
-            }
-        }
-
-        function handleShare(btn) {
-            let shares = parseInt(btn.getAttribute('data-shares')) || 0;
-            shares += 1;
-            btn.setAttribute('data-shares', shares);
-            btn.innerHTML = `↗️ ${shares} ${shares === 1 ? 'Share' : 'Shares'}`;
-            alert("Post shared successfully!");
+            }).then(() => {
+                alert("Post shared successfully!");
+            });
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
@@ -552,6 +643,8 @@
             window.location.href = '/login.html';
         }
 
+        loadLiveFeed();
+        loadLiveStories();
         loadUsers();
     </script>
 </body>
