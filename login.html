@@ -24,14 +24,17 @@
             text-align: center;
         }
         .app-title {
-            font-size: 22px;
+            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
+            font-size: 36px;
             font-weight: bold;
-            color: #10b981;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+        }
+        .tex-part {
+            color: #ec4899; /* Pink */
+        }
+        .us-part {
+            color: #10b981; /* Lime */
         }
         input {
             width: 100%;
@@ -80,7 +83,7 @@
 
     <div class="container">
         <div class="app-title">
-            🔒 TexUs
+            <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
 
         <form id="loginForm">
@@ -112,7 +115,6 @@
             const data = await response.json();
             if (data.success) {
                 alert('Login successful!');
-                // You can redirect to your main app dashboard page here later
             } else {
                 document.getElementById('errorMsg').innerText = data.message;
             }

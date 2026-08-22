@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - BeYou App</title>
+    <title>Register - TexUs</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,25 +21,29 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             width: 320px;
-        }
-        .app-brand {
             text-align: center;
-            font-size: 26px;
+        }
+        .app-title {
+            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
+            font-size: 36px;
             font-weight: bold;
-            color: #10b981;
             margin-bottom: 5px;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+        }
+        .tex-part {
+            color: #ec4899; /* Pink */
+        }
+        .us-part {
+            color: #10b981; /* Lime */
         }
         .app-tagline {
-            text-align: center;
             font-size: 13px;
             color: #94a3b8;
             margin-bottom: 25px;
         }
         h2 {
-            text-align: center;
             margin-bottom: 15px;
-            font-size: 20px;
+            font-size: 18px;
             color: #f8fafc;
         }
         input {
@@ -72,17 +76,30 @@
         #errorMsg, #verifyErrorMsg {
             color: #ef4444;
             font-size: 13px;
-            text-align: center;
             margin-top: 5px;
+        }
+        .login-link {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .login-link a {
+            color: #10b981;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- App Branding Tag -->
-        <div class="app-brand">BeYou</div>
-        <div class="app-tagline">Express your true self securely</div>
+        <!-- Custom Cursive Branding -->
+        <div class="app-title">
+            <span class="tex-part">Tex</span><span class="us-part">Us</span>
+        </div>
+        <div class="app-tagline">Connect securely with your world</div>
 
         <!-- Registration Form -->
         <form id="registerForm">
@@ -97,11 +114,15 @@
         <!-- Verification Code Form -->
         <form id="verifyForm" class="hidden">
             <h2>Verify Email</h2>
-            <p style="font-size: 13px; text-align: center; color: #94a3b8;">Enter the 4-digit code sent to your email.</p>
+            <p style="font-size: 13px; color: #94a3b8;">Enter the 4-digit code sent to your email.</p>
             <input type="text" id="otp" placeholder="Enter 4-digit code" required>
             <p id="verifyErrorMsg"></p>
             <button type="button" id="verifyBtn">Verify & Register</button>
         </form>
+
+        <div class="login-link">
+            Already have an account? <a href="/login.html">Login here</a>
+        </div>
     </div>
 
     <script>
