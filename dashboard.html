@@ -138,6 +138,12 @@
             justify-content: center;
             font-size: 18px;
             flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .user-avatar:hover {
+            transform: scale(1.08);
+            background-color: #475569;
         }
         .post-input-mock {
             flex: 1;
@@ -249,7 +255,8 @@
 
             <!-- Post Creator Box -->
             <div class="post-creator">
-                <div class="user-avatar">👤</div>
+                <!-- Clickable Avatar that redirects to Profile Page -->
+                <div class="user-avatar" onclick="goToProfile()" title="View Profile">👤</div>
                 <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
                 <button class="photo-btn" onclick="createPostPrompt()" title="Upload Photo">📷</button>
             </div>
@@ -315,19 +322,19 @@
 
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-        <button class="nav-btn active" onclick="switchPage('home', this)">
+        <button class="nav-btn active" id="nav-home" onclick="switchPage('home', this)">
             <span>🏠</span> Home
         </button>
-        <button class="nav-btn" onclick="switchPage('friends', this)">
+        <button class="nav-btn" id="nav-friends" onclick="switchPage('friends', this)">
             <span>👥</span> Friends
         </button>
-        <button class="nav-btn" onclick="switchPage('chat', this)">
+        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)">
             <span>💬</span> Chat
         </button>
-        <button class="nav-btn" onclick="switchPage('profile', this)">
+        <button class="nav-btn" id="nav-profile" onclick="switchPage('profile', this)">
             <span>👤</span> Profile
         </button>
-        <button class="nav-btn" onclick="switchPage('settings', this)">
+        <button class="nav-btn" id="nav-settings" onclick="switchPage('settings', this)">
             <span>⚙️</span> Settings
         </button>
     </div>
@@ -338,11 +345,22 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
             document.getElementById(pageId).classList.add('active');
-            btnElement.classList.add('active');
+            
+            // Highlight the correct bottom navigation button if passed, or find it by ID
+            if (btnElement) {
+                btnElement.classList.add('active');
+            } else {
+                const targetNav = document.getElementById('nav-' + pageId);
+                if (targetNav) targetNav.classList.add('active');
+            }
 
             if (pageId === 'friends') {
                 loadUsers();
             }
+        }
+
+        function goToProfile() {
+            switchPage('profile', document.getElementById('nav-profile'));
         }
 
         function createPostPrompt() {
@@ -355,7 +373,6 @@
                     noPostsMsg.remove();
                 }
 
-                // Create new post card dynamically with live counter states
                 const postCard = document.createElement('div');
                 postCard.className = 'feed-post';
                 postCard.innerHTML = `
