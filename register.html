@@ -20,12 +20,27 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 300px;
+            width: 320px;
+        }
+        .app-brand {
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .app-tagline {
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 25px;
         }
         h2 {
             text-align: center;
-            margin-bottom: 20px;
-            color: #10b981;
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #f8fafc;
         }
         input {
             width: 100%;
@@ -39,7 +54,7 @@
         }
         button {
             width: 100%;
-            padding: 10px;
+            padding: 11px;
             background-color: #10b981;
             color: white;
             border: none;
@@ -54,16 +69,21 @@
         .hidden {
             display: none;
         }
-        #errorMsg {
+        #errorMsg, #verifyErrorMsg {
             color: #ef4444;
-            font-size: 14px;
+            font-size: 13px;
             text-align: center;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- App Branding Tag -->
+        <div class="app-brand">BeYou</div>
+        <div class="app-tagline">Express your true self securely</div>
+
         <!-- Registration Form -->
         <form id="registerForm">
             <h2>Create Account</h2>
@@ -77,9 +97,9 @@
         <!-- Verification Code Form -->
         <form id="verifyForm" class="hidden">
             <h2>Verify Email</h2>
-            <p style="font-size: 13px; text-align: center; color: #94a3b8;">Check your inbox for your 4-digit code.</p>
+            <p style="font-size: 13px; text-align: center; color: #94a3b8;">Enter the 4-digit code sent to your email.</p>
             <input type="text" id="otp" placeholder="Enter 4-digit code" required>
-            <p id="verifyErrorMsg" style="color: #ef4444; font-size: 14px; text-align: center;"></p>
+            <p id="verifyErrorMsg"></p>
             <button type="button" id="verifyBtn">Verify & Register</button>
         </form>
     </div>
