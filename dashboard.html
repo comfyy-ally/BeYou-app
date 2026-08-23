@@ -229,6 +229,18 @@
             color: #10b981;
         }
 
+        /* Comments View Styles */
+        #commentsView {
+            display: none;
+        }
+        .comment-item {
+            background-color: #0f172a;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -279,27 +291,48 @@
     </div>
 
     <div class="content">
-        <!-- Home Page -->
+        <!-- Home Page (Feed & Stories) -->
         <div id="home" class="page active">
-            <h2>Home Feed</h2>
-            <div class="post-creator">
-                <div class="user-avatar" onclick="goToProfile()" title="View Profile">👤</div>
-                <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
-                <input type="file" id="imageUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleImageUpload(event)">
-                <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Upload Photo or Video">📷</button>
-            </div>
+            
+            <!-- Main Feed View -->
+            <div id="mainFeedView">
+                <h2>Home Feed</h2>
+                <div class="post-creator">
+                    <div class="user-avatar" onclick="goToProfile()" title="View Profile">👤</div>
+                    <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
+                    <input type="file" id="imageUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleImageUpload(event)">
+                    <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Upload Photo or Video">📷</button>
+                </div>
 
-            <div class="stories-container" id="storiesContainer">
-                <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
-                <div class="story-card create-story" onclick="document.getElementById('storyUploadInput').click()">
-                    <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
-                    <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
+                <div class="stories-container" id="storiesContainer">
+                    <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
+                    <div class="story-card create-story" onclick="document.getElementById('storyUploadInput').click()">
+                        <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
+                        <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
+                    </div>
+                </div>
+
+                <div id="feedPostsContainer">
+                    <p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">Loading live feed...</p>
                 </div>
             </div>
 
-            <div id="feedPostsContainer">
-                <p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">Loading live feed...</p>
+            <!-- Dedicated Comments Inside View -->
+            <div id="commentsView">
+                <button onclick="backToFeed()" style="background:#334155; border:none; color:white; padding: 6px 12px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 15px;">← Back to Feed</button>
+                <h2>Comments</h2>
+                <div class="card">
+                    <div id="activePostPreview" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #334155;"></div>
+                    <div id="commentsListContainer" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
+                        <p style="color: #94a3b8; font-size: 13px;">Loading comments...</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="commentInputField" placeholder="Write a comment..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;">
+                        <button onclick="submitComment()" style="background:#10b981; border:none; color:white; padding: 10px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">Send</button>
+                    </div>
+                </div>
             </div>
+
         </div>
 
         <!-- Make Friends Page -->
@@ -395,6 +428,15 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
+        // Fixed unique user ID logic
+        let currentUserId = localStorage.getItem('texus_user_id');
+        if (!currentUserId) {
+            currentUserId = 'user_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('texus_user_id', currentUserId);
+        }
+
+        let activeSelectedPostId = null;
+
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -433,11 +475,10 @@
                 text: text,
                 mediaUrl: mediaUrl || "",
                 isVideo: isVideo || false,
-                username: "You",
+                username: "User_" + currentUserId.substring(5, 9),
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 likes: 0,
-                comments: 0,
-                shares: 0
+                likedBy: []
             }).then(() => alert("Post is live! 🚀")).catch(err => alert(err.message));
         }
 
@@ -451,7 +492,7 @@
                         db.collection("stories").add({
                             mediaUrl: downloadURL,
                             isVideo: isVideo,
-                            username: "You",
+                            username: "User_" + currentUserId.substring(5, 9),
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         }).then(() => alert("Story added! ✨"));
                     });
@@ -477,18 +518,96 @@
                     let mediaHtml = post.mediaUrl ? (post.isVideo ? `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>` : `<div class="post-media-container"><img src="${post.mediaUrl}"></div>`) : '';
                     let textHtml = post.text ? `<p style="font-size: 14px; color: #e2e8f0;">${escapeHtml(post.text)}</p>` : '';
 
+                    const hasLiked = post.likedBy && post.likedBy.includes(currentUserId);
+
                     postCard.innerHTML = `
                         <div class="post-header"><span class="post-user">👤 ${escapeHtml(post.username)}</span></div>
                         ${mediaHtml}
                         ${textHtml}
                         <div class="post-actions-row">
-                            <button class="feed-action-btn" onclick="db.collection('posts').doc('${postId}').update({likes: ${(post.likes||0)+1}})">❤️ ${post.likes || 0} Likes</button>
-                            <button class="feed-action-btn" onclick="alert('Comments active!')">💬 ${post.comments || 0} Comments</button>
+                            <button class="feed-action-btn" onclick="toggleLike('${postId}')" style="color: ${hasLiked ? '#10b981' : '#94a3b8'};">❤️ ${post.likes || 0} Likes</button>
+                            <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text || 'Media Post')}')">💬 Comments</button>
                         </div>
                     `;
                     feedContainer.appendChild(postCard);
                 });
             });
+        }
+
+        function toggleLike(postId) {
+            const postRef = db.collection("posts").doc(postId);
+            db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(postRef);
+                if (!doc.exists) return;
+
+                let data = doc.data();
+                let likedBy = data.likedBy || [];
+                let likes = data.likes || 0;
+
+                if (likedBy.includes(currentUserId)) {
+                    likedBy = likedBy.filter(id => id !== currentUserId);
+                    likes = Math.max(0, likes - 1);
+                } else {
+                    likedBy.push(currentUserId);
+                    likes += 1;
+                }
+
+                transaction.update(postRef, { likes: likes, likedBy: likedBy });
+            });
+        }
+
+        function openCommentsView(postId, username, postSummary) {
+            activeSelectedPostId = postId;
+            document.getElementById('mainFeedView').style.display = 'none';
+            document.getElementById('commentsView').style.display = 'block';
+
+            document.getElementById('activePostPreview').innerHTML = `
+                <strong style="color: #10b981;">${username}:</strong> 
+                <span style="color: #e2e8f0; font-size: 13px;">${postSummary}</span>
+            `;
+
+            loadLiveComments(postId);
+        }
+
+        function backToFeed() {
+            activeSelectedPostId = null;
+            document.getElementById('commentsView').style.display = 'none';
+            document.getElementById('mainFeedView').style.display = 'block';
+        }
+
+        function loadLiveComments(postId) {
+            const container = document.getElementById('commentsListContainer');
+            
+            db.collection("posts").doc(postId).collection("comments")
+                .orderBy("timestamp", "asc")
+                .onSnapshot((snapshot) => {
+                    container.innerHTML = '';
+                    if (snapshot.empty) {
+                        container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No comments yet. Be the first to comment!</p>';
+                        return;
+                    }
+                    snapshot.forEach((doc) => {
+                        const comment = doc.data();
+                        const commentEl = document.createElement('div');
+                        commentEl.className = 'comment-item';
+                        commentEl.innerHTML = `<strong style="color: #10b981;">${escapeHtml(comment.username)}:</strong> ${escapeHtml(comment.text)}`;
+                        container.appendChild(commentEl);
+                    });
+                });
+        }
+
+        function submitComment() {
+            const inputField = document.getElementById('commentInputField');
+            const commentText = inputField.value.trim();
+            if (!commentText || !activeSelectedPostId) return;
+
+            db.collection("posts").doc(activeSelectedPostId).collection("comments").add({
+                text: commentText,
+                username: "User_" + currentUserId.substring(5, 9),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                inputField.value = '';
+            }).catch(err => alert("Error posting comment: " + err.message));
         }
 
         function loadLiveStories() {
@@ -513,7 +632,7 @@
             if(!targetUser) return alert("Please enter a username!");
 
             db.collection("friendRequests").add({
-                fromUser: "You",
+                fromUser: "User_" + currentUserId.substring(5, 9),
                 toUser: targetUser,
                 status: "pending",
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
