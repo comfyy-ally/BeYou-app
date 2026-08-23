@@ -9,171 +9,123 @@
             font-family: Arial, sans-serif;
             background-color: #0f172a;
             color: #ffffff;
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
-        .container {
+        .register-card {
             background-color: #1e293b;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 320px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             text-align: center;
         }
         .app-title {
             font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
             font-size: 36px;
             font-weight: bold;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
+            margin-bottom: 20px;
         }
-        .tex-part {
-            color: #ec4899; /* Pink */
-        }
-        .us-part {
-            color: #10b981; /* Lime */
-        }
-        .app-tagline {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 25px;
-        }
-        h2 {
-            margin-bottom: 15px;
-            font-size: 18px;
-            color: #f8fafc;
-        }
+        .tex-part { color: #ec4899; }
+        .us-part { color: #10b981; }
         input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border: 1px solid #334155;
             background-color: #0f172a;
+            border: 1px solid #334155;
             color: white;
-            border-radius: 5px;
+            border-radius: 6px;
             box-sizing: border-box;
         }
         button {
             width: 100%;
-            padding: 11px;
+            padding: 12px;
             background-color: #10b981;
-            color: white;
             border: none;
-            border-radius: 5px;
+            color: white;
             font-weight: bold;
+            border-radius: 6px;
             cursor: pointer;
             margin-top: 10px;
+            transition: background 0.2s;
         }
         button:hover {
             background-color: #059669;
         }
-        .hidden {
-            display: none;
-        }
-        #errorMsg, #verifyErrorMsg {
-            color: #ef4444;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-        .login-link {
+        .switch-link {
             margin-top: 15px;
             font-size: 13px;
             color: #94a3b8;
         }
-        .login-link a {
+        .switch-link a {
             color: #10b981;
             text-decoration: none;
         }
-        .login-link a:hover {
-            text-decoration: underline;
-        }
     </style>
+
+    <!-- Import Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Custom Cursive Branding -->
+    <div class="register-card">
         <div class="app-title">
             <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
-        <div class="app-tagline">Connect securely with your world</div>
-
-        <!-- Registration Form -->
-        <form id="registerForm">
-            <h2>Create Account</h2>
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="email" id="email" placeholder="Email Address" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <p id="errorMsg"></p>
-            <button type="submit">Send Verification Code</button>
-        </form>
-
-        <!-- Verification Code Form -->
-        <form id="verifyForm" class="hidden">
-            <h2>Verify Email</h2>
-            <p style="font-size: 13px; color: #94a3b8;">Enter the 4-digit code sent to your email.</p>
-            <input type="text" id="otp" placeholder="Enter 4-digit code" required>
-            <p id="verifyErrorMsg"></p>
-            <button type="button" id="verifyBtn">Verify & Register</button>
-        </form>
-
-        <div class="login-link">
-            Already have an account? <a href="/login.html">Login here</a>
+        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Create your account & get verified via email</p>
+        
+        <input type="text" id="username" placeholder="Username">
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        
+        <button onclick="registerUser()">Register & Send Verification Email</button>
+        
+        <div class="switch-link">
+            Already have an account? <a href="login.html">Login here</a>
         </div>
     </div>
 
     <script>
-        const registerForm = document.getElementById('registerForm');
-        const verifyForm = document.getElementById('verifyForm');
-        let registeredEmail = '';
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvR0Eo",
+            authDomain: "texus-5c99e.firebaseapp.com",
+            projectId: "texus-5c99e",
+            storageBucket: "texus-5c99e.firebasestorage.app",
+            messagingSenderId: "1040040305137",
+            appId: "1:1040040305137:web:86f4f717204378a22da450",
+            measurementId: "G-KCF9J53BGH"
+        };
 
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
+        firebase.initializeApp(firebaseConfig);
+
+        function registerUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            registeredEmail = email;
 
-            const response = await fetch('/api/send-email-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, email })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                if (data.fallbackCode) {
-                    alert(data.message);
-                } else {
-                    alert('Verification code sent to your email! Check your inbox.');
-                }
-                registerForm.classList.add('hidden');
-                verifyForm.classList.remove('hidden');
-            } else {
-                document.getElementById('errorMsg').innerText = data.message;
+            if (!username || !email || !password) {
+                alert("Please fill in all fields!");
+                return;
             }
-        });
 
-        document.getElementById('verifyBtn').addEventListener('click', async () => {
-            const otp = document.getElementById('otp').value;
-
-            const response = await fetch('/api/verify-email-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: registeredEmail, otp })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                alert('Account verified and created successfully!');
-                window.location.href = '/login.html';
-            } else {
-                document.getElementById('verifyErrorMsg').innerText = data.message;
-            }
-        });
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    userCredential.user.sendEmailVerification()
+                        .then(() => {
+                            alert("Account created successfully! A verification email has been sent to " + email + ". Please check your inbox.");
+                            window.location.href = 'login.html';
+                        });
+                })
+                .catch((error) => {
+                    alert("Registration Error: " + error.message);
+                });
+        }
     </script>
 </body>
 </html>
