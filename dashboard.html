@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TexUs</title>
+    <title>Register - TexUs</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,376 +11,88 @@
             color: #ffffff;
             margin: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            overflow: hidden;
         }
-
-        /* Top Header with Cursive Branding */
-        .top-header {
-            text-align: center;
-            padding: 15px;
+        .register-card {
             background-color: #1e293b;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 10;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            text-align: center;
         }
         .app-title {
             font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
-            letter-spacing: 2px;
-            margin: 0;
+            margin-bottom: 20px;
         }
-        .tex-part { color: #ec4899; } /* Pink */
-        .us-part { color: #10b981; } /* Lime */
-
-        /* Main Content Area */
-        .content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            padding-bottom: 90px;
-        }
-        .page {
-            display: none;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .page.active {
-            display: block;
-        }
-        h2 {
-            color: #10b981;
-        }
-        .card {
-            background-color: #1e293b;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-top: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-
-        /* Stories Row Styles */
-        .stories-container {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            scrollbar-width: none;
-        }
-        .stories-container::-webkit-scrollbar {
-            display: none;
-        }
-        .story-card {
-            min-width: 110px;
-            height: 180px;
-            background-color: #334155;
-            border-radius: 12px;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 10px;
-            transition: transform 0.2s;
-        }
-        .story-card:hover {
-            transform: scale(1.03);
-        }
-        .story-card.create-story {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 2px dashed #10b981;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .story-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background-color: #3b82f6;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 6px;
-            z-index: 2;
-        }
-        .story-name {
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            margin: 0;
-            z-index: 2;
-        }
-        .story-media {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .tex-part { color: #ec4899; }
+        .us-part { color: #10b981; }
+        input {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        /* Post Creator Box */
-        .post-creator {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: #1e293b;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #334155;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .user-avatar:hover {
-            transform: scale(1.08);
-            background-color: #475569;
-        }
-        .post-input-mock {
-            flex: 1;
+            padding: 12px;
+            margin: 10px 0;
             background-color: #0f172a;
             border: 1px solid #334155;
-            padding: 10px 15px;
-            border-radius: 20px;
-            color: #94a3b8;
-            font-size: 14px;
-            cursor: pointer;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
         }
-        .photo-btn {
-            background: none;
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #10b981;
             border: none;
-            font-size: 22px;
-            cursor: pointer;
-            padding: 0;
-            transition: transform 0.2s;
-        }
-        .photo-btn:hover {
-            transform: scale(1.15);
-        }
-
-        /* Feed Post Card */
-        .feed-post {
-            background-color: #1e293b;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .post-user {
+            color: white;
             font-weight: bold;
-            font-size: 14px;
-            color: #ffffff;
-        }
-        .post-media-container {
+            border-radius: 6px;
+            cursor: pointer;
             margin-top: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            overflow: hidden;
-            max-height: 350px;
-            background-color: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            transition: background 0.2s;
         }
-        .post-media-container img, .post-media-container video {
-            width: 100%;
-            height: auto;
-            max-height: 350px;
-            object-fit: cover;
+        button:hover {
+            background-color: #059669;
         }
-        .post-actions-row {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #334155;
-            margin-top: 12px;
-            padding-top: 10px;
-        }
-        .feed-action-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
+        .switch-link {
+            margin-top: 15px;
             font-size: 13px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .feed-action-btn:hover {
-            color: #10b981;
-        }
-
-        /* Bottom Navigation Bar */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
-            background-color: #1e293b;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-        }
-        .nav-btn {
-            background: none;
-            border: none;
             color: #94a3b8;
-            font-size: 13px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            flex: 1;
-            transition: 0.2s;
         }
-        .nav-btn span {
-            font-size: 20px;
-            margin-bottom: 3px;
-        }
-        .nav-btn:hover, .nav-btn.active {
+        .switch-link a {
             color: #10b981;
-            font-weight: bold;
+            text-decoration: none;
         }
     </style>
 
     <!-- Import Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-    <!-- Top Header -->
-    <div class="top-header">
+    <div class="register-card">
         <div class="app-title">
             <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
-    </div>
-
-    <!-- Main Content Pages -->
-    <div class="content">
-        <!-- Home Page -->
-        <div id="home" class="page active">
-            <h2>Home Feed</h2>
-
-            <!-- Post Creator Box -->
-            <div class="post-creator">
-                <div class="user-avatar" onclick="goToProfile()" title="View Profile">👤</div>
-                <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
-                
-                <input type="file" id="imageUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleImageUpload(event)">
-                <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Upload Photo or Video">📷</button>
-            </div>
-
-            <!-- Stories Row -->
-            <div class="stories-container" id="storiesContainer">
-                <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
-                
-                <!-- Create Story Button Card (Always First) -->
-                <div class="story-card create-story" onclick="document.getElementById('storyUploadInput').click()">
-                    <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
-                    <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
-                </div>
-            </div>
-
-            <!-- Dynamic Feed Posts Container -->
-            <div id="feedPostsContainer">
-                <p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">Loading live feed...</p>
-            </div>
+        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Create your account & get verified via email</p>
+        
+        <input type="text" id="username" placeholder="Username">
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        
+        <button onclick="registerUser()">Register & Send Verification Email</button>
+        
+        <div class="switch-link">
+            Already have an account? <a href="login.html">Login here</a>
         </div>
-
-        <!-- Make Friends Page -->
-        <div id="friends" class="page">
-            <h2>Make Friends</h2>
-            <div class="card">
-                <p>Discover new people to connect with:</p>
-                <ul id="userList" style="list-style: none; padding: 0; margin-top: 15px;">
-                    <p style="color: #94a3b8; font-size: 14px;">Loading users...</p>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Chat Page -->
-        <div id="chat" class="page">
-            <h2>Messages</h2>
-            <div class="card" style="height: 300px; display: flex; flex-direction: column; justify-content: space-between;">
-                <div style="overflow-y: auto; flex:1;">
-                    <p><strong>Community:</strong> Welcome to TexUs chat!</p>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <input type="text" placeholder="Type a message..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;">
-                    <button style="background:#10b981; border:none; color:white; padding: 10px 20px; border-radius:5px; cursor:pointer;">Send</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Profile Page -->
-        <div id="profile" class="page">
-            <h2>My Profile</h2>
-            <div class="card">
-                <p><strong>Status:</strong> Exploring TexUs 🚀</p>
-            </div>
-        </div>
-
-        <!-- Settings Page -->
-        <div id="settings" class="page">
-            <h2>Settings</h2>
-            <div class="card">
-                <p>App Theme: <strong>Dark Mode (Active)</strong></p>
-                <p>Notifications: Enabled</p>
-                <button onclick="logout()" style="background:#ef4444; border:none; color:white; padding:8px 15px; border-radius:5px; cursor:pointer; margin-top:15px; font-weight:bold;">Logout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav">
-        <button class="nav-btn active" id="nav-home" onclick="switchPage('home', this)">
-            <span>🏠</span> Home
-        </button>
-        <button class="nav-btn" id="nav-friends" onclick="switchPage('friends', this)">
-            <span>👥</span> Friends
-        </button>
-        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)">
-            <span>💬</span> Chat
-        </button>
-        <button class="nav-btn" id="nav-profile" onclick="switchPage('profile', this)">
-            <span>👤</span> Profile
-        </button>
-        <button class="nav-btn" id="nav-settings" onclick="switchPage('settings', this)">
-            <span>⚙️</span> Settings
-        </button>
     </div>
 
     <script>
-        // --- YOUR FIREBASE CONFIGURATION (INCLUDED) ---
+        // --- YOUR FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvR0Eo",
             authDomain: "texus-5c99e.firebaseapp.com",
@@ -391,261 +103,32 @@
             measurementId: "G-KCF9J53BGH"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
 
-        function switchPage(pageId, btnElement) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(pageId).classList.add('active');
-            
-            if (btnElement) {
-                btnElement.classList.add('active');
-            } else {
-                const targetNav = document.getElementById('nav-' + pageId);
-                if (targetNav) targetNav.classList.add('active');
+        function registerUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !email || !password) {
+                alert("Please fill in all fields!");
+                return;
             }
 
-            if (pageId === 'friends') {
-                loadUsers();
-            }
-        }
-
-        function goToProfile() {
-            switchPage('profile', document.getElementById('nav-profile'));
-        }
-
-        // --- UPLOAD POST TO FIRESTORE ---
-        function createPostPrompt() {
-            const postText = prompt("Tell us something fun about yourself!");
-            if (postText && postText.trim() !== "") {
-                savePostToFirebase(postText, null, false);
-            }
-        }
-
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const caption = prompt("Add a caption for your post:") || "";
-                const isVideo = file.type.startsWith('video');
-                
-                const storageRef = storage.ref('posts/' + Date.now() + '_' + file.name);
-                const uploadTask = storageRef.put(file);
-
-                uploadTask.on('state_changed', 
-                    null, 
-                    (error) => {
-                        alert("Upload failed: " + error.message);
-                    }, 
-                    () => {
-                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                            savePostToFirebase(caption, downloadURL, isVideo);
+            // Create user with Firebase Authentication
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Send official Firebase email verification link to user's inbox
+                    userCredential.user.sendEmailVerification()
+                        .then(() => {
+                            alert("Account created successfully! A verification email has been sent to " + email + ". Please check your inbox (and spam folder) to verify your account before logging in.");
+                            window.location.href = 'login.html';
                         });
-                    }
-                );
-            }
-            event.target.value = '';
-        }
-
-        function savePostToFirebase(text, mediaUrl, isVideo) {
-            db.collection("posts").add({
-                text: text,
-                mediaUrl: mediaUrl || "",
-                isVideo: isVideo || false,
-                username: "You",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                likes: 0,
-                comments: 0,
-                shares: 0
-            })
-            .then(() => {
-                alert("Boom! Your post is live on the feed for everyone to see! 🚀🔥");
-            })
-            .catch((error) => {
-                alert("Error adding post: " + error.message);
-            });
-        }
-
-        // --- UPLOAD STORY TO FIRESTORE ---
-        function handleStoryUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const isVideo = file.type.startsWith('video');
-                const storageRef = storage.ref('stories/' + Date.now() + '_' + file.name);
-                const uploadTask = storageRef.put(file);
-
-                uploadTask.on('state_changed', 
-                    null, 
-                    (error) => {
-                        alert("Story upload failed: " + error.message);
-                    }, 
-                    () => {
-                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                            db.collection("stories").add({
-                                mediaUrl: downloadURL,
-                                isVideo: isVideo,
-                                username: "You",
-                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                            }).then(() => {
-                                alert("Your story has been added successfully! ✨");
-                            });
-                        });
-                    }
-                );
-            }
-            event.target.value = '';
-        }
-
-        // --- REAL-TIME LISTENERS FOR LIVE SYNC ACROSS DEVICES ---
-        function loadLiveFeed() {
-            const feedContainer = document.getElementById('feedPostsContainer');
-            
-            db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                feedContainer.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    feedContainer.innerHTML = '<p id="noPostsMessage" style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">No posts yet. Be the first to share something fun above! ✨</p>';
-                    return;
-                }
-
-                snapshot.forEach((doc) => {
-                    const post = doc.data();
-                    const postId = doc.id;
-
-                    const postCard = document.createElement('div');
-                    postCard.className = 'feed-post';
-                    
-                    let mediaContentHtml = '';
-                    if (post.mediaUrl) {
-                        if (post.isVideo) {
-                            mediaContentHtml = `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>`;
-                        } else {
-                            mediaContentHtml = `<div class="post-media-container"><img src="${post.mediaUrl}" alt="Post Media"></div>`;
-                        }
-                    }
-
-                    let textContentHtml = post.text ? `<p style="font-size: 14px; line-height: 1.4; color: #e2e8f0; margin-top: ${post.mediaUrl ? '5px' : '0'};">${escapeHtml(post.text)}</p>` : '';
-
-                    postCard.innerHTML = `
-                        <div class="post-header">
-                            <span class="post-user">👤 ${escapeHtml(post.username)}</span>
-                        </div>
-                        ${mediaContentHtml}
-                        ${textContentHtml}
-                        <div class="post-actions-row">
-                            <button class="feed-action-btn" onclick="handleLike('${postId}', ${post.likes})">❤️ ${post.likes || 0} Likes</button>
-                            <button class="feed-action-btn" onclick="handleComment('${postId}')">💬 ${post.comments || 0} Comments</button>
-                            <button class="feed-action-btn" onclick="handleShare('${postId}')">↗️ ${post.shares || 0} Shares</button>
-                        </div>
-                    `;
-                    feedContainer.appendChild(postCard);
+                })
+                .catch((error) => {
+                    alert("Registration Error: " + error.message);
                 });
-            });
         }
-
-        function loadLiveStories() {
-            const storiesContainer = document.getElementById('storiesContainer');
-
-            db.collection("stories").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                const createStoryCard = storiesContainer.querySelector('.create-story');
-                storiesContainer.innerHTML = '';
-                storiesContainer.appendChild(createStoryCard);
-
-                snapshot.forEach((doc) => {
-                    const story = doc.data();
-                    const storyCard = document.createElement('div');
-                    storyCard.className = 'story-card';
-                    
-                    let mediaHtml = story.isVideo ? 
-                        `<video class="story-media" src="${story.mediaUrl}"></video>` : 
-                        `<img class="story-media" src="${story.mediaUrl}" alt="Story">`;
-
-                    storyCard.innerHTML = `
-                        ${mediaHtml}
-                        <div class="story-badge">🔥 New</div>
-                        <p class="story-name">${escapeHtml(story.username)}</p>
-                    `;
-                    storiesContainer.appendChild(storyCard);
-                });
-            });
-        }
-
-        function handleLike(postId, currentLikes) {
-            db.collection("posts").doc(postId).update({
-                likes: (currentLikes || 0) + 1
-            });
-        }
-
-        function handleComment(postId) {
-            const commentText = prompt("Write a comment:");
-            if (commentText && commentText.trim() !== "") {
-                const postRef = db.collection("posts").doc(postId);
-                db.runTransaction(async (transaction) => {
-                    const doc = await transaction.get(postRef);
-                    if (doc.exists) {
-                        const newComments = (doc.data().comments || 0) + 1;
-                        transaction.update(postRef, { comments: newComments });
-                    }
-                }).then(() => {
-                    alert("Comment added!");
-                });
-            }
-        }
-
-        function handleShare(postId) {
-            const postRef = db.collection("posts").doc(postId);
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(postRef);
-                if (doc.exists) {
-                    const newShares = (doc.data().shares || 0) + 1;
-                    transaction.update(postRef, { shares: newShares });
-                }
-            }).then(() => {
-                alert("Post shared successfully!");
-            });
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        async function loadUsers() {
-            const userListContainer = document.getElementById('userList');
-            try {
-                const response = await fetch('/api/users');
-                const users = await response.json();
-
-                if (users.length === 0) {
-                    userListContainer.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">No other users found yet.</p>';
-                    return;
-                }
-
-                userListContainer.innerHTML = '';
-                users.forEach(user => {
-                    const li = document.createElement('li');
-                    li.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155;';
-                    li.innerHTML = `
-                        <span>👤 ${user.username}</span>
-                        <button onclick="alert('Friend request sent to ${user.username}!')" style="background:#10b981; border:none; color:white; padding:5px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">Add Friend</button>
-                    `;
-                    userListContainer.appendChild(li);
-                });
-            } catch (err) {
-                userListContainer.innerHTML = '<p style="color: #ef4444;">Failed to load users.</p>';
-            }
-        }
-
-        function logout() {
-            window.location.href = '/login.html';
-        }
-
-        loadLiveFeed();
-        loadLiveStories();
-        loadUsers();
     </script>
 </body>
 </html>
