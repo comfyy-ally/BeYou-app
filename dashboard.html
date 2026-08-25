@@ -290,12 +290,14 @@
         </div>
 
         <div id="friends" class="page">
-            <h2>Make Friends</h2>
+            <h2>Search Users</h2>
             <div class="card">
-                <p>Discover new people:</p>
+                <p>Find app users to connect with:</p>
                 <div style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 15px;">
-                    <input type="text" id="searchUserField" placeholder="Enter username..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;">
-                    <button onclick="sendFriendRequest()" style="background:#10b981; border:none; color:white; padding: 10px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">Add</button>
+                    <input type="text" id="searchUserField" placeholder="Search username..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;" oninput="searchAppUsers()">
+                </div>
+                <div id="searchResultsContainer" style="margin-top: 10px;">
+                    <p style="color: #94a3b8; font-size: 13px;">Type to search users...</p>
                 </div>
             </div>
         </div>
@@ -303,9 +305,9 @@
         <div id="acceptFriends" class="page">
             <h2>Accept Friends</h2>
             <div class="card">
-                <p>Incoming friend requests:</p>
+                <p>Your private incoming friend requests:</p>
                 <div id="friendRequestsContainer" style="margin-top: 15px;">
-                    <p style="color: #94a3b8; font-size: 14px;">No incoming requests yet.</p>
+                    <p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>
                 </div>
             </div>
         </div>
@@ -358,6 +360,8 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
+        let currentUsername = localStorage.getItem('texus_username') || ("User_" + Math.random().toString(36).substring(2, 9));
+        localStorage.setItem('texus_username', currentUsername);
         let currentUserId = localStorage.getItem('texus_user_id') || ('user_' + Math.random().toString(36).substring(2, 9));
         localStorage.setItem('texus_user_id', currentUserId);
         let activeSelectedPostId = null;
@@ -391,7 +395,7 @@
         function savePostToFirebase(text, mediaUrl, isVideo) {
             db.collection("posts").add({
                 text: text, mediaUrl: mediaUrl || "", isVideo: isVideo || false,
-                username: "User_" + currentUserId.substring(5, 9),
+                username: currentUsername,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 likes: 0, likedBy: []
             }).then(() => alert("Post is live! 🚀")).catch(err => alert(err.message));
@@ -405,7 +409,7 @@
                     snapshot.ref.getDownloadURL().then(downloadURL => {
                         db.collection("stories").add({
                             mediaUrl: downloadURL, isVideo: isVideo,
-                            username: "User_" + currentUserId.substring(5, 9),
+                            username: currentUsername,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         }).then(() => alert("Story added! ✨"));
                     });
@@ -495,7 +499,7 @@
             const commentText = inputField.value.trim();
             if (!commentText || !activeSelectedPostId) return;
             db.collection("posts").doc(activeSelectedPostId).collection("comments").add({
-                text: commentText, username: "User_" + currentUserId.substring(5, 9),
+                text: commentText, username: currentUsername,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => inputField.value = '').catch(err => alert(err.message));
         }
@@ -518,26 +522,64 @@
             });
         }
 
-        function sendFriendRequest() {
-            const usernameInput = document.getElementById('searchUserField');
-            const targetUser = usernameInput.value.trim();
-            if(!targetUser) return alert("Please enter a username!");
-            db.collection("friendRequests").add({
-                fromUser: "User_" + currentUserId.substring(5, 9), toUser: targetUser, status: "pending",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => { alert("Friend request sent!"); usernameInput.value = ''; });
+        function searchAppUsers() {
+            const queryText = document.getElementById('searchUserField').value.trim().toLowerCase();
+            const container = document.getElementById('searchResultsContainer');
+            if(!queryText) {
+                container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">Type to search users...</p>';
+                return;
+            }
+            
+            // Search dynamically through active posts/stories authors or simulated active community list
+            db.collection("posts").limit(20).get().then((snapshot) => {
+                let foundUsers = new Set();
+                snapshot.forEach(doc => {
+                    let uname = doc.data().username;
+                    if(uname && uname.toLowerCase().includes(queryText) && uname !== currentUsername) {
+                        foundUsers.add(uname);
+                    }
+                });
+
+                container.innerHTML = '';
+                if(foundUsers.size === 0) {
+                    container.innerHTML = `<p style="color: #94a3b8; font-size: 13px;">No users found matching "${escapeHtml(queryText)}".</p>`;
+                    return;
+                }
+
+                foundUsers.forEach(username => {
+                    const userRow = document.createElement('div');
+                    userRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 8px; background: #0f172a; padding: 8px 12px; border-radius: 6px;';
+                    userRow.innerHTML = `<span>👤 ${escapeHtml(username)}</span><button onclick="sendPrivateFriendRequest('${username}')" style="background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 12px;">Add Friend</button>`;
+                    container.appendChild(userRow);
+                });
+            });
         }
 
-        function loadFriendRequests() {
-            db.collection("friendRequests").where("status", "==", "pending").onSnapshot((snapshot) => {
+        function sendPrivateFriendRequest(targetUser) {
+            db.collection("friendRequests").add({
+                fromUser: currentUsername, 
+                toUser: targetUser, 
+                status: "pending",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => { alert(`Friend request sent privately to ${targetUser}!`); });
+        }
+
+        function loadPrivateFriendRequests() {
+            db.collection("friendRequests")
+              .where("toUser", "==", currentUsername)
+              .where("status", "==", "pending")
+              .onSnapshot((snapshot) => {
                 const container = document.getElementById('friendRequestsContainer');
                 container.innerHTML = '';
-                if(snapshot.empty) { container.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>'; return; }
+                if(snapshot.empty) { 
+                    container.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>'; 
+                    return; 
+                }
                 snapshot.forEach((doc) => {
                     const req = doc.data(), reqId = doc.id;
                     const item = document.createElement('div');
                     item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-bottom: 8px; border-bottom: 1px solid #334155;';
-                    item.innerHTML = `<span>👤 ${escapeHtml(req.fromUser)} wants to connect</span><div><button onclick="db.collection('friendRequests').doc('${reqId}').update({status: 'accepted'})" style="background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; margin-right:5px;">Accept</button><button onclick="db.collection('friendRequests').doc('${reqId}').delete()" style="background:#ef4444; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Decline</button></div>`;
+                    item.innerHTML = `<span>👤 ${escapeHtml(req.fromUser)} wants to connect</span><div><button onclick="db.collection('friendRequests').doc('${reqId}').update({status: 'accepted'}); alert('Connection accepted!');" style="background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; margin-right:5px;">Accept</button><button onclick="db.collection('friendRequests').doc('${reqId}').delete()" style="background:#ef4444; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Decline</button></div>`;
                     container.appendChild(item);
                 });
             });
@@ -552,7 +594,7 @@
 
         loadLiveFeed();
         loadLiveStories();
-        loadFriendRequests();
+        loadPrivateFriendRequests();
     </script>
 </body>
 </html>
