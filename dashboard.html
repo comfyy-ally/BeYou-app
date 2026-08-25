@@ -401,7 +401,7 @@
                 </p>
             </div>
 
-            <!-- MONETIZATION BALANCE & WITHDRAWAL CARD -->
+            <!-- MONETIZATION BALANCE & PAYPAL WITHDRAWAL CARD -->
             <div class="card" style="margin-top: 10px; border-left: 4px solid #f59e0b;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
@@ -536,16 +536,26 @@
             });
         }
 
+        // PAYPAL WITHDRAWAL FUNCTION WITH EMAIL PROMPT
         function withdrawFunds() {
             if (totalCurrentBalance <= 0) {
                 alert("You currently have no funds available to withdraw.");
                 return;
             }
 
-            const confirmWithdraw = confirm(`Are you sure you want to withdraw your balance of $${totalCurrentBalance.toFixed(2)} USD?`);
+            const paypalEmail = prompt(`Your current balance is $${totalCurrentBalance.toFixed(2)} USD.\n\nPlease enter the PayPal email address where you want to receive your money:`);
+            if (paypalEmail === null) return;
+
+            const trimmedEmail = paypalEmail.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+                alert("Please enter a valid PayPal email address.");
+                return;
+            }
+
+            const confirmWithdraw = confirm(`Confirm transfer of $${totalCurrentBalance.toFixed(2)} USD to PayPal account:\n${trimmedEmail}`);
             if (!confirmWithdraw) return;
 
-            // Reset view counters for all user's ads to zero out balance upon withdrawal
             db.collection("posts")
               .where("username", "==", currentUsername)
               .where("isAd", "==", true)
@@ -558,7 +568,7 @@
                   return batch.commit();
               })
               .then(() => {
-                  alert(`Withdrawal successful! $${totalCurrentBalance.toFixed(2)} USD has been transferred to your payout method.`);
+                  alert(`Withdrawal request submitted! $${totalCurrentBalance.toFixed(2)} USD is scheduled to transfer to ${trimmedEmail}.`);
               })
               .catch(err => alert("Withdrawal error: " + err.message));
         }
@@ -601,6 +611,7 @@
             event.target.value = '';
         }
 
+        // LOAD LIVE FEED WITH DELETE, ARCHIVE, AND HIDE CONTROLS
         function loadLiveFeed() {
             db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
                 const feedContainer = document.getElementById('feedPostsContainer');
@@ -609,9 +620,26 @@
                     feedContainer.innerHTML = '<p style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">No posts yet. Be the first to share something! ✨</p>';
                     return;
                 }
+
+                const hiddenPosts = JSON.parse(localStorage.getItem('texus_hidden_posts') || '[]');
+
                 snapshot.forEach((doc) => {
                     const post = doc.data(), postId = doc.id;
+                    
+                    if (hiddenPosts.includes(postId) || post.isArchived) {
+                        return;
+                    }
+
                     const postCard = document.createElement('div');
+                    const isOwner = post.username === currentUsername;
+
+                    const managementMenu = `
+                        <div style="display: flex; gap: 6px;">
+                            ${isOwner ? `<button onclick="deletePost('${postId}')" style="background:#ef4444; border:none; color:white; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Delete</button>` : ''}
+                            ${isOwner ? `<button onclick="archivePost('${postId}')" style="background:#64748b; border:none; color:white; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Archive</button>` : ''}
+                            <button onclick="hidePost('${postId}')" style="background:#334155; border:none; color:#94a3b8; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Hide</button>
+                        </div>
+                    `;
                     
                     if (post.isAd) {
                         postCard.className = 'feed-post ad-post';
@@ -622,8 +650,9 @@
                         postCard.innerHTML = `
                             <div class="post-header">
                                 <span class="post-user">📢 ${escapeHtml(post.username)} <span class="ad-badge">SPONSORED AD</span></span>
-                                <span style="font-size: 11px; color: #f59e0b; font-weight: bold;">👁️ ${post.viewsCount || 0} Views ($${totalEarnings})</span>
+                                ${managementMenu}
                             </div>
+                            <div style="font-size: 11px; color: #f59e0b; font-weight: bold; margin-bottom: 8px;">👁️ ${post.viewsCount || 0} Views ($${totalEarnings})</div>
                             <p style="font-size: 15px; color: #ffffff; font-weight: bold; margin: 10px 0;">${escapeHtml(post.text)}</p>
                             ${post.targetUrl ? `<a href="${escapeHtml(post.targetUrl)}" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; padding: 8px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 12px; margin-bottom: 10px;">Learn More 🔗</a>` : ''}
                             <div class="post-actions-row">
@@ -635,8 +664,12 @@
                         let mediaHtml = post.mediaUrl ? (post.isVideo ? `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>` : `<div class="post-media-container"><img src="${post.mediaUrl}"></div>`) : '';
                         let textHtml = post.text ? `<p style="font-size: 14px; color: #e2e8f0;">${escapeHtml(post.text)}</p>` : '';
                         const hasLiked = post.likedBy && post.likedBy.includes(currentUserId);
+                        
                         postCard.innerHTML = `
-                            <div class="post-header"><span class="post-user">👤 ${escapeHtml(post.username)}</span></div>
+                            <div class="post-header">
+                                <span class="post-user">👤 ${escapeHtml(post.username)}</span>
+                                ${managementMenu}
+                            </div>
                             ${mediaHtml}${textHtml}
                             <div class="post-actions-row">
                                 <button class="feed-action-btn" onclick="toggleLike('${postId}')" style="color: ${hasLiked ? '#10b981' : '#94a3b8'};">❤️ ${post.likes || 0} Likes</button>
@@ -646,6 +679,32 @@
                     feedContainer.appendChild(postCard);
                 });
             });
+        }
+
+        // POST CONTROL FUNCTIONS
+        function deletePost(postId) {
+            if (confirm("Are you sure you want to permanently delete this post?")) {
+                db.collection("posts").doc(postId).delete()
+                  .then(() => alert("Post deleted successfully."))
+                  .catch(err => alert("Error deleting post: " + err.message));
+            }
+        }
+
+        function archivePost(postId) {
+            if (confirm("Archive this post? It will no longer show on the main feed.")) {
+                db.collection("posts").doc(postId).update({ isArchived: true })
+                  .then(() => alert("Post archived."))
+                  .catch(err => alert("Error archiving post: " + err.message));
+            }
+        }
+
+        function hidePost(postId) {
+            const hiddenPosts = JSON.parse(localStorage.getItem('texus_hidden_posts') || '[]');
+            if (!hiddenPosts.includes(postId)) {
+                hiddenPosts.push(postId);
+                localStorage.setItem('texus_hidden_posts', JSON.stringify(hiddenPosts));
+            }
+            loadLiveFeed();
         }
 
         function toggleLike(postId) {
