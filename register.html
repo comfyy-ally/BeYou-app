@@ -9,25 +9,24 @@
             font-family: Arial, sans-serif;
             background-color: #0f172a;
             color: #ffffff;
-            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
-        .card {
+        .auth-card {
             background-color: #1e293b;
             padding: 30px;
             border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 350px;
             text-align: center;
         }
         .app-title {
-            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
+            font-family: 'Brush Script MT', cursive, sans-serif;
             font-size: 36px;
-            font-weight: bold;
             margin-bottom: 20px;
         }
         .tex-part { color: #ec4899; }
@@ -35,92 +34,94 @@
         input {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            color: white;
+            margin: 8px 0;
             border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #ffffff;
             box-sizing: border-box;
         }
         button {
             width: 100%;
             padding: 12px;
-            background-color: #10b981;
+            margin-top: 15px;
+            border-radius: 6px;
             border: none;
+            background-color: #ec4899;
             color: white;
             font-weight: bold;
-            border-radius: 6px;
             cursor: pointer;
-            margin-top: 10px;
         }
-        button:hover { background-color: #059669; }
-        .switch-link { margin-top: 15px; font-size: 13px; color: #94a3b8; }
-        .switch-link a { color: #10b981; text-decoration: none; }
+        .link-text {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .link-text a {
+            color: #10b981;
+            text-decoration: none;
+        }
     </style>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-
-    <div class="card">
+    <div class="auth-card">
         <div class="app-title">
             <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
-        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Create a New Account</p>
-        
-        <input type="text" id="regUsername" placeholder="Choose a Username">
-        <input type="password" id="regPassword" placeholder="Choose a Password">
-        <button onclick="registerUser()">Register</button>
-
-        <div class="switch-link">
-            Already have an account? <a href="login.html">Login here</a>
-        </div>
+        <h2>Create Account</h2>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="registerUser()">Sign Up</button>
+        <p class="link-text">Already have an account? <a href="login.html">Login here</a></p>
     </div>
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyBRIWC0K8X7V8DUGpco8INUAzv4RekJZ68",
+            apiKey: "YOUR_RESTRICTED_API_KEY",
             authDomain: "texus-5c99e.firebaseapp.com",
             projectId: "texus-5c99e",
             storageBucket: "texus-5c99e.firebasestorage.app",
             messagingSenderId: "1040040305137",
-            appId: "1:1040040305137:web:86f4f717204378a22da450",
-            measurementId: "G-KCF9J53BGH"
+            appId: "1:1040040305137:web:86f4f717204378a22da450"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         function registerUser() {
-            const username = document.getElementById('regUsername').value.trim();
-            const password = document.getElementById('regPassword').value.trim();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            if (!username || !password) {
-                alert("Please fill in both fields!");
+            if (!username) {
+                alert("Please enter a username");
                 return;
             }
 
-            const userRef = db.collection("users").doc(username);
-            userRef.get().then((doc) => {
-                if (doc.exists) {
-                    alert("That username is already taken. Choose another one.");
-                } else {
-                    userRef.set({
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    
+                    // Save username to local storage & Firestore users collection
+                    localStorage.setItem('texus_username', username);
+                    localStorage.setItem('texus_user_id', user.uid);
+
+                    return db.collection("users").doc(user.uid).set({
                         username: username,
-                        password: password,
+                        email: email,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }).then(() => {
-                        localStorage.setItem('texus_username', username);
-                        localStorage.setItem('texus_user_id', 'user_' + Math.random().toString(36).substring(2, 9));
-                        alert("Account created successfully!");
-                        window.location.href = 'dashboard.html';
-                    }).catch((error) => {
-                        alert("Error: " + error.message);
                     });
-                }
-            });
+                })
+                .then(() => {
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                });
         }
     </script>
 </body>
 </html>
-
