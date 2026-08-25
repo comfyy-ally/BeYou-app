@@ -148,7 +148,7 @@
             font-size: 14px;
             cursor: pointer;
         }
-        .photo-btn {
+        .photo-btn, .ad-btn {
             background: none;
             border: none;
             font-size: 22px;
@@ -161,6 +161,19 @@
             padding: 15px;
             margin-top: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .ad-post {
+            border: 2px solid #f59e0b;
+            background-color: #1c1917;
+        }
+        .ad-badge {
+            background-color: #f59e0b;
+            color: #000;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
         }
         .post-header {
             display: flex;
@@ -274,7 +287,8 @@
                     </div>
                     <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
                     <input type="file" id="imageUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleImageUpload(event)">
-                    <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()">📷</button>
+                    <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Add Image/Video">📷</button>
+                    <button class="ad-btn" onclick="createAdPrompt()" title="Create Sponsored Ad">📢</button>
                 </div>
 
                 <div class="stories-container" id="storiesContainer">
@@ -354,7 +368,7 @@
             </div>
         </div>
 
-        <!-- PROFILE PAGE WITH UPDATED UI -->
+        <!-- PROFILE PAGE WITH MONETIZATION DISPLAY -->
         <div id="profile" class="page">
             <div style="position: relative; background: #334155; height: 120px; border-radius: 12px 12px 0 0;">
                 <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadProfilePicture(event)">
@@ -370,6 +384,16 @@
                 <p style="margin: 5px 0 15px; font-size: 13px; color: #94a3b8;">
                     <span id="friendsCount">0</span> friends · <span id="postsCount">0</span> posts
                 </p>
+            </div>
+
+            <div class="card" style="margin-top: 10px; border-left: 4px solid #f59e0b;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: #f59e0b; font-size: 14px;">Ad Earnings (Monetization)</strong>
+                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">$0.10 USD per ad viewer</p>
+                    </div>
+                    <div style="font-size: 20px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
+                </div>
             </div>
 
             <div class="card" style="margin-top: 10px;">
@@ -457,6 +481,45 @@
             if (postText && postText.trim() !== "") savePostToFirebase(postText, null, false);
         }
 
+        // AD CREATION AND MONETIZATION LOGIC
+        function createAdPrompt() {
+            const adText = prompt("Enter your Ad title/description:");
+            if (!adText || adText.trim() === "") return;
+            const targetUrl = prompt("Enter Destination Link/URL (Optional):") || "";
+
+            db.collection("posts").add({
+                text: adText,
+                targetUrl: targetUrl,
+                isAd: true,
+                viewsCount: 0,
+                viewers: [],
+                username: currentUsername,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                likes: 0,
+                likedBy: []
+            }).then(() => alert("Your Sponsored Ad is now live on the feed! 📢")).catch(err => alert(err.message));
+        }
+
+        function registerAdView(postId) {
+            const postRef = db.collection("posts").doc(postId);
+            db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(postRef);
+                if (!doc.exists) return;
+                let data = doc.data();
+                let viewers = data.viewers || [];
+                
+                // Track unique views to pay out monetization
+                if (!viewers.includes(currentUserId)) {
+                    viewers.push(currentUserId);
+                    let newViewsCount = (data.viewsCount || 0) + 1;
+                    transaction.update(postRef, {
+                        viewsCount: newViewsCount,
+                        viewers: viewers
+                    });
+                }
+            });
+        }
+
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
@@ -506,17 +569,37 @@
                 snapshot.forEach((doc) => {
                     const post = doc.data(), postId = doc.id;
                     const postCard = document.createElement('div');
-                    postCard.className = 'feed-post';
-                    let mediaHtml = post.mediaUrl ? (post.isVideo ? `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>` : `<div class="post-media-container"><img src="${post.mediaUrl}"></div>`) : '';
-                    let textHtml = post.text ? `<p style="font-size: 14px; color: #e2e8f0;">${escapeHtml(post.text)}</p>` : '';
-                    const hasLiked = post.likedBy && post.likedBy.includes(currentUserId);
-                    postCard.innerHTML = `
-                        <div class="post-header"><span class="post-user">👤 ${escapeHtml(post.username)}</span></div>
-                        ${mediaHtml}${textHtml}
-                        <div class="post-actions-row">
-                            <button class="feed-action-btn" onclick="toggleLike('${postId}')" style="color: ${hasLiked ? '#10b981' : '#94a3b8'};">❤️ ${post.likes || 0} Likes</button>
-                            <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text || 'Media Post')}')">💬 Comments</button>
-                        </div>`;
+                    
+                    if (post.isAd) {
+                        postCard.className = 'feed-post ad-post';
+                        registerAdView(postId);
+                        
+                        let totalEarnings = ((post.viewsCount || 0) * 0.10).toFixed(2);
+                        
+                        postCard.innerHTML = `
+                            <div class="post-header">
+                                <span class="post-user">📢 ${escapeHtml(post.username)} <span class="ad-badge">SPONSORED AD</span></span>
+                                <span style="font-size: 11px; color: #f59e0b; font-weight: bold;">👁️ ${post.viewsCount || 0} Views ($${totalEarnings})</span>
+                            </div>
+                            <p style="font-size: 15px; color: #ffffff; font-weight: bold; margin: 10px 0;">${escapeHtml(post.text)}</p>
+                            ${post.targetUrl ? `<a href="${escapeHtml(post.targetUrl)}" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; padding: 8px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 12px; margin-bottom: 10px;">Learn More 🔗</a>` : ''}
+                            <div class="post-actions-row">
+                                <button class="feed-action-btn" onclick="toggleLike('${postId}')">❤️ ${post.likes || 0} Likes</button>
+                                <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text)}')">💬 Comments</button>
+                            </div>`;
+                    } else {
+                        postCard.className = 'feed-post';
+                        let mediaHtml = post.mediaUrl ? (post.isVideo ? `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>` : `<div class="post-media-container"><img src="${post.mediaUrl}"></div>`) : '';
+                        let textHtml = post.text ? `<p style="font-size: 14px; color: #e2e8f0;">${escapeHtml(post.text)}</p>` : '';
+                        const hasLiked = post.likedBy && post.likedBy.includes(currentUserId);
+                        postCard.innerHTML = `
+                            <div class="post-header"><span class="post-user">👤 ${escapeHtml(post.username)}</span></div>
+                            ${mediaHtml}${textHtml}
+                            <div class="post-actions-row">
+                                <button class="feed-action-btn" onclick="toggleLike('${postId}')" style="color: ${hasLiked ? '#10b981' : '#94a3b8'};">❤️ ${post.likes || 0} Likes</button>
+                                <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text || 'Media Post')}')">💬 Comments</button>
+                            </div>`;
+                    }
                     feedContainer.appendChild(postCard);
                 });
             });
@@ -833,7 +916,6 @@
             }).then(() => { inputField.value = ''; }).catch((err) => alert(err.message));
         }
 
-        // PROFILE PICTURE, FRIEND LIST & MEDIA FILTERING LOGIC
         function uploadProfilePicture(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -905,10 +987,16 @@
               .where("username", "==", currentUsername)
               .onSnapshot(snapshot => {
                     userProfileMedia = [];
+                    let totalAdViews = 0;
                     snapshot.forEach(doc => {
-                        userProfileMedia.push({ id: doc.id, ...doc.data() });
+                        let postData = { id: doc.id, ...doc.data() };
+                        userProfileMedia.push(postData);
+                        if (postData.isAd) {
+                            totalAdViews += (postData.viewsCount || 0);
+                        }
                     });
                     document.getElementById('postsCount').innerText = userProfileMedia.length;
+                    document.getElementById('adEarningsDisplay').innerText = `$${(totalAdViews * 0.10).toFixed(2)}`;
                     renderFilteredMedia();
               });
         }
@@ -940,7 +1028,7 @@
 
             filtered.forEach(post => {
                 const el = document.createElement('div');
-                el.className = 'feed-post';
+                el.className = post.isAd ? 'feed-post ad-post' : 'feed-post';
                 let mediaHtml = '';
 
                 if (post.mediaUrl) {
@@ -950,7 +1038,7 @@
                 }
 
                 el.innerHTML = `
-                    <div class="post-header"><span class="post-user">👤 ${escapeHtml(post.username)}</span></div>
+                    <div class="post-header"><span class="post-user">${post.isAd ? '📢' : '👤'} ${escapeHtml(post.username)} ${post.isAd ? '<span class="ad-badge">SPONSORED AD</span>' : ''}</span></div>
                     ${mediaHtml}
                     ${post.text ? `<p style="font-size: 14px; color: #e2e8f0;">${escapeHtml(post.text)}</p>` : ''}
                 `;
@@ -974,3 +1062,4 @@
     </script>
 </body>
 </html>
+
