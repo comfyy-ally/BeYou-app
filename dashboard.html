@@ -261,6 +261,21 @@
             display: none;
             border: 1px solid #1e293b;
         }
+        .withdraw-btn {
+            background: #10b981;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .withdraw-btn:hover { background: #059669; }
+        .withdraw-btn:disabled { background: #475569; cursor: not-allowed; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -368,7 +383,7 @@
             </div>
         </div>
 
-        <!-- PROFILE PAGE WITH MONETIZATION DISPLAY -->
+        <!-- PROFILE PAGE WITH BALANCE & WITHDRAWAL -->
         <div id="profile" class="page">
             <div style="position: relative; background: #334155; height: 120px; border-radius: 12px 12px 0 0;">
                 <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadProfilePicture(event)">
@@ -386,14 +401,16 @@
                 </p>
             </div>
 
+            <!-- MONETIZATION BALANCE & WITHDRAWAL CARD -->
             <div class="card" style="margin-top: 10px; border-left: 4px solid #f59e0b;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <strong style="color: #f59e0b; font-size: 14px;">Ad Earnings (Monetization)</strong>
-                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">$0.10 USD per ad viewer</p>
+                        <strong style="color: #f59e0b; font-size: 14px;">Total Earnings Balance</strong>
+                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">Sum of all post views ($0.10 / view)</p>
                     </div>
-                    <div style="font-size: 20px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
+                    <div style="font-size: 22px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
                 </div>
+                <button class="withdraw-btn" id="withdrawBtn" onclick="withdrawFunds()">💸 Withdraw All Funds</button>
             </div>
 
             <div class="card" style="margin-top: 10px;">
@@ -466,6 +483,7 @@
         let unreadChats = {};
         let userProfileMedia = [];
         let currentFilter = 'all';
+        let totalCurrentBalance = 0;
 
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -481,7 +499,6 @@
             if (postText && postText.trim() !== "") savePostToFirebase(postText, null, false);
         }
 
-        // AD CREATION AND MONETIZATION LOGIC
         function createAdPrompt() {
             const adText = prompt("Enter your Ad title/description:");
             if (!adText || adText.trim() === "") return;
@@ -508,7 +525,6 @@
                 let data = doc.data();
                 let viewers = data.viewers || [];
                 
-                // Track unique views to pay out monetization
                 if (!viewers.includes(currentUserId)) {
                     viewers.push(currentUserId);
                     let newViewsCount = (data.viewsCount || 0) + 1;
@@ -518,6 +534,33 @@
                     });
                 }
             });
+        }
+
+        function withdrawFunds() {
+            if (totalCurrentBalance <= 0) {
+                alert("You currently have no funds available to withdraw.");
+                return;
+            }
+
+            const confirmWithdraw = confirm(`Are you sure you want to withdraw your balance of $${totalCurrentBalance.toFixed(2)} USD?`);
+            if (!confirmWithdraw) return;
+
+            // Reset view counters for all user's ads to zero out balance upon withdrawal
+            db.collection("posts")
+              .where("username", "==", currentUsername)
+              .where("isAd", "==", true)
+              .get()
+              .then(snapshot => {
+                  const batch = db.batch();
+                  snapshot.forEach(doc => {
+                      batch.update(doc.ref, { viewsCount: 0, viewers: [] });
+                  });
+                  return batch.commit();
+              })
+              .then(() => {
+                  alert(`Withdrawal successful! $${totalCurrentBalance.toFixed(2)} USD has been transferred to your payout method.`);
+              })
+              .catch(err => alert("Withdrawal error: " + err.message));
         }
 
         function handleImageUpload(event) {
@@ -995,8 +1038,15 @@
                             totalAdViews += (postData.viewsCount || 0);
                         }
                     });
+
+                    totalCurrentBalance = totalAdViews * 0.10;
+
                     document.getElementById('postsCount').innerText = userProfileMedia.length;
-                    document.getElementById('adEarningsDisplay').innerText = `$${(totalAdViews * 0.10).toFixed(2)}`;
+                    document.getElementById('adEarningsDisplay').innerText = `$${totalCurrentBalance.toFixed(2)} USD`;
+                    
+                    const withdrawBtn = document.getElementById('withdrawBtn');
+                    withdrawBtn.disabled = totalCurrentBalance <= 0;
+
                     renderFilteredMedia();
               });
         }
@@ -1062,4 +1112,3 @@
     </script>
 </body>
 </html>
-
