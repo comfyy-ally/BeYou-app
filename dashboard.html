@@ -232,9 +232,21 @@
             cursor: pointer;
             flex: 1;
             min-width: 55px;
+            position: relative;
         }
         .nav-btn span { font-size: 18px; margin-bottom: 2px; }
         .nav-btn.active { color: #10b981; font-weight: bold; }
+        .notification-dot {
+            position: absolute;
+            top: 2px;
+            right: 15px;
+            width: 9px;
+            height: 9px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: none;
+            border: 1px solid #1e293b;
+        }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -337,7 +349,10 @@
     <div class="bottom-nav">
         <button class="nav-btn active" id="nav-home" onclick="switchPage('home', this)"><span>🏠</span> Home</button>
         <button class="nav-btn" id="nav-friends" onclick="switchPage('friends', this)"><span>👥</span> Suggested</button>
-        <button class="nav-btn" id="nav-acceptFriends" onclick="switchPage('acceptFriends', this)"><span>🤝</span> Accept</button>
+        <button class="nav-btn" id="nav-acceptFriends" onclick="switchPage('acceptFriends', this)">
+            <span>🤝</span> Accept
+            <div class="notification-dot" id="friendNotificationDot"></div>
+        </button>
         <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)"><span>💬</span> Chat</button>
         <button class="nav-btn" id="nav-profile" onclick="switchPage('profile', this)"><span>👤</span> Profile</button>
         <button class="nav-btn" id="nav-settings" onclick="switchPage('settings', this)"><span>⚙️</span> Settings</button>
@@ -519,35 +534,59 @@
             });
         }
 
-        // Automatically load all registered users as Suggested Users
         function loadSuggestedUsers() {
             const container = document.getElementById('suggestedUsersContainer');
             
-            db.collection("users").onSnapshot((snapshot) => {
-                container.innerHTML = '';
-                if (snapshot.empty) {
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No other users registered yet.</p>';
-                    return;
-                }
-
-                let count = 0;
-                snapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    const username = userData.username;
-
-                    // Do not show the currently logged-in user in their own suggested list
-                    if (username && username !== currentUsername) {
-                        count++;
-                        const userRow = document.createElement('div');
-                        userRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 8px; background: #0f172a; padding: 8px 12px; border-radius: 6px;';
-                        userRow.innerHTML = `<span>👤 ${escapeHtml(username)}</span><button onclick="sendPrivateFriendRequest('${username}')" style="background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 12px;">Add Friend</button>`;
-                        container.appendChild(userRow);
-                    }
+            // First fetch active friend requests sent by current user to dynamically change buttons
+            db.collection("friendRequests")
+              .where("fromUser", "==", currentUsername)
+              .onSnapshot((reqSnapshot) => {
+                const sentRequests = {};
+                reqSnapshot.forEach((doc) => {
+                    sentRequests[doc.data().toUser] = doc.id; // map target user to request doc id
                 });
 
-                if (count === 0) {
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No other users registered yet.</p>';
-                }
+                db.collection("users").onSnapshot((snapshot) => {
+                    container.innerHTML = '';
+                    if (snapshot.empty) {
+                        container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No other users registered yet.</p>';
+                        return;
+                    }
+
+                    let count = 0;
+                    snapshot.forEach((doc) => {
+                        const userData = doc.data();
+                        const username = userData.username;
+
+                        if (username && username !== currentUsername) {
+                            count++;
+                            const userRow = document.createElement('div');
+                            userRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 8px; background: #0f172a; padding: 8px 12px; border-radius: 6px;';
+                            
+                            const requestId = sentRequests[username];
+                            let actionButtonHtml = '';
+
+                            if (requestId) {
+                                // Request is already sent
+                                actionButtonHtml = `
+                                    <div style="display: flex; gap: 5px; align-items: center;">
+                                        <span style="font-size: 11px; color: #94a3b8; font-weight: bold;">Friend Request Sent</span>
+                                        <button onclick="cancelFriendRequest('${requestId}')" style="background:#ef4444; border:none; color:white; padding:5px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 11px;">Cancel Request</button>
+                                    </div>`;
+                            } else {
+                                // Request not sent yet
+                                actionButtonHtml = `<button onclick="sendPrivateFriendRequest('${username}')" style="background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 12px;">Add Friend</button>`;
+                            }
+
+                            userRow.innerHTML = `<span>👤 ${escapeHtml(username)}</span>${actionButtonHtml}`;
+                            container.appendChild(userRow);
+                        }
+                    });
+
+                    if (count === 0) {
+                        container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No other users registered yet.</p>';
+                    }
+                });
             });
         }
 
@@ -560,17 +599,30 @@
             }).then(() => { alert(`Friend request sent privately to ${targetUser}!`); });
         }
 
+        function cancelFriendRequest(requestId) {
+            db.collection("friendRequests").doc(requestId).delete()
+              .then(() => { alert("Friend request cancelled."); })
+              .catch((err) => { alert("Error cancelling request: " + err.message); });
+        }
+
         function loadPrivateFriendRequests() {
             db.collection("friendRequests")
               .where("toUser", "==", currentUsername)
               .where("status", "==", "pending")
               .onSnapshot((snapshot) => {
                 const container = document.getElementById('friendRequestsContainer');
+                const notificationDot = document.getElementById('friendNotificationDot');
+                
                 container.innerHTML = '';
+                
                 if(snapshot.empty) { 
                     container.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>'; 
+                    notificationDot.style.display = 'none'; 
                     return; 
                 }
+
+                notificationDot.style.display = 'block';
+
                 snapshot.forEach((doc) => {
                     const req = doc.data(), reqId = doc.id;
                     const item = document.createElement('div');
@@ -595,4 +647,3 @@
     </script>
 </body>
 </html>
-
