@@ -66,6 +66,9 @@
             color: #10b981;
             text-decoration: none;
         }
+        #code-section {
+            display: none;
+        }
     </style>
 
     <!-- Import Firebase SDKs -->
@@ -78,13 +81,21 @@
         <div class="app-title">
             <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
-        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Create your account & get verified via email</p>
+        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Register with your Phone Number</p>
         
         <input type="text" id="username" placeholder="Username">
-        <input type="email" id="email" placeholder="Email Address">
-        <input type="password" id="password" placeholder="Password">
+        <input type="tel" id="phone" placeholder="Phone (e.g. +1234567890)">
         
-        <button onclick="registerUser()">Register & Send Verification Email</button>
+        <button id="send-code-btn" onclick="sendVerificationCode()">Send SMS Code</button>
+
+        <!-- Hidden section until SMS code is sent -->
+        <div id="code-section">
+            <input type="text" id="verification-code" placeholder="Enter 6-digit SMS Code">
+            <button onclick="verifyCodeAndRegister()">Verify & Complete</button>
+        </div>
+
+        <!-- Invisible reCAPTCHA container required by Firebase -->
+        <div id="recaptcha-container"></div>
         
         <div class="switch-link">
             Already have an account? <a href="login.html">Login here</a>
@@ -106,28 +117,55 @@
             firebase.initializeApp(firebaseConfig);
         }
 
-        function registerUser() {
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+        window.onload = function() {
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'invisible'
+            });
+        };
 
-            if (!username || !email || !password) {
-                alert("Please fill in all fields!");
+        let confirmationResultObj = null;
+
+        function sendVerificationCode() {
+            const username = document.getElementById('username').value.trim();
+            const phoneNumber = document.getElementById('phone').value.trim();
+
+            if (!username || !phoneNumber) {
+                alert("Please fill in both your username and phone number (with country code, e.g., +1...)!");
                 return;
             }
 
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    userCredential.user.sendEmailVerification()
-                        .then(() => {
-                            localStorage.setItem('texus_username', username);
-                            alert("Account created successfully! A verification email has been sent to " + email + ". Please check your inbox.");
-                            window.location.href = 'login.html';
-                        });
-                })
-                .catch((error) => {
-                    alert("Registration Error: " + error.message);
+            localStorage.setItem('temp_texus_username', username);
+            const appVerifier = window.recaptchaVerifier;
+
+            firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    confirmationResultObj = confirmationResult;
+                    alert("SMS verification code sent successfully!");
+                    document.getElementById('send-code-btn').style.display = 'none';
+                    document.getElementById('code-section').style.display = 'block';
+                }).catch((error) => {
+                    alert("SMS Error: " + error.message);
+                    grecaptcha.reset(window.recaptchaWidgetId);
                 });
+        }
+
+        function verifyCodeAndRegister() {
+            const code = document.getElementById('verification-code').value.trim();
+            if (!code) {
+                alert("Please enter the 6-digit code sent to your phone.");
+                return;
+            }
+
+            confirmationResultObj.confirm(code).then((result) => {
+                const user = result.user;
+                const savedUsername = localStorage.getItem('temp_texus_username') || "User";
+                localStorage.setItem('texus_username', savedUsername);
+                
+                alert("Phone verified and registration successful!");
+                window.location.href = 'dashboard.html';
+            }).catch((error) => {
+                alert("Incorrect code or verification failed: " + error.message);
+            });
         }
     </script>
 </body>
