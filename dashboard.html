@@ -367,7 +367,10 @@
             <span>🤝</span> Accept
             <div class="notification-dot" id="friendNotificationDot"></div>
         </button>
-        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)"><span>💬</span> Chat</button>
+        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)">
+            <span>💬</span> Chat
+            <div class="notification-dot" id="chatNotificationDot"></div>
+        </button>
         <button class="nav-btn" id="nav-profile" onclick="switchPage('profile', this)"><span>👤</span> Profile</button>
         <button class="nav-btn" id="nav-settings" onclick="switchPage('settings', this)"><span>⚙️</span> Settings</button>
     </div>
@@ -392,6 +395,7 @@
         localStorage.setItem('texus_user_id', currentUserId);
         let activeSelectedPostId = null;
         let activeChatPeer = null;
+        let unreadChats = {};
 
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -634,7 +638,7 @@
             });
         }
 
-        // MESSENGER STYLE CHAT LIST & VIEW
+        // MESSENGER STYLE CHAT LIST & VIEW WITH LAST TEXT TIMESTAMPS
         function loadAcceptedConnections() {
             db.collection("friendRequests")
               .where("status", "==", "accepted")
@@ -660,7 +664,6 @@
                 connections.forEach((friendName) => {
                     const roomId = getChatRoomId(currentUsername, friendName);
                     
-                    // Listen to latest message in room to display snippet matching Messenger style layout
                     db.collection("chats").doc(roomId).collection("messages").orderBy("timestamp", "desc").limit(1)
                       .onSnapshot((msgSnap) => {
                         let lastText = "Tap to start chatting";
@@ -673,7 +676,13 @@
                                 const date = lastMsg.timestamp.toDate();
                                 timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                             }
+
+                            if (lastMsg.sender !== currentUsername && activeChatPeer !== friendName) {
+                                unreadChats[friendName] = true;
+                            }
                         }
+
+                        updateChatNotificationBadge();
 
                         let chatRow = document.getElementById('chat-row-' + friendName);
                         if (!chatRow) {
@@ -691,7 +700,7 @@
                                 <div style="width: 45px; height: 45px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">👤</div>
                                 <div style="display: flex; flex-direction: column; overflow: hidden;">
                                     <span style="font-weight: bold; color: #ffffff; font-size: 14px;">${escapeHtml(friendName)}</span>
-                                    <span style="color: #94a3b8; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">${escapeHtml(lastText)}</span>
+                                    <span style="color: ${unreadChats[friendName] ? '#10b981' : '#94a3b8'}; font-weight: ${unreadChats[friendName] ? 'bold' : 'normal'}; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${escapeHtml(lastText)}</span>
                                 </div>
                             </div>
                             <span style="font-size: 11px; color: #64748b; flex-shrink: 0;">${timeString}</span>
@@ -701,8 +710,16 @@
             });
         }
 
+        function updateChatNotificationBadge() {
+            const dot = document.getElementById('chatNotificationDot');
+            const hasUnread = Object.values(unreadChats).includes(true);
+            dot.style.display = hasUnread ? 'block' : 'none';
+        }
+
         function openActiveChat(friendName) {
             activeChatPeer = friendName;
+            unreadChats[friendName] = false;
+            updateChatNotificationBadge();
             document.getElementById('chatListView').style.display = 'none';
             document.getElementById('activeChatView').style.display = 'block';
             document.getElementById('activeChatTitle').innerText = friendName;
@@ -734,10 +751,17 @@
                     const isMe = msg.sender === currentUsername;
                     const msgEl = document.createElement('div');
                     msgEl.style.cssText = `margin-bottom: 8px; display: flex; flex-direction: column; align-items: ${isMe ? 'flex-end' : 'flex-start'};`;
+                    
+                    let msgTime = "";
+                    if (msg.timestamp) {
+                        msgTime = msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
                     msgEl.innerHTML = `
                         <div style="background: ${isMe ? '#10b981' : '#334155'}; color: white; padding: 10px 14px; border-radius: 16px; max-width: 75%; font-size: 13px;">
                             ${escapeHtml(msg.text)}
                         </div>
+                        <span style="font-size: 9px; color: #64748b; margin-top: 2px; padding: 0 4px;">${msgTime}</span>
                     `;
                     container.appendChild(msgEl);
                 });
