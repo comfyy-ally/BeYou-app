@@ -348,7 +348,7 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvR0Eo",
+            apiKey: "AIzaSyBRIWC0K8X7V8DUGpco8INUAzv4RekJZ68",
             authDomain: "texus-5c99e.firebaseapp.com",
             projectId: "texus-5c99e",
             storageBucket: "texus-5c99e.firebasestorage.app",
@@ -530,7 +530,6 @@
                 return;
             }
             
-            // Search dynamically through active posts/stories authors or simulated active community list
             db.collection("posts").limit(20).get().then((snapshot) => {
                 let foundUsers = new Set();
                 snapshot.forEach(doc => {

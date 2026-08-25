@@ -93,7 +93,7 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvR0Eo",
+            apiKey: "AIzaSyBRIWC0K8X7V8DUGpco8INUAzv4RekJZ68",
             authDomain: "texus-5c99e.firebaseapp.com",
             projectId: "texus-5c99e",
             storageBucket: "texus-5c99e.firebasestorage.app",
@@ -102,7 +102,9 @@
             measurementId: "G-KCF9J53BGH"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
 
         function registerUser() {
             const username = document.getElementById('username').value.trim();
@@ -118,6 +120,7 @@
                 .then((userCredential) => {
                     userCredential.user.sendEmailVerification()
                         .then(() => {
+                            localStorage.setItem('texus_username', username);
                             alert("Account created successfully! A verification email has been sent to " + email + ". Please check your inbox.");
                             window.location.href = 'login.html';
                         });
@@ -129,3 +132,4 @@
     </script>
 </body>
 </html>
+
