@@ -261,21 +261,6 @@
             display: none;
             border: 1px solid #1e293b;
         }
-        .withdraw-btn {
-            background: #10b981;
-            color: #ffffff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-            transition: background 0.2s;
-        }
-        .withdraw-btn:hover { background: #059669; }
-        .withdraw-btn:disabled { background: #475569; cursor: not-allowed; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -419,7 +404,7 @@
             </div>
         </div>
 
-        <!-- PROFILE PAGE WITH BANK BALANCE WITHDRAWAL -->
+        <!-- PROFILE PAGE -->
         <div id="profile" class="page">
             <div style="position: relative; background: #334155; height: 120px; border-radius: 12px 12px 0 0;">
                 <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadProfilePicture(event)">
@@ -435,18 +420,6 @@
                 <p style="margin: 5px 0 15px; font-size: 13px; color: #94a3b8;">
                     <span id="friendsCount">0</span> friends · <span id="postsCount">0</span> posts
                 </p>
-            </div>
-
-            <!-- MONETIZATION BALANCE & DIRECT BANK WITHDRAWAL CARD -->
-            <div class="card" style="margin-top: 10px; border-left: 4px solid #f59e0b;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong style="color: #f59e0b; font-size: 14px;">Total Earnings Balance</strong>
-                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">Accumulated from ads and streams</p>
-                    </div>
-                    <div style="font-size: 22px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
-                </div>
-                <button class="withdraw-btn" id="withdrawBtn" onclick="withdrawFunds()">💸 Withdraw All Funds to Bank</button>
             </div>
 
             <div class="card" style="margin-top: 10px;">
@@ -515,7 +488,6 @@
         let activeChatPeer = null;
         let userProfileMedia = [];
         let currentFilter = 'all';
-        let totalCurrentBalance = 0;
 
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -529,12 +501,6 @@
         function playTrack(title, artist) {
             document.getElementById('currentSongTitle').innerText = title;
             document.getElementById('currentSongArtist').innerText = artist;
-
-            // Increment stream count for music monetization behind the scenes (2 streams = $0.05)
-            let userStreams = parseInt(localStorage.getItem('texus_music_streams_' + currentUserId) || '0') + 1;
-            localStorage.setItem('texus_music_streams_' + currentUserId, userStreams);
-
-            loadProfileData();
             alert(`Now streaming: ${title} by ${artist}`);
         }
 
@@ -559,89 +525,6 @@
                 likes: 0,
                 likedBy: []
             }).then(() => alert("Your Sponsored Ad is now live on the feed! 📢")).catch(err => alert(err.message));
-        }
-
-        function registerAdView(postId) {
-            const postRef = db.collection("posts").doc(postId);
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(postRef);
-                if (!doc.exists) return;
-                let data = doc.data();
-                let viewers = data.viewers || [];
-                
-                if (!viewers.includes(currentUserId)) {
-                    viewers.push(currentUserId);
-                    let newViewsCount = (data.viewsCount || 0) + 1;
-                    transaction.update(postRef, {
-                        viewsCount: newViewsCount,
-                        viewers: viewers
-                    });
-                }
-            });
-        }
-
-        async function withdrawFunds() {
-            if (totalCurrentBalance <= 0) {
-                alert("You currently have no funds available to withdraw.");
-                return;
-            }
-
-            const stripeAccountId = prompt("Please enter your Stripe Connected Bank Account ID (e.g., acct_123456789):");
-            
-            if (!stripeAccountId || stripeAccountId.trim() === "") {
-                alert("Account ID is required to process bank payouts.");
-                return;
-            }
-
-            const confirmWithdraw = confirm(`Transfer your available funds directly to bank account ${stripeAccountId.trim()}?`);
-            if (!confirmWithdraw) return;
-
-            const withdrawBtn = document.getElementById('withdrawBtn');
-            withdrawBtn.disabled = true;
-            withdrawBtn.innerText = "Processing Bank Transfer...";
-
-            await withdrawToBank(stripeAccountId.trim(), totalCurrentBalance);
-
-            withdrawBtn.innerText = "💸 Withdraw All Funds to Bank";
-        }
-
-        async function withdrawToBank(stripeAccountId, totalEarningsDollars) {
-            const amountInCents = Math.round(totalEarningsDollars * 100);
-
-            try {
-                const response = await fetch('/api/withdraw-to-bank', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        stripeConnectedAccountId: stripeAccountId,
-                        amountInCents: amountInCents
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert(`Success! Funds transferred to your bank. Transfer ID: ${data.transferId}`);
-                    
-                    // Reset trackers post-withdrawal
-                    localStorage.setItem('texus_music_streams_' + currentUserId, '0');
-                    db.collection("posts")
-                      .where("username", "==", currentUsername)
-                      .where("isAd", "==", true)
-                      .get()
-                      .then(snapshot => {
-                          const batch = db.batch();
-                          snapshot.forEach(doc => {
-                              batch.update(doc.ref, { viewsCount: 0, viewers: [] });
-                          });
-                          return batch.commit();
-                      });
-                } else {
-                    alert(`Bank transfer failed: ${data.error}`);
-                }
-            } catch (err) {
-                alert(`Error connecting to server: ${err.message}`);
-            }
         }
 
         function handleImageUpload(event) {
@@ -713,8 +596,6 @@
                     
                     if (post.isAd) {
                         postCard.className = 'feed-post ad-post';
-                        registerAdView(postId);
-                        
                         postCard.innerHTML = `
                             <div class="post-header">
                                 <span class="post-user">📢 ${escapeHtml(post.username)} <span class="ad-badge">SPONSORED AD</span></span>
@@ -1001,27 +882,17 @@
             db.collection("posts").where("username", "==", currentUsername).onSnapshot(snapshot => {
                 userProfileMedia = [];
                 let postCount = 0;
-                let calculatedAdBalance = 0;
 
                 snapshot.forEach(doc => {
                     const post = doc.data();
                     if (!post.isArchived) {
                         postCount++;
-                        if (post.isAd) {
-                            calculatedAdBalance += (post.viewsCount || 0) * 0.10;
-                        }
                         if (post.mediaUrl) {
                             userProfileMedia.push({ id: doc.id, ...post });
                         }
                     }
                 });
 
-                // Calculate balances behind the scenes
-                let userStreams = parseInt(localStorage.getItem('texus_music_streams_' + currentUserId) || '0');
-                let calculatedMusicBalance = (userStreams / 2) * 0.05;
-
-                totalCurrentBalance = calculatedAdBalance + calculatedMusicBalance;
-                document.getElementById('adEarningsDisplay').innerText = `$${totalCurrentBalance.toFixed(2)}`;
                 document.getElementById('postsCount').innerText = postCount;
                 renderProfileMedia(currentFilter);
             });
