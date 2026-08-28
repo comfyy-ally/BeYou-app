@@ -386,8 +386,7 @@
             <div class="card" style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #10b981;">
                 <div style="font-size: 40px; margin-bottom: 10px;">🎵</div>
                 <h3 id="currentSongTitle" style="margin: 5px 0; color: #ffffff;">Select a track</h3>
-                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 5px;">TexUs Radio Artist</p>
-                <p style="font-size: 11px; color: #f59e0b; margin-bottom: 15px;">Earnings Rate: 2 Streams = $0.05</p>
+                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">TexUs Radio Artist</p>
                 <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
                     <button onclick="alert('Playing previous track')" style="background: #334155; border: none; color: white; padding: 10px 15px; border-radius: 50%; cursor: pointer;">⏮️</button>
                     <button onclick="alert('Playback toggled')" style="background: #10b981; border: none; color: white; padding: 10px 20px; border-radius: 50%; cursor: pointer; font-size: 16px;">▶️</button>
@@ -443,7 +442,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <strong style="color: #f59e0b; font-size: 14px;">Total Earnings Balance</strong>
-                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">Ads ($0.10/view) + Music Streams (2 streams = $0.05)</p>
+                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">Accumulated from ads and streams</p>
                     </div>
                     <div style="font-size: 22px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
                 </div>
@@ -531,12 +530,12 @@
             document.getElementById('currentSongTitle').innerText = title;
             document.getElementById('currentSongArtist').innerText = artist;
 
-            // Increment stream count for music monetization (2 streams = $0.05 -> $0.025 per stream)
+            // Increment stream count for music monetization behind the scenes (2 streams = $0.05)
             let userStreams = parseInt(localStorage.getItem('texus_music_streams_' + currentUserId) || '0') + 1;
             localStorage.setItem('texus_music_streams_' + currentUserId, userStreams);
 
             loadProfileData();
-            alert(`Now streaming: ${title} by ${artist} (+1 stream counted!)`);
+            alert(`Now streaming: ${title} by ${artist}`);
         }
 
         function createPostPrompt() {
@@ -587,14 +586,14 @@
                 return;
             }
 
-            const stripeAccountId = prompt(`Your total earnings are $${totalCurrentBalance.toFixed(2)} USD.\n\nPlease enter your Stripe Connected Bank Account ID (e.g., acct_123456789):`);
+            const stripeAccountId = prompt("Please enter your Stripe Connected Bank Account ID (e.g., acct_123456789):");
             
             if (!stripeAccountId || stripeAccountId.trim() === "") {
                 alert("Account ID is required to process bank payouts.");
                 return;
             }
 
-            const confirmWithdraw = confirm(`Transfer $${totalCurrentBalance.toFixed(2)} USD directly to bank account ${stripeAccountId.trim()}?`);
+            const confirmWithdraw = confirm(`Transfer your available funds directly to bank account ${stripeAccountId.trim()}?`);
             if (!confirmWithdraw) return;
 
             const withdrawBtn = document.getElementById('withdrawBtn');
@@ -622,9 +621,9 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert(`Success! $${totalEarningsDollars.toFixed(2)} transferred to your bank. Transfer ID: ${data.transferId}`);
+                    alert(`Success! Funds transferred to your bank. Transfer ID: ${data.transferId}`);
                     
-                    // Reset music streams and ad earnings trackers post-withdrawal
+                    // Reset trackers post-withdrawal
                     localStorage.setItem('texus_music_streams_' + currentUserId, '0');
                     db.collection("posts")
                       .where("username", "==", currentUsername)
@@ -716,14 +715,11 @@
                         postCard.className = 'feed-post ad-post';
                         registerAdView(postId);
                         
-                        let totalEarnings = ((post.viewsCount || 0) * 0.10).toFixed(2);
-                        
                         postCard.innerHTML = `
                             <div class="post-header">
                                 <span class="post-user">📢 ${escapeHtml(post.username)} <span class="ad-badge">SPONSORED AD</span></span>
                                 ${managementMenu}
                             </div>
-                            <div style="font-size: 11px; color: #f59e0b; font-weight: bold; margin-bottom: 8px;">👁️ ${post.viewsCount || 0} Views ($${totalEarnings})</div>
                             <p style="font-size: 15px; color: #ffffff; font-weight: bold; margin: 10px 0;">${escapeHtml(post.text)}</p>
                             ${post.targetUrl ? `<a href="${escapeHtml(post.targetUrl)}" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; padding: 8px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 12px; margin-bottom: 10px;">Learn More 🔗</a>` : ''}
                             <div class="post-actions-row">
@@ -1020,7 +1016,7 @@
                     }
                 });
 
-                // Calculate music stream earnings: 2 streams = $0.05 ($0.025 per stream)
+                // Calculate balances behind the scenes
                 let userStreams = parseInt(localStorage.getItem('texus_music_streams_' + currentUserId) || '0');
                 let calculatedMusicBalance = (userStreams / 2) * 0.05;
 
