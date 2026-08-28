@@ -3,1195 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TexUs</title>
+    <title>TexUs - Dashboard</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #ffffff;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .top-header {
-            text-align: center;
-            padding: 15px;
-            background-color: #1e293b;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-        .app-title {
-            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 0;
-        }
-        .tex-part { color: #ec4899; }
-        .us-part { color: #10b981; }
-        .content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            padding-bottom: 90px;
-        }
-        .page {
-            display: none;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .page.active {
-            display: block;
-        }
-        h2 { color: #10b981; }
-        .card {
-            background-color: #1e293b;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-top: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .stories-container {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            scrollbar-width: none;
-        }
-        .stories-container::-webkit-scrollbar { display: none; }
-        .story-card {
-            min-width: 110px;
-            height: 180px;
-            background-color: #334155;
-            border-radius: 12px;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 10px;
-            transition: transform 0.2s;
-        }
-        .story-card:hover { transform: scale(1.03); }
-        .story-card.create-story {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 2px dashed #10b981;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .story-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background-color: #3b82f6;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 6px;
-            z-index: 2;
-        }
-        .story-name {
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            margin: 0;
-            z-index: 2;
-        }
-        .story-media {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-        .post-creator {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: #1e293b;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #334155;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-            cursor: pointer;
-            overflow: hidden;
-        }
-        .post-input-mock {
-            flex: 1;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            padding: 10px 15px;
-            border-radius: 20px;
-            color: #94a3b8;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .photo-btn, .ad-btn {
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .feed-post {
-            background-color: #1e293b;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .ad-post {
-            border: 2px solid #f59e0b;
-            background-color: #1c1917;
-        }
-        .ad-badge {
-            background-color: #f59e0b;
-            color: #000;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .post-user { font-weight: bold; font-size: 14px; color: #ffffff; }
-        .post-media-container {
-            margin: 10px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            max-height: 350px;
+
+        body {
             background-color: #0f172a;
+            color: #f8fafc;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .post-media-container img, .post-media-container video {
-            width: 100%;
-            height: auto;
-            max-height: 350px;
-            object-fit: cover;
-        }
-        .post-actions-row {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #334155;
-            margin-top: 12px;
-            padding-top: 10px;
-        }
-        .feed-action-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .feed-action-btn:hover { color: #10b981; }
-        #commentsView { display: none; }
-        .comment-item {
-            background-color: #0f172a;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
+
+        .dashboard-card {
             background-color: #1e293b;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 100;
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
-        .nav-btn {
-            background: none;
-            border: none;
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background-color: #334155;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .user-info h2 {
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        .user-info p {
+            font-size: 14px;
             color: #94a3b8;
-            font-size: 11px;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #1e3a8a, #0284c7);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .balance-card span {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #38bdf8;
+        }
+
+        .balance-card h1 {
+            font-size: 32px;
+            margin-top: 5px;
+            color: #ffffff;
+        }
+
+        .payout-form {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            flex: 1;
-            min-width: 55px;
-            position: relative;
+            gap: 15px;
         }
-        .nav-btn span { font-size: 18px; margin-bottom: 2px; }
-        .nav-btn.active { color: #10b981; font-weight: bold; }
-        .notification-dot {
-            position: absolute;
-            top: 2px;
-            right: 15px;
-            width: 9px;
-            height: 9px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            display: none;
-            border: 1px solid #1e293b;
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
+
+        .form-group label {
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #38bdf8;
+        }
+
         .withdraw-btn {
-            background: #10b981;
+            background-color: #0284c7;
             color: #ffffff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
-            font-size: 13px;
             cursor: pointer;
+            transition: background-color 0.2s;
             margin-top: 10px;
-            width: 100%;
-            transition: background 0.2s;
         }
-        .withdraw-btn:hover { background: #059669; }
-        .withdraw-btn:disabled { background: #475569; cursor: not-allowed; }
-    </style>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+        .withdraw-btn:hover {
+            background-color: #0369a1;
+        }
+
+        .withdraw-btn:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .status-msg.error {
+            color: #f87171;
+        }
+
+        .status-msg.success {
+            color: #4ade80;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="top-header">
-        <div class="app-title">
-            <span class="tex-part">Tex</span><span class="us-part">Us</span>
-        </div>
-    </div>
-
-    <div class="content">
-        <!-- HOME PAGE -->
-        <div id="home" class="page active">
-            <div id="mainFeedView">
-                <h2>Home Feed</h2>
-                <div class="post-creator">
-                    <div class="user-avatar" onclick="goToProfile()">
-                        <img id="homeUserAvatar" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                        <span id="homeUserAvatarPlaceholder">👤</span>
-                    </div>
-                    <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
-                    <input type="file" id="imageUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleImageUpload(event)">
-                    <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Add Image/Video">📷</button>
-                    <button class="ad-btn" onclick="createAdPrompt()" title="Create Sponsored Ad">📢</button>
-                </div>
-
-                <div class="stories-container" id="storiesContainer">
-                    <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
-                    <div class="story-card create-story" onclick="document.getElementById('storyUploadInput').click()">
-                        <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
-                        <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
-                    </div>
-                </div>
-
-                <div id="feedPostsContainer">
-                    <p style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">Loading live feed...</p>
-                </div>
-            </div>
-
-            <div id="commentsView">
-                <button onclick="backToFeed()" style="background:#334155; border:none; color:white; padding: 6px 12px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 15px;">← Back to Feed</button>
-                <h2>Comments</h2>
-                <div class="card">
-                    <div id="activePostPreview" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #334155;"></div>
-                    <div id="commentsListContainer" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
-                        <p style="color: #94a3b8; font-size: 13px;">Loading comments...</p>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="commentInputField" placeholder="Write a comment..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;">
-                        <button onclick="submitComment()" style="background:#10b981; border:none; color:white; padding: 10px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">Send</button>
-                    </div>
-                </div>
+    <div class="dashboard-card">
+        <!-- User Profile Section -->
+        <div class="profile-section">
+            <div class="avatar">👤</div>
+            <div class="user-info">
+                <h2 id="userName">candice</h2>
+                <p><span id="friendCount">3</span> friends · <span id="postCount">2</span> posts</p>
             </div>
         </div>
 
-        <!-- SUGGESTED USERS PAGE -->
-        <div id="friends" class="page">
-            <h2>Suggested Users</h2>
-            <div class="card">
-                <p>People using TexUs you can connect with:</p>
-                <div id="suggestedUsersContainer" style="margin-top: 15px;">
-                    <p style="color: #94a3b8; font-size: 13px;">Loading suggested users...</p>
-                </div>
-            </div>
+        <!-- Total Earnings Balance -->
+        <div class="balance-card">
+            <span>Total Earnings Balance</span>
+            <h1 id="earningsDisplay">$0.20 USD</h1>
         </div>
 
-        <!-- ACCEPT FRIENDS PAGE -->
-        <div id="acceptFriends" class="page">
-            <h2>Accept Friends</h2>
-            <div class="card">
-                <p>Your private incoming friend requests:</p>
-                <div id="friendRequestsContainer" style="margin-top: 15px;">
-                    <p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- CHAT PAGE -->
-        <div id="chat" class="page">
-            <div id="chatListView">
-                <h2>Messages</h2>
-                <div class="card" style="background-color: #1e293b; padding: 10px 15px;">
-                    <div id="acceptedConnectionsContainer">
-                        <p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px;">No active connections yet.</p>
-                    </div>
-                </div>
+        <!-- PayPal Withdrawal Form -->
+        <form id="payoutForm" class="payout-form">
+            <div class="form-group">
+                <label for="paypalEmail">PayPal Email Address</label>
+                <input 
+                    type="email" 
+                    id="paypalEmail" 
+                    placeholder="name@example.com" 
+                    required 
+                />
             </div>
 
-            <div id="activeChatView" style="display: none;">
-                <button onclick="backToChatList()" style="background:#334155; border:none; color:white; padding: 6px 12px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 15px;">← Back to Messages</button>
-                <h2 id="activeChatTitle">Chat</h2>
-                <div class="card" style="height: 380px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div id="privateMessagesContainer" style="overflow-y: auto; flex:1; padding-right: 5px;">
-                        <p style="color: #94a3b8; font-size: 13px;">Loading messages...</p>
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-top: 10px;">
-                        <input type="text" id="privateMessageInput" placeholder="Aa" style="flex:1; padding: 12px; border:1px solid #334155; background:#0f172a; color:white; border-radius:20px;">
-                        <button onclick="sendPrivateMessage()" style="background:#10b981; border:none; color:white; padding: 0 18px; border-radius:20px; cursor:pointer; font-weight:bold;">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PROFILE PAGE WITH BANK BALANCE WITHDRAWAL -->
-        <div id="profile" class="page">
-            <div style="position: relative; background: #334155; height: 120px; border-radius: 12px 12px 0 0;">
-                <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadProfilePicture(event)">
-                <div style="position: absolute; bottom: -30px; left: 20px; width: 85px; height: 85px; border-radius: 50%; background: #0f172a; border: 3px solid #1e293b; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="document.getElementById('avatarFileInput').click()">
-                    <img id="userAvatarImg" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                    <span id="userAvatarPlaceholder" style="font-size: 36px;">👤</span>
-                    <div style="position: absolute; bottom: 4px; right: 4px; background: #10b981; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px;">📷</div>
-                </div>
+            <div class="form-group">
+                <label for="withdrawAmount">Amount to Withdraw ($)</label>
+                <input 
+                    type="number" 
+                    id="withdrawAmount" 
+                    step="0.01" 
+                    min="0.01" 
+                    value="0.20" 
+                    required 
+                />
             </div>
 
-            <div style="margin-top: 35px; padding: 0 10px;">
-                <h2 id="profileUsernameDisplay" style="margin: 0; color: #ffffff;">User</h2>
-                <p style="margin: 5px 0 15px; font-size: 13px; color: #94a3b8;">
-                    <span id="friendsCount">0</span> friends · <span id="postsCount">0</span> posts
-                </p>
-            </div>
+            <button type="submit" id="withdrawBtn" class="withdraw-btn">
+                Withdraw to PayPal
+            </button>
+        </form>
 
-            <!-- MONETIZATION BALANCE & DIRECT BANK WITHDRAWAL CARD -->
-            <div class="card" style="margin-top: 10px; border-left: 4px solid #f59e0b;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong style="color: #f59e0b; font-size: 14px;">Total Earnings Balance</strong>
-                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">Sum of all post views ($0.10 / view)</p>
-                    </div>
-                    <div style="font-size: 22px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
-                </div>
-                <button class="withdraw-btn" id="withdrawBtn" onclick="withdrawFunds()">💸 Withdraw All Funds to Bank</button>
-            </div>
-
-            <div class="card" style="margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <strong style="color: #ffffff; font-size: 15px;">Friends</strong>
-                    <span style="color: #10b981; font-size: 12px; cursor: pointer;" onclick="switchPage('friends', document.getElementById('nav-friends'))">See all</span>
-                </div>
-                <div id="profileFriendsGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    <p style="grid-column: span 4; font-size: 12px; color: #94a3b8;">Loading friends...</p>
-                </div>
-            </div>
-
-            <div style="display: flex; border-bottom: 2px solid #334155; margin-top: 20px;">
-                <button id="tab-all" onclick="filterProfileMedia('all')" style="flex: 1; padding: 10px; background: none; border: none; color: #10b981; border-bottom: 2px solid #10b981; font-weight: bold; cursor: pointer;">All</button>
-                <button id="tab-reels" onclick="filterProfileMedia('reels')" style="flex: 1; padding: 10px; background: none; border: none; color: #94a3b8; font-weight: bold; cursor: pointer;">Reels</button>
-                <button id="tab-photos" onclick="filterProfileMedia('photos')" style="flex: 1; padding: 10px; background: none; border: none; color: #94a3b8; font-weight: bold; cursor: pointer;">Photos</button>
-            </div>
-
-            <div id="profilePostsContainer" style="margin-top: 15px;">
-                <p style="font-size: 13px; color: #94a3b8; text-align: center;">Loading user content...</p>
-            </div>
-        </div>
-
-        <!-- SETTINGS PAGE -->
-        <div id="settings" class="page">
-            <h2>Settings</h2>
-            <div class="card">
-                <p>App Theme: <strong>Dark Mode</strong></p>
-                <button onclick="logout()" style="background:#ef4444; border:none; color:white; padding:8px 15px; border-radius:5px; cursor:pointer; margin-top:15px; font-weight:bold;">Logout</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="bottom-nav">
-        <button class="nav-btn active" id="nav-home" onclick="switchPage('home', this)"><span>🏠</span> Home</button>
-        <button class="nav-btn" id="nav-friends" onclick="switchPage('friends', this)"><span>👥</span> Suggested</button>
-        <button class="nav-btn" id="nav-acceptFriends" onclick="switchPage('acceptFriends', this)">
-            <span>🤝</span> Accept
-            <div class="notification-dot" id="friendNotificationDot"></div>
-        </button>
-        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)">
-            <span>💬</span> Chat
-            <div class="notification-dot" id="chatNotificationDot"></div>
-        </button>
-        <button class="nav-btn" id="nav-profile" onclick="switchPage('profile', this)"><span>👤</span> Profile</button>
-        <button class="nav-btn" id="nav-settings" onclick="switchPage('settings', this)"><span>⚙️</span> Settings</button>
+        <div id="statusMessage" class="status-msg"></div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBLWsJhuxdhDJgvnMnclXdYhAcQv5RrGm0",
-            authDomain: "texus-5c99e.firebaseapp.com",
-            projectId: "texus-5c99e",
-            storageBucket: "texus-5c99e.firebasestorage.app",
-            messagingSenderId: "1040040305137",
-            appId: "1:1040040305137:web:86f4f717204378a22da450",
-            measurementId: "G-KCF9J53BGH"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        const payoutForm = document.getElementById('payoutForm');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const statusMessage = document.getElementById('statusMessage');
 
-        let currentUsername = localStorage.getItem('texus_username') || ("User_" + Math.random().toString(36).substring(2, 9));
-        localStorage.setItem('texus_username', currentUsername);
-        let currentUserId = localStorage.getItem('texus_user_id') || ('user_' + Math.random().toString(36).substring(2, 9));
-        localStorage.setItem('texus_user_id', currentUserId);
+        payoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        let activeSelectedPostId = null;
-        let activeChatPeer = null;
-        let unreadChats = {};
-        let userProfileMedia = [];
-        let currentFilter = 'all';
-        let totalCurrentBalance = 0;
+            const email = document.getElementById('paypalEmail').value.trim();
+            const amount = document.getElementById('withdrawAmount').value;
 
-        function switchPage(pageId, btnElement) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            if (btnElement) btnElement.classList.add('active');
-        }
-
-        function goToProfile() { switchPage('profile', document.getElementById('nav-profile')); }
-
-        function createPostPrompt() {
-            const postText = prompt("Tell us something fun about yourself!");
-            if (postText && postText.trim() !== "") savePostToFirebase(postText, null, false);
-        }
-
-        function createAdPrompt() {
-            const adText = prompt("Enter your Ad title/description:");
-            if (!adText || adText.trim() === "") return;
-            const targetUrl = prompt("Enter Destination Link/URL (Optional):") || "";
-
-            db.collection("posts").add({
-                text: adText,
-                targetUrl: targetUrl,
-                isAd: true,
-                viewsCount: 0,
-                viewers: [],
-                username: currentUsername,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                likes: 0,
-                likedBy: []
-            }).then(() => alert("Your Sponsored Ad is now live on the feed! 📢")).catch(err => alert(err.message));
-        }
-
-        function registerAdView(postId) {
-            const postRef = db.collection("posts").doc(postId);
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(postRef);
-                if (!doc.exists) return;
-                let data = doc.data();
-                let viewers = data.viewers || [];
-                
-                if (!viewers.includes(currentUserId)) {
-                    viewers.push(currentUserId);
-                    let newViewsCount = (data.viewsCount || 0) + 1;
-                    transaction.update(postRef, {
-                        viewsCount: newViewsCount,
-                        viewers: viewers
-                    });
-                }
-            });
-        }
-
-        // --- UPDATED BANK WITHDRAWAL FUNCTIONS ---
-        async function withdrawFunds() {
-            if (totalCurrentBalance <= 0) {
-                alert("You currently have no funds available to withdraw.");
+            if (!email || !amount) {
+                showStatus('Please fill in all fields.', 'error');
                 return;
             }
 
-            const stripeAccountId = prompt(`Your total earnings are $${totalCurrentBalance.toFixed(2)} USD.\n\nPlease enter your Stripe Connected Bank Account ID (e.g., acct_123456789):`);
-            
-            if (!stripeAccountId || stripeAccountId.trim() === "") {
-                alert("Account ID is required to process bank payouts.");
-                return;
-            }
-
-            const confirmWithdraw = confirm(`Transfer $${totalCurrentBalance.toFixed(2)} USD directly to bank account ${stripeAccountId.trim()}?`);
-            if (!confirmWithdraw) return;
-
-            const withdrawBtn = document.getElementById('withdrawBtn');
+            // Disable button and show loading text
             withdrawBtn.disabled = true;
-            withdrawBtn.innerText = "Processing Bank Transfer...";
-
-            await withdrawToBank(stripeAccountId.trim(), totalCurrentBalance);
-
-            withdrawBtn.innerText = "💸 Withdraw All Funds to Bank";
-        }
-
-        async function withdrawToBank(stripeAccountId, totalEarningsDollars) {
-            const amountInCents = Math.round(totalEarningsDollars * 100);
+            withdrawBtn.innerText = 'Processing PayPal Transfer...';
+            statusMessage.innerText = '';
+            statusMessage.className = 'status-msg';
 
             try {
-                const response = await fetch('/api/withdraw-to-bank', {
+                const response = await fetch('/api/withdraw-to-paypal', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
-                        stripeConnectedAccountId: stripeAccountId,
-                        amountInCents: amountInCents
+                        paypalEmail: email,
+                        amountInDollars: amount
                     })
                 });
 
-                const data = await response.json();
+                const result = await response.json();
 
-                if (data.success) {
-                    alert(`Success! $${totalEarningsDollars.toFixed(2)} transferred to your bank. Transfer ID: ${data.transferId}`);
-                    
-                    db.collection("posts")
-                      .where("username", "==", currentUsername)
-                      .where("isAd", "==", true)
-                      .get()
-                      .then(snapshot => {
-                          const batch = db.batch();
-                          snapshot.forEach(doc => {
-                              batch.update(doc.ref, { viewsCount: 0, viewers: [] });
-                          });
-                          return batch.commit();
-                      });
+                if (result.success) {
+                    showStatus(result.message, 'success');
+                    alert(result.message);
                 } else {
-                    alert(`Bank transfer failed: ${data.error}`);
+                    showStatus(`Transfer failed: ${result.error}`, 'error');
+                    alert(`PayPal transfer failed: ${result.error}`);
                 }
-            } catch (err) {
-                alert(`Error connecting to server: ${err.message}`);
+            } catch (error) {
+                console.error('Request Error:', error);
+                showStatus('An error occurred during withdrawal. Please try again.', 'error');
+                alert('An error occurred during withdrawal.');
+            } finally {
+                withdrawBtn.disabled = false;
+                withdrawBtn.innerText = 'Withdraw to PayPal';
             }
+        });
+
+        function showStatus(msg, type) {
+            statusMessage.innerText = msg;
+            statusMessage.className = `status-msg ${type}`;
         }
-
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const caption = prompt("Add a caption for your post:") || "";
-                const isVideo = file.type.startsWith('video');
-                storage.ref('posts/' + Date.now() + '_' + file.name).put(file).then(snapshot => {
-                    snapshot.ref.getDownloadURL().then(downloadURL => savePostToFirebase(caption, downloadURL, isVideo));
-                }).catch(err => alert("Upload error: " + err.message));
-            }
-            event.target.value = '';
-        }
-
-        function savePostToFirebase(text, mediaUrl, isVideo) {
-            db.collection("posts").add({
-                text: text, mediaUrl: mediaUrl || "", isVideo: isVideo || false,
-                username: currentUsername,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                likes: 0, likedBy: []
-            }).then(() => alert("Post is live! 🚀")).catch(err => alert(err.message));
-        }
-
-        function handleStoryUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const isVideo = file.type.startsWith('video');
-                storage.ref('stories/' + Date.now() + '_' + file.name).put(file).then(snapshot => {
-                    snapshot.ref.getDownloadURL().then(downloadURL => {
-                        db.collection("stories").add({
-                            mediaUrl: downloadURL, isVideo: isVideo,
-                            username: currentUsername,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        }).then(() => alert("Story added! ✨"));
-                    });
-                }).catch(err => alert("Story upload error: " + err.message));
-            }
-            event.target.value = '';
-        }
-
-        function loadLiveFeed() {
-            db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                const feedContainer = document.getElementById('feedPostsContainer');
-                feedContainer.innerHTML = '';
-                if (snapshot.empty) {
-                    feedContainer.innerHTML = '<p style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">No posts yet. Be the first to share something! ✨</p>';
-                    return;
-                }
-
-                const hiddenPosts = JSON.parse(localStorage.getItem('texus_hidden_posts') || '[]');
-
-                snapshot.forEach((doc) => {
-                    const post = doc.data(), postId = doc.id;
-                    
-                    if (hiddenPosts.includes(postId) || post.isArchived) {
-                        return;
-                    }
-
-                    const postCard = document.createElement('div');
-                    const isOwner = post.username === currentUsername;
-
-                    const managementMenu = `
-                        <div style="display: flex; gap: 6px;">
-                            ${isOwner ? `<button onclick="deletePost('${postId}')" style="background:#ef4444; border:none; color:white; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Delete</button>` : ''}
-                            ${isOwner ? `<button onclick="archivePost('${postId}')" style="background:#64748b; border:none; color:white; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Archive</button>` : ''}
-                            <button onclick="hidePost('${postId}')" style="background:#334155; border:none; color:#94a3b8; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Hide</button>
-                        </div>
-                    `;
-                    
-                    if (post.isAd) {
-                        postCard.className = 'feed-post ad-post';
-                        registerAdView(postId);
-                        
-                        let totalEarnings = ((post.viewsCount || 0) * 0.10).toFixed(2);
-                        
-                        postCard.innerHTML = `
-                            <div class="post-header">
-                                <span class="post-user">📢 ${escapeHtml(post.username)} <span class="ad-badge">SPONSORED AD</span></span>
-                                ${managementMenu}
-                            </div>
-                            <div style="font-size: 11px; color: #f59e0b; font-weight: bold; margin-bottom: 8px;">👁️ ${post.viewsCount || 0} Views ($${totalEarnings})</div>
-                            <p style="font-size: 15px; color: #ffffff; font-weight: bold; margin: 10px 0;">${escapeHtml(post.text)}</p>
-                            ${post.targetUrl ? `<a href="${escapeHtml(post.targetUrl)}" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; padding: 8px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 12px; margin-bottom: 10px;">Learn More 🔗</a>` : ''}
-                            <div class="post-actions-row">
-                                <button class="feed-action-btn" onclick="toggleLike('${postId}')">❤️ ${post.likes || 0} Likes</button>
-                                <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text)}')">💬 Comments</button>
-                            </div>`;
-                    } else {
-                        postCard.className = 'feed-post';
-                        let mediaHtml = post.mediaUrl ? (post.isVideo ? `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>` : `<div class="post-media-container"><img src="${post.mediaUrl}"></div>`) : '';
-                        let textHtml = post.text ? `<p style="font-size: 14px; color: #e2e8f0;">${escapeHtml(post.text)}</p>` : '';
-                        const hasLiked = post.likedBy && post.likedBy.includes(currentUserId);
-                        
-                        postCard.innerHTML = `
-                            <div class="post-header">
-                                <span class="post-user">👤 ${escapeHtml(post.username)}</span>
-                                ${managementMenu}
-                            </div>
-                            ${mediaHtml}${textHtml}
-                            <div class="post-actions-row">
-                                <button class="feed-action-btn" onclick="toggleLike('${postId}')" style="color: ${hasLiked ? '#10b981' : '#94a3b8'};">❤️ ${post.likes || 0} Likes</button>
-                                <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text || 'Media Post')}')">💬 Comments</button>
-                            </div>`;
-                    }
-                    feedContainer.appendChild(postCard);
-                });
-            });
-        }
-
-        function deletePost(postId) {
-            if (confirm("Are you sure you want to permanently delete this post?")) {
-                db.collection("posts").doc(postId).delete()
-                  .then(() => alert("Post deleted successfully."))
-                  .catch(err => alert("Error deleting post: " + err.message));
-            }
-        }
-
-        function archivePost(postId) {
-            if (confirm("Archive this post? It will no longer show on the main feed.")) {
-                db.collection("posts").doc(postId).update({ isArchived: true })
-                  .then(() => alert("Post archived."))
-                  .catch(err => alert("Error archiving post: " + err.message));
-            }
-        }
-
-        function hidePost(postId) {
-            const hiddenPosts = JSON.parse(localStorage.getItem('texus_hidden_posts') || '[]');
-            if (!hiddenPosts.includes(postId)) {
-                hiddenPosts.push(postId);
-                localStorage.setItem('texus_hidden_posts', JSON.stringify(hiddenPosts));
-            }
-            loadLiveFeed();
-        }
-
-        function toggleLike(postId) {
-            const postRef = db.collection("posts").doc(postId);
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(postRef);
-                if (!doc.exists) return;
-                let data = doc.data(), likedBy = data.likedBy || [], likes = data.likes || 0;
-                if (likedBy.includes(currentUserId)) {
-                    likedBy = likedBy.filter(id => id !== currentUserId);
-                    likes = Math.max(0, likes - 1);
-                } else {
-                    likedBy.push(currentUserId);
-                    likes += 1;
-                }
-                transaction.update(postRef, { likes: likes, likedBy: likedBy });
-            });
-        }
-
-        function openCommentsView(postId, username, postSummary) {
-            activeSelectedPostId = postId;
-            document.getElementById('mainFeedView').style.display = 'none';
-            document.getElementById('commentsView').style.display = 'block';
-            document.getElementById('activePostPreview').innerHTML = `<strong style="color: #10b981;">${username}:</strong> <span style="color: #e2e8f0; font-size: 13px;">${postSummary}</span>`;
-            loadLiveComments(postId);
-        }
-
-        function backToFeed() {
-            activeSelectedPostId = null;
-            document.getElementById('commentsView').style.display = 'none';
-            document.getElementById('mainFeedView').style.display = 'block';
-        }
-
-        function loadLiveComments(postId) {
-            db.collection("posts").doc(postId).collection("comments").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
-                const container = document.getElementById('commentsListContainer');
-                container.innerHTML = '';
-                if (snapshot.empty) {
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No comments yet.</p>';
-                    return;
-                }
-                snapshot.forEach((doc) => {
-                    const comment = doc.data();
-                    const commentEl = document.createElement('div');
-                    commentEl.className = 'comment-item';
-                    commentEl.innerHTML = `<strong style="color: #10b981;">${escapeHtml(comment.username)}:</strong> ${escapeHtml(comment.text)}`;
-                    container.appendChild(commentEl);
-                });
-            });
-        }
-
-        function submitComment() {
-            const input = document.getElementById('commentInputField');
-            const text = input.value.trim();
-            if (!text || !activeSelectedPostId) return;
-
-            db.collection("posts").doc(activeSelectedPostId).collection("comments").add({
-                username: currentUsername,
-                text: text,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => { input.value = ''; });
-        }
-
-        function loadLiveStories() {
-            db.collection("stories").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                const storiesContainer = document.getElementById('storiesContainer');
-                let storiesHTML = `
-                    <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
-                    <div class="story-card create-story" onclick="document.getElementById('storyUploadInput').click()">
-                        <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
-                        <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
-                    </div>`;
-                snapshot.forEach((doc) => {
-                    const story = doc.data();
-                    const mediaTag = story.isVideo ? `<video class="story-media" src="${story.mediaUrl}"></video>` : `<img class="story-media" src="${story.mediaUrl}">`;
-                    storiesHTML += `<div class="story-card">${mediaTag}<div class="story-badge">🔥 New</div><p class="story-name">${escapeHtml(story.username)}</p></div>`;
-                });
-                storiesContainer.innerHTML = storiesHTML;
-            });
-        }
-
-        function loadSuggestedUsers() {
-            const container = document.getElementById('suggestedUsersContainer');
-            db.collection("friendRequests")
-              .where("fromUser", "==", currentUsername)
-              .onSnapshot((reqSnapshot) => {
-                const sentRequests = {};
-                reqSnapshot.forEach((doc) => { sentRequests[doc.data().toUser] = doc.id; });
-
-                db.collection("users").onSnapshot((snapshot) => {
-                    container.innerHTML = '';
-                    if (snapshot.empty) {
-                        container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No other users registered yet.</p>';
-                        return;
-                    }
-
-                    let count = 0;
-                    snapshot.forEach((doc) => {
-                        const userData = doc.data();
-                        const username = userData.username;
-
-                        if (username && username !== currentUsername) {
-                            count++;
-                            const userRow = document.createElement('div');
-                            userRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 8px; background: #0f172a; padding: 8px 12px; border-radius: 6px;';
-                            
-                            const requestId = sentRequests[username];
-                            let actionButtonHtml = '';
-
-                            if (requestId) {
-                                actionButtonHtml = `
-                                    <div style="display: flex; gap: 5px; align-items: center;">
-                                        <span style="font-size: 11px; color: #94a3b8; font-weight: bold;">Friend Request Sent</span>
-                                        <button onclick="cancelFriendRequest('${requestId}')" style="background:#ef4444; border:none; color:white; padding:5px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 11px;">Cancel Request</button>
-                                    </div>`;
-                            } else {
-                                actionButtonHtml = `<button onclick="sendPrivateFriendRequest('${username}')" style="background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 12px;">Add Friend</button>`;
-                            }
-
-                            userRow.innerHTML = `<span>👤 ${escapeHtml(username)}</span>${actionButtonHtml}`;
-                            container.appendChild(userRow);
-                        }
-                    });
-
-                    if (count === 0) {
-                        container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No other users registered yet.</p>';
-                    }
-                });
-            });
-        }
-
-        function sendPrivateFriendRequest(targetUser) {
-            db.collection("friendRequests").add({
-                fromUser: currentUsername, 
-                toUser: targetUser, 
-                status: "pending",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => { alert(`Friend request sent privately to ${targetUser}!`); });
-        }
-
-        function cancelFriendRequest(requestId) {
-            db.collection("friendRequests").doc(requestId).delete()
-              .then(() => { alert("Friend request cancelled."); })
-              .catch((err) => { alert("Error cancelling request: " + err.message); });
-        }
-
-        function loadPrivateFriendRequests() {
-            db.collection("friendRequests")
-              .where("toUser", "==", currentUsername)
-              .where("status", "==", "pending")
-              .onSnapshot((snapshot) => {
-                const container = document.getElementById('friendRequestsContainer');
-                const notificationDot = document.getElementById('friendNotificationDot');
-                container.innerHTML = '';
-                
-                if(snapshot.empty) { 
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>'; 
-                    notificationDot.style.display = 'none'; 
-                    return; 
-                }
-
-                notificationDot.style.display = 'block';
-
-                snapshot.forEach((doc) => {
-                    const req = doc.data(), reqId = doc.id;
-                    const item = document.createElement('div');
-                    item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-bottom: 8px; border-bottom: 1px solid #334155;';
-                    item.innerHTML = `👤 ${escapeHtml(req.fromUser)} wants to connect<div><button onclick="db.collection('friendRequests').doc('${reqId}').update({status: 'accepted'}); alert('Connection accepted!');" style="background:#10b981; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; margin-right:5px;">Accept</button><button onclick="db.collection('friendRequests').doc('${reqId}').delete()" style="background:#ef4444; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Decline</button></div>`;
-                    container.appendChild(item);
-                });
-            });
-        }
-
-        function loadAcceptedConnections() {
-            db.collection("friendRequests")
-              .where("status", "==", "accepted")
-              .onSnapshot((snapshot) => {
-                const container = document.getElementById('acceptedConnectionsContainer');
-                container.innerHTML = '';
-                
-                let connections = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.fromUser === currentUsername) connections.push(data.toUser);
-                    else if (data.toUser === currentUsername) connections.push(data.fromUser);
-                });
-
-                if (connections.length === 0) {
-                    container.innerHTML = '<p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px;">No active connections yet. Accept or make friends to start chatting!</p>';
-                    return;
-                }
-
-                connections.forEach((friendName) => {
-                    const roomId = getChatRoomId(currentUsername, friendName);
-                    
-                    db.collection("chats").doc(roomId).collection("messages").orderBy("timestamp", "desc").limit(1)
-                      .onSnapshot((msgSnap) => {
-                        let lastText = "Tap to start chatting";
-                        let timeString = "";
-                        
-                        if (!msgSnap.empty) {
-                            const lastMsg = msgSnap.docs[0].data();
-                            lastText = (lastMsg.sender === currentUsername ? "You: " : "") + lastMsg.text;
-                            if (lastMsg.timestamp) {
-                                const date = lastMsg.timestamp.toDate();
-                                timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            }
-
-                            if (lastMsg.sender !== currentUsername && activeChatPeer !== friendName) {
-                                unreadChats[friendName] = true;
-                            }
-                        }
-
-                        updateChatNotificationBadge();
-
-                        let chatRow = document.getElementById('chat-row-' + friendName);
-                        if (!chatRow) {
-                            chatRow = document.createElement('div');
-                            chatRow.id = 'chat-row-' + friendName;
-                            chatRow.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 10px 8px; border-radius: 8px; cursor: pointer; transition: background 0.2s; margin-bottom: 4px;';
-                            chatRow.onmouseover = () => chatRow.style.background = '#334155';
-                            chatRow.onmouseout = () => chatRow.style.background = 'transparent';
-                            chatRow.onclick = () => openActiveChat(friendName);
-                            container.appendChild(chatRow);
-                        }
-
-                        chatRow.innerHTML = `
-                            <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
-                                <div style="width: 45px; height: 45px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">👤</div>
-                                <div style="display: flex; flex-direction: column; overflow: hidden;">
-                                    <span style="font-weight: bold; color: #ffffff; font-size: 14px;">${escapeHtml(friendName)}</span>
-                                    <span style="color: ${unreadChats[friendName] ? '#10b981' : '#94a3b8'}; font-weight: ${unreadChats[friendName] ? 'bold' : 'normal'}; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${escapeHtml(lastText)}</span>
-                                </div>
-                            </div>
-                            <span style="font-size: 11px; color: #64748b; flex-shrink: 0;">${timeString}</span>
-                        `;
-                    });
-                });
-            });
-        }
-
-        function updateChatNotificationBadge() {
-            const dot = document.getElementById('chatNotificationDot');
-            const hasUnread = Object.values(unreadChats).includes(true);
-            dot.style.display = hasUnread ? 'block' : 'none';
-        }
-
-        function openActiveChat(friendName) {
-            activeChatPeer = friendName;
-            unreadChats[friendName] = false;
-            updateChatNotificationBadge();
-            document.getElementById('chatListView').style.display = 'none';
-            document.getElementById('activeChatView').style.display = 'block';
-            document.getElementById('activeChatTitle').innerText = friendName;
-            loadPrivateMessages(friendName);
-        }
-
-        function backToChatList() {
-            activeChatPeer = null;
-            document.getElementById('activeChatView').style.display = 'none';
-            document.getElementById('chatListView').style.display = 'block';
-        }
-
-        function getChatRoomId(userA, userB) {
-            return userA < userB ? `${userA}_${userB}` : `${userB}_${userA}`;
-        }
-
-        function loadPrivateMessages(peerName) {
-            const roomId = getChatRoomId(currentUsername, peerName);
-            db.collection("chats").doc(roomId).collection("messages").orderBy("timestamp", "asc")
-              .onSnapshot((snapshot) => {
-                const container = document.getElementById('privateMessagesContainer');
-                container.innerHTML = '';
-                if (snapshot.empty) {
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 13px; text-align: center; margin-top: 20px;">Say hello to your connection! 👋</p>';
-                    return;
-                }
-                snapshot.forEach((doc) => {
-                    const msg = doc.data();
-                    const isMe = msg.sender === currentUsername;
-                    const msgEl = document.createElement('div');
-                    msgEl.style.cssText = `margin-bottom: 8px; display: flex; flex-direction: column; align-items: ${isMe ? 'flex-end' : 'flex-start'};`;
-                    
-                    let msgTime = "";
-                    if (msg.timestamp) {
-                        msgTime = msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    }
-
-                    msgEl.innerHTML = `
-                        <div style="background: ${isMe ? '#10b981' : '#334155'}; color: white; padding: 10px 14px; border-radius: 16px; max-width: 75%; font-size: 13px;">
-                            ${escapeHtml(msg.text)}
-                        </div>
-                        <span style="font-size: 9px; color: #64748b; margin-top: 2px; padding: 0 4px;">${msgTime}</span>
-                    `;
-                    container.appendChild(msgEl);
-                });
-                container.scrollTop = container.scrollHeight;
-            });
-        }
-
-        function sendPrivateMessage() {
-            const inputField = document.getElementById('privateMessageInput');
-            const text = inputField.value.trim();
-            if (!text || !activeChatPeer) return;
-
-            const roomId = getChatRoomId(currentUsername, activeChatPeer);
-            db.collection("chats").doc(roomId).collection("messages").add({
-                text: text,
-                sender: currentUsername,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => { inputField.value = ''; }).catch((err) => alert(err.message));
-        }
-
-        function uploadProfilePicture(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            storage.ref(`avatars/${currentUserId}_${Date.now()}`).put(file).then(snapshot => {
-                return snapshot.ref.getDownloadURL();
-            }).then(downloadURL => {
-                return db.collection("users").doc(currentUserId).set({
-                    avatarUrl: downloadURL
-                }, { merge: true }).then(() => downloadURL);
-            }).then((downloadURL) => {
-                displayAvatar(downloadURL);
-                alert("Profile picture updated!");
-            }).catch(err => alert("Error updating avatar: " + err.message));
-        }
-
-        function displayAvatar(url) {
-            if (url) {
-                document.getElementById('userAvatarImg').src = url;
-                document.getElementById('userAvatarImg').style.display = 'block';
-                document.getElementById('userAvatarPlaceholder').style.display = 'none';
-                
-                document.getElementById('homeUserAvatar').src = url;
-                document.getElementById('homeUserAvatar').style.display = 'block';
-                document.getElementById('homeUserAvatarPlaceholder').style.display = 'none';
-            }
-        }
-
-        function loadProfileData() {
-            document.getElementById('profileUsernameDisplay').innerText = currentUsername;
-
-            db.collection("users").doc(currentUserId).get().then(doc => {
-                if (doc.exists && doc.data().avatarUrl) displayAvatar(doc.data().avatarUrl);
-            });
-
-            db.collection("friendRequests")
-              .where("status", "==", "accepted")
-              .onSnapshot(snapshot => {
-                    const friendsList = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.fromUser === currentUsername) friendsList.push(data.toUser);
-                        if (data.toUser === currentUsername) friendsList.push(data.fromUser);
-                    });
-
-                    document.getElementById('friendsCount').innerText = friendsList.length;
-
-                    const gridContainer = document.getElementById('profileFriendsGrid');
-                    gridContainer.innerHTML = '';
-
-                    if (friendsList.length === 0) {
-                        gridContainer.innerHTML = '<p style="grid-column: span 4; font-size: 12px; color: #94a3b8;">No friends added yet.</p>';
-                        return;
-                    }
-
-                    friendsList.forEach(friend => {
-                        const item = document.createElement('div');
-                        item.style.cssText = 'text-align: center; font-size: 11px; font-weight: bold; color: #e2e8f0; cursor: pointer;';
-                        item.onclick = () => openActiveChat(friend);
-                        item.innerHTML = `
-                            <div style="width: 55px; height: 55px; background: #334155; border-radius: 50%; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 22px;">👤</div>
-                            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 65px; margin: 0 auto;">${escapeHtml(friend)}</div>
-                        `;
-                        gridContainer.appendChild(item);
-                    });
-              });
-
-            db.collection("posts")
-              .where("username", "==", currentUsername)
-              .onSnapshot(snapshot => {
-                    userProfileMedia = [];
-                    let totalAdViews = 0;
-                    snapshot.forEach(doc => {
-                        let postData = { id: doc.id, ...doc.data() };
-                        userProfileMedia.push(postData);
-                        if (postData.isAd) {
-                            totalAdViews += (postData.viewsCount || 0);
-                        }
-                    });
-
-                    totalCurrentBalance = totalAdViews * 0.10;
-
-                    document.getElementById('postsCount').innerText = userProfileMedia.length;
-                    document.getElementById('adEarningsDisplay').innerText = `$${totalCurrentBalance.toFixed(2)} USD`;
-                    
-                    const withdrawBtn = document.getElementById('withdrawBtn');
-                    withdrawBtn.disabled = totalCurrentBalance <= 0;
-
-                    renderFilteredMedia();
-              });
-        }
-
-        function filterProfileMedia(tabType) {
-            currentFilter = tabType;
-            ['all', 'reels', 'photos'].forEach(tab => {
-                const btn = document.getElementById(`tab-${tab}`);
-                btn.style.color = tab === tabType ? '#10b981' : '#94a3b8';
-                btn.style.borderBottom = tab === tabType ? '2px solid #10b981' : 'none';
-            });
-            renderFilteredMedia();
-        }
-
-        function renderFilteredMedia() {
-            const container = document.getElementById('profilePostsContainer');
-            container.innerHTML = '';
-
-            const filtered = userProfileMedia.filter(post => {
-                if (currentFilter === 'reels') return post.isVideo === true;
-                if (currentFilter === 'photos') return post.mediaUrl && !post.isVideo;
-                return true;
-            });
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<p style="font-size: 13px; color: #94a3b8; text-align: center;">No ${currentFilter} uploaded yet.</p>`;
-                return;
-            }
-
-            filtered.forEach(post => {
-                const el = document.createElement('div');
-                el.className = post.isAd ? 'feed-post ad-post' : 'feed-post';
-                let mediaHtml = '';
-
-                if (post.mediaUrl) {
-                    mediaHtml = post.isVideo 
-                        ? `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>`
-                        : `<div class="post-media-container"><img src="${post.mediaUrl}"></div>`;
-                }
-
-                el.innerHTML = `
-                    <div class="post-header"><span class="post-user">${post.isAd ? '📢' : '👤'} ${escapeHtml(post.username)} ${post.isAd ? '<span class="ad-badge">SPONSORED AD</span>' : ''}</span></div>
-                    ${mediaHtml}
-                    ${post.text ? `<p style="font-size: 14px; color: #e2e8f0;">${escapeHtml(post.text)}</p>` : ''}
-                `;
-                container.appendChild(el);
-            });
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        function logout() { window.location.href = '/login.html'; }
-
-        loadLiveFeed();
-        loadLiveStories();
-        loadSuggestedUsers();
-        loadPrivateFriendRequests();
-        loadAcceptedConnections();
-        loadProfileData();
     </script>
+
 </body>
 </html>
