@@ -253,7 +253,7 @@
         .notification-dot {
             position: absolute;
             top: 2px;
-            right: 15px;
+            right: 12px;
             width: 9px;
             height: 9px;
             background-color: #ef4444;
@@ -335,24 +335,21 @@
             </div>
         </div>
 
-        <!-- SUGGESTED USERS PAGE -->
+        <!-- COMBINED FRIENDS & REQUESTS PAGE -->
         <div id="friends" class="page">
-            <h2>Suggested Users</h2>
+            <h2>Friends & Requests</h2>
+            
             <div class="card">
-                <p>People using TexUs you can connect with:</p>
-                <div id="suggestedUsersContainer" style="margin-top: 15px;">
-                    <p style="color: #94a3b8; font-size: 13px;">Loading suggested users...</p>
+                <strong style="color: #10b981; font-size: 14px;">Incoming Friend Requests</strong>
+                <div id="friendRequestsContainer" style="margin-top: 10px;">
+                    <p style="color: #94a3b8; font-size: 13px;">No incoming requests.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- ACCEPT FRIENDS PAGE -->
-        <div id="acceptFriends" class="page">
-            <h2>Accept Friends</h2>
-            <div class="card">
-                <p>Your private incoming friend requests:</p>
-                <div id="friendRequestsContainer" style="margin-top: 15px;">
-                    <p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>
+            <div class="card" style="margin-top: 15px;">
+                <strong style="color: #ffffff; font-size: 14px;">Suggested Users</strong>
+                <div id="suggestedUsersContainer" style="margin-top: 10px;">
+                    <p style="color: #94a3b8; font-size: 13px;">Loading suggested users...</p>
                 </div>
             </div>
         </div>
@@ -378,6 +375,45 @@
                     <div style="display: flex; gap: 8px; margin-top: 10px;">
                         <input type="text" id="privateMessageInput" placeholder="Aa" style="flex:1; padding: 12px; border:1px solid #334155; background:#0f172a; color:white; border-radius:20px;">
                         <button onclick="sendPrivateMessage()" style="background:#10b981; border:none; color:white; padding: 0 18px; border-radius:20px; cursor:pointer; font-weight:bold;">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STREAMING MUSIC PAGE (6th TAB) -->
+        <div id="music" class="page">
+            <h2>TexUs Music Streaming</h2>
+            <div class="card" style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #10b981;">
+                <div style="font-size: 40px; margin-bottom: 10px;">🎵</div>
+                <h3 id="currentSongTitle" style="margin: 5px 0; color: #ffffff;">Select a track</h3>
+                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">TexUs Radio Artist</p>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                    <button onclick="alert('Playing previous track')" style="background: #334155; border: none; color: white; padding: 10px 15px; border-radius: 50%; cursor: pointer;">⏮️</button>
+                    <button onclick="alert('Playback toggled')" style="background: #10b981; border: none; color: white; padding: 10px 20px; border-radius: 50%; cursor: pointer; font-size: 16px;">▶️</button>
+                    <button onclick="alert('Playing next track')" style="background: #334155; border: none; color: white; padding: 10px 15px; border-radius: 50%; cursor: pointer;">⏭️</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <strong style="color: #ffffff; font-size: 14px;">Trending Playlist</strong>
+                <div style="margin-top: 10px;">
+                    <div onclick="playTrack('Neon Nights', 'CyberPulse')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                        <div>
+                            <strong>Neon Nights</strong><br><span style="font-size: 11px; color: #94a3b8;">CyberPulse</span>
+                        </div>
+                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
+                    </div>
+                    <div onclick="playTrack('Sunset Boulevard', 'Aura Sound')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                        <div>
+                            <strong>Sunset Boulevard</strong><br><span style="font-size: 11px; color: #94a3b8;">Aura Sound</span>
+                        </div>
+                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
+                    </div>
+                    <div onclick="playTrack('Midnight Groove', 'LoFi Beats')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                        <div>
+                            <strong>Midnight Groove</strong><br><span style="font-size: 11px; color: #94a3b8;">LoFi Beats</span>
+                        </div>
+                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
                     </div>
                 </div>
             </div>
@@ -446,15 +482,12 @@
 
     <div class="bottom-nav">
         <button class="nav-btn active" id="nav-home" onclick="switchPage('home', this)"><span>🏠</span> Home</button>
-        <button class="nav-btn" id="nav-friends" onclick="switchPage('friends', this)"><span>👥</span> Suggested</button>
-        <button class="nav-btn" id="nav-acceptFriends" onclick="switchPage('acceptFriends', this)">
-            <span>🤝</span> Accept
+        <button class="nav-btn" id="nav-friends" onclick="switchPage('friends', this)">
+            <span>👥</span> Friends
             <div class="notification-dot" id="friendNotificationDot"></div>
         </button>
-        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)">
-            <span>💬</span> Chat
-            <div class="notification-dot" id="chatNotificationDot"></div>
-        </button>
+        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)"><span>💬</span> Chat</button>
+        <button class="nav-btn" id="nav-music" onclick="switchPage('music', this)"><span>🎵</span> Music</button>
         <button class="nav-btn" id="nav-profile" onclick="switchPage('profile', this)"><span>👤</span> Profile</button>
         <button class="nav-btn" id="nav-settings" onclick="switchPage('settings', this)"><span>⚙️</span> Settings</button>
     </div>
@@ -480,7 +513,6 @@
 
         let activeSelectedPostId = null;
         let activeChatPeer = null;
-        let unreadChats = {};
         let userProfileMedia = [];
         let currentFilter = 'all';
         let totalCurrentBalance = 0;
@@ -493,6 +525,12 @@
         }
 
         function goToProfile() { switchPage('profile', document.getElementById('nav-profile')); }
+
+        function playTrack(title, artist) {
+            document.getElementById('currentSongTitle').innerText = title;
+            document.getElementById('currentSongArtist').innerText = artist;
+            alert(`Now streaming: ${title} by ${artist}`);
+        }
 
         function createPostPrompt() {
             const postText = prompt("Tell us something fun about yourself!");
@@ -536,7 +574,6 @@
             });
         }
 
-        // --- UPDATED BANK WITHDRAWAL FUNCTIONS ---
         async function withdrawFunds() {
             if (totalCurrentBalance <= 0) {
                 alert("You currently have no funds available to withdraw.");
@@ -844,7 +881,7 @@
                 container.innerHTML = '';
                 
                 if (snapshot.empty) {
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 14px;">No incoming requests.</p>';
+                    container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No incoming requests.</p>';
                     dot.style.display = 'none';
                     return;
                 }
