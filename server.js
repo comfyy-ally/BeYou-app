@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 
@@ -8,8 +9,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend files if they are in the same project directory
-// app.use(express.static('public'));
+// Serve all static frontend files (HTML, CSS, JS) from the root or public directory
+// If your HTML files are in the root directory alongside server.js, use __dirname:
+app.use(express.static(__dirname));
 
 /**
  * Payout API Endpoint
@@ -34,14 +36,6 @@ app.post('/api/withdraw-to-bank', async (req, res) => {
             });
         }
 
-        // TODO: Integrate actual Stripe transfer logic here using the 'stripe' npm package if desired:
-        // const stripe = require('stripe')('YOUR_STRIPE_SECRET_KEY');
-        // const transfer = await stripe.transfers.create({
-        // amount: amountInCents,
-        // currency: 'usd',
-        // destination: stripeConnectedAccountId,
-        // });
-
         // Simulated success response for testing and deployment
         const simulatedTransferId = 'tr_' + Math.random().toString(36).substring(2, 12);
 
@@ -60,9 +54,14 @@ app.post('/api/withdraw-to-bank', async (req, res) => {
     }
 });
 
-// Fallback route for undefined API endpoints to prevent HTML error pages
+// Fallback route for undefined API endpoints to prevent returning HTML pages
 app.use('/api/*', (req, res) => {
     res.status(404).json({ success: false, error: "API endpoint not found." });
+});
+
+// Catch-all route to serve index.html or handle SPA routing gracefully if needed
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start the server
