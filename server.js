@@ -7,14 +7,14 @@ const app = express();
 // Middleware to parse incoming JSON requests
 app.use(express.json());
 
-// Serve static frontend files (like dashboard.html)
+// Serve static frontend files (like dashboard.html) from current directory
 app.use(express.static(__dirname));
 
 // Environment Variables for PayPal Credentials
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 // Set to 'https://api-m.sandbox.paypal.com' for testing or 'https://api-m.paypal.com' for live production
-const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
+const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.paypal.com';
 
 /**
  * Helper function to generate a PayPal OAuth Access Token
@@ -43,14 +43,19 @@ async function getPayPalAccessToken() {
  * Sends funds directly to a user's PayPal email address
  */
 app.post('/api/withdraw-to-paypal', async (req, res) => {
-    const { paypalEmail, amountInDollars } = req.body;
+    let { paypalEmail, amountInDollars } = req.body;
 
-    // 1. Validation
+    // 1. Basic Validation
     if (!paypalEmail || !amountInDollars) {
         return res.status(400).json({
             success: false,
             error: 'Missing required parameters: paypalEmail and amountInDollars are required.'
         });
+    }
+
+    // Convert comma to period if user entered '0,20' instead of '0.20'
+    if (typeof amountInDollars === 'string') {
+        amountInDollars = amountInDollars.replace(',', '.');
     }
 
     const amount = parseFloat(amountInDollars);
@@ -62,7 +67,7 @@ app.post('/api/withdraw-to-paypal', async (req, res) => {
     }
 
     try {
-        // 2. Get Access Token from PayPal
+        // 2. Fetch Access Token from PayPal
         const accessToken = await getPayPalAccessToken();
 
         // 3. Construct Payout Request Payload
@@ -70,8 +75,8 @@ app.post('/api/withdraw-to-paypal', async (req, res) => {
         const payoutPayload = {
             sender_batch_header: {
                 sender_batch_id: senderBatchId,
-                email_subject: "You received a payout from Beyou App!",
-                email_message: "Thank you for using Beyou App. Your withdrawal has been processed."
+                email_subject: "You received a payout from TexUs!",
+                email_message: "Thank you for using TexUs. Your withdrawal has been processed successfully."
             },
             items: [
                 {
@@ -106,11 +111,18 @@ app.post('/api/withdraw-to-paypal', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('PayPal Payout Error:', error.response ? error.response.data : error.message);
+        console.error('PayPal Payout Error Details:', error.response ? error.response.data : error.message);
 
-        const errorMessage = error.response && error.response.data && error.response.data.message
-            ? error.response.data.message
-            : 'PayPal payout failed.';
+        // Extract specific error details returned by PayPal API
+        let errorMessage = 'PayPal payout failed.';
+        if (error.response && error.response.data) {
+            const data = error.response.data;
+            if (data.details && data.details.length > 0) {
+                errorMessage = data.details.map(d => d.issue || d.description).join('; ');
+            } else if (data.message) {
+                errorMessage = data.message;
+            }
+        }
 
         return res.status(500).json({
             success: false,
@@ -124,7 +136,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
-// Start server
+// Start server listening on allocated port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
