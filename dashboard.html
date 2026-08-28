@@ -383,7 +383,7 @@
             </div>
         </div>
 
-        <!-- PROFILE PAGE WITH BALANCE & WITHDRAWAL -->
+        <!-- PROFILE PAGE WITH BANK BALANCE WITHDRAWAL -->
         <div id="profile" class="page">
             <div style="position: relative; background: #334155; height: 120px; border-radius: 12px 12px 0 0;">
                 <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadProfilePicture(event)">
@@ -401,7 +401,7 @@
                 </p>
             </div>
 
-            <!-- MONETIZATION BALANCE & PAYPAL WITHDRAWAL CARD -->
+            <!-- MONETIZATION BALANCE & DIRECT BANK WITHDRAWAL CARD -->
             <div class="card" style="margin-top: 10px; border-left: 4px solid #f59e0b;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
@@ -410,7 +410,7 @@
                     </div>
                     <div style="font-size: 22px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
                 </div>
-                <button class="withdraw-btn" id="withdrawBtn" onclick="withdrawFunds()">💸 Withdraw All Funds</button>
+                <button class="withdraw-btn" id="withdrawBtn" onclick="withdrawFunds()">💸 Withdraw All Funds to Bank</button>
             </div>
 
             <div class="card" style="margin-top: 10px;">
@@ -536,41 +536,67 @@
             });
         }
 
-        // PAYPAL WITHDRAWAL FUNCTION WITH EMAIL PROMPT
-        function withdrawFunds() {
+        // --- UPDATED BANK WITHDRAWAL FUNCTIONS ---
+        async function withdrawFunds() {
             if (totalCurrentBalance <= 0) {
                 alert("You currently have no funds available to withdraw.");
                 return;
             }
 
-            const paypalEmail = prompt(`Your current balance is $${totalCurrentBalance.toFixed(2)} USD.\n\nPlease enter the PayPal email address where you want to receive your money:`);
-            if (paypalEmail === null) return;
-
-            const trimmedEmail = paypalEmail.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
-                alert("Please enter a valid PayPal email address.");
+            const stripeAccountId = prompt(`Your total earnings are $${totalCurrentBalance.toFixed(2)} USD.\n\nPlease enter your Stripe Connected Bank Account ID (e.g., acct_123456789):`);
+            
+            if (!stripeAccountId || stripeAccountId.trim() === "") {
+                alert("Account ID is required to process bank payouts.");
                 return;
             }
 
-            const confirmWithdraw = confirm(`Confirm transfer of $${totalCurrentBalance.toFixed(2)} USD to PayPal account:\n${trimmedEmail}`);
+            const confirmWithdraw = confirm(`Transfer $${totalCurrentBalance.toFixed(2)} USD directly to bank account ${stripeAccountId.trim()}?`);
             if (!confirmWithdraw) return;
 
-            db.collection("posts")
-              .where("username", "==", currentUsername)
-              .where("isAd", "==", true)
-              .get()
-              .then(snapshot => {
-                  const batch = db.batch();
-                  snapshot.forEach(doc => {
-                      batch.update(doc.ref, { viewsCount: 0, viewers: [] });
-                  });
-                  return batch.commit();
-              })
-              .then(() => {
-                  alert(`Withdrawal request submitted! $${totalCurrentBalance.toFixed(2)} USD is scheduled to transfer to ${trimmedEmail}.`);
-              })
-              .catch(err => alert("Withdrawal error: " + err.message));
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            withdrawBtn.disabled = true;
+            withdrawBtn.innerText = "Processing Bank Transfer...";
+
+            await withdrawToBank(stripeAccountId.trim(), totalCurrentBalance);
+
+            withdrawBtn.innerText = "💸 Withdraw All Funds to Bank";
+        }
+
+        async function withdrawToBank(stripeAccountId, totalEarningsDollars) {
+            const amountInCents = Math.round(totalEarningsDollars * 100);
+
+            try {
+                const response = await fetch('/api/withdraw-to-bank', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        stripeConnectedAccountId: stripeAccountId,
+                        amountInCents: amountInCents
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Success! $${totalEarningsDollars.toFixed(2)} transferred to your bank. Transfer ID: ${data.transferId}`);
+                    
+                    db.collection("posts")
+                      .where("username", "==", currentUsername)
+                      .where("isAd", "==", true)
+                      .get()
+                      .then(snapshot => {
+                          const batch = db.batch();
+                          snapshot.forEach(doc => {
+                              batch.update(doc.ref, { viewsCount: 0, viewers: [] });
+                          });
+                          return batch.commit();
+                      });
+                } else {
+                    alert(`Bank transfer failed: ${data.error}`);
+                }
+            } catch (err) {
+                alert(`Error connecting to server: ${err.message}`);
+            }
         }
 
         function handleImageUpload(event) {
@@ -611,7 +637,6 @@
             event.target.value = '';
         }
 
-        // LOAD LIVE FEED WITH DELETE, ARCHIVE, AND HIDE CONTROLS
         function loadLiveFeed() {
             db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
                 const feedContainer = document.getElementById('feedPostsContainer');
@@ -681,7 +706,6 @@
             });
         }
 
-        // POST CONTROL FUNCTIONS
         function deletePost(postId) {
             if (confirm("Are you sure you want to permanently delete this post?")) {
                 db.collection("posts").doc(postId).delete()
