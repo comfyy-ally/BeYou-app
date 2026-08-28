@@ -261,6 +261,26 @@
             display: none;
             border: 1px solid #1e293b;
         }
+        .creator-banner {
+            background: linear-gradient(135deg, #065f46, #047857);
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .withdraw-btn {
+            background: #10b981;
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .withdraw-btn:hover { background: #059669; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -422,6 +442,20 @@
                 </p>
             </div>
 
+            <!-- CREATOR ADMIN PAYOUT PANEL (Only visible for creator contact 0836964543) -->
+            <div id="creatorAdminSection" style="display: none;">
+                <div class="creator-banner">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: #ffffff; font-size: 15px;">👑 App Creator Daily Payout</strong>
+                            <p style="margin: 3px 0 0; font-size: 12px; color: #d1fae5;">Aggregated streams & ads pool (Phone: 0836964543)</p>
+                        </div>
+                        <div style="font-size: 22px; font-weight: bold; color: #ffffff;" id="creatorTotalEarnings">$0.00</div>
+                    </div>
+                    <button class="withdraw-btn" id="creatorWithdrawBtn" onclick="triggerCreatorDailyPayout()">📥 Withdraw Total Earnings to Bank</button>
+                </div>
+            </div>
+
             <div class="card" style="margin-top: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <strong style="color: #ffffff; font-size: 15px;">Friends</strong>
@@ -484,10 +518,22 @@
         let currentUserId = localStorage.getItem('texus_user_id') || ('user_' + Math.random().toString(36).substring(2, 9));
         localStorage.setItem('texus_user_id', currentUserId);
 
+        // Creator Identification Setup
+        const CREATOR_PHONE = "0836964543";
+        let userPhone = localStorage.getItem('texus_phone') || "";
+        
+        // If phone isn't set yet, prompt the creator/user to log in with admin contact
+        if (!userPhone) {
+            let inputPhone = prompt("Enter contact phone number:") || "";
+            localStorage.setItem('texus_phone', inputPhone);
+            userPhone = inputPhone;
+        }
+
         let activeSelectedPostId = null;
         let activeChatPeer = null;
         let userProfileMedia = [];
         let currentFilter = 'all';
+        let platformTotalBalance = 0;
 
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -501,6 +547,11 @@
         function playTrack(title, artist) {
             document.getElementById('currentSongTitle').innerText = title;
             document.getElementById('currentSongArtist').innerText = artist;
+
+            // Increment global platform music streams
+            let globalStreams = parseInt(localStorage.getItem('texus_global_streams') || '0') + 1;
+            localStorage.setItem('texus_global_streams', globalStreams);
+
             alert(`Now streaming: ${title} by ${artist}`);
         }
 
@@ -525,6 +576,73 @@
                 likes: 0,
                 likedBy: []
             }).then(() => alert("Your Sponsored Ad is now live on the feed! 📢")).catch(err => alert(err.message));
+        }
+
+        function registerAdView(postId) {
+            const postRef = db.collection("posts").doc(postId);
+            db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(postRef);
+                if (!doc.exists) return;
+                let data = doc.data();
+                let viewers = data.viewers || [];
+                
+                if (!viewers.includes(currentUserId)) {
+                    viewers.push(currentUserId);
+                    let newViewsCount = (data.viewsCount || 0) + 1;
+                    transaction.update(postRef, {
+                        viewsCount: newViewsCount,
+                        viewers: viewers
+                    });
+                }
+            });
+        }
+
+        async function triggerCreatorDailyPayout() {
+            if (userPhone !== CREATOR_PHONE) {
+                alert("Unauthorized: Only app creator can access daily payouts.");
+                return;
+            }
+
+            if (platformTotalBalance <= 0) {
+                alert("No accumulated platform earnings available right now.");
+                return;
+            }
+
+            const bankAccount = prompt(`Enter Bank Account ID for creator (${CREATOR_PHONE}):`);
+            if (!bankAccount) return;
+
+            const btn = document.getElementById('creatorWithdrawBtn');
+            btn.disabled = true;
+            btn.innerText = "Processing Daily Payout...";
+
+            try {
+                const response = await fetch('/api/withdraw-to-bank', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        stripeConnectedAccountId: bankAccount.trim(),
+                        amountInCents: Math.round(platformTotalBalance * 100)
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Daily creator payout successful! Transfer ID: ${data.transferId}`);
+                    localStorage.setItem('texus_global_streams', '0');
+                    // Reset ad view counters across posts
+                    db.collection("posts").where("isAd", "==", true).get().then(snapshot => {
+                        const batch = db.batch();
+                        snapshot.forEach(doc => batch.update(doc.ref, { viewsCount: 0, viewers: [] }));
+                        return batch.commit();
+                    });
+                } else {
+                    alert(`Payout failed: ${data.error}`);
+                }
+            } catch (err) {
+                alert(`Server error: ${err.message}`);
+            }
+            btn.disabled = false;
+            btn.innerText = "📥 Withdraw Total Earnings to Bank";
         }
 
         function handleImageUpload(event) {
@@ -596,6 +714,8 @@
                     
                     if (post.isAd) {
                         postCard.className = 'feed-post ad-post';
+                        registerAdView(postId);
+                        
                         postCard.innerHTML = `
                             <div class="post-header">
                                 <span class="post-user">📢 ${escapeHtml(post.username)} <span class="ad-badge">SPONSORED AD</span></span>
@@ -878,20 +998,38 @@
 
         function loadProfileData() {
             document.getElementById('profileUsernameDisplay').innerText = currentUsername;
+
+            // Check if user is the creator based on phone number
+            if (userPhone === CREATOR_PHONE) {
+                document.getElementById('creatorAdminSection').style.display = 'block';
+            }
             
-            db.collection("posts").where("username", "==", currentUsername).onSnapshot(snapshot => {
+            db.collection("posts").onSnapshot(snapshot => {
                 userProfileMedia = [];
                 let postCount = 0;
+                let calculatedAdPool = 0;
 
                 snapshot.forEach(doc => {
                     const post = doc.data();
-                    if (!post.isArchived) {
+                    if (post.username === currentUsername && !post.isArchived) {
                         postCount++;
                         if (post.mediaUrl) {
                             userProfileMedia.push({ id: doc.id, ...post });
                         }
                     }
+                    if (post.isAd) {
+                        calculatedAdPool += (post.viewsCount || 0) * 0.10;
+                    }
                 });
+
+                let globalStreams = parseInt(localStorage.getItem('texus_global_streams') || '0');
+                let calculatedMusicPool = (globalStreams / 2) * 0.05;
+
+                platformTotalBalance = calculatedAdPool + calculatedMusicPool;
+                
+                if (userPhone === CREATOR_PHONE) {
+                    document.getElementById('creatorTotalEarnings').innerText = `$${platformTotalBalance.toFixed(2)}`;
+                }
 
                 document.getElementById('postsCount').innerText = postCount;
                 renderProfileMedia(currentFilter);
