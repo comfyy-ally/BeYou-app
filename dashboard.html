@@ -386,7 +386,8 @@
             <div class="card" style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #10b981;">
                 <div style="font-size: 40px; margin-bottom: 10px;">🎵</div>
                 <h3 id="currentSongTitle" style="margin: 5px 0; color: #ffffff;">Select a track</h3>
-                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">TexUs Radio Artist</p>
+                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 5px;">TexUs Radio Artist</p>
+                <p style="font-size: 11px; color: #f59e0b; margin-bottom: 15px;">Earnings Rate: 2 Streams = $0.05</p>
                 <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
                     <button onclick="alert('Playing previous track')" style="background: #334155; border: none; color: white; padding: 10px 15px; border-radius: 50%; cursor: pointer;">⏮️</button>
                     <button onclick="alert('Playback toggled')" style="background: #10b981; border: none; color: white; padding: 10px 20px; border-radius: 50%; cursor: pointer; font-size: 16px;">▶️</button>
@@ -442,7 +443,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <strong style="color: #f59e0b; font-size: 14px;">Total Earnings Balance</strong>
-                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">Sum of all post views ($0.10 / view)</p>
+                        <p style="margin: 3px 0 0; font-size: 12px; color: #94a3b8;">Ads ($0.10/view) + Music Streams (2 streams = $0.05)</p>
                     </div>
                     <div style="font-size: 22px; font-weight: bold; color: #10b981;" id="adEarningsDisplay">$0.00</div>
                 </div>
@@ -529,7 +530,13 @@
         function playTrack(title, artist) {
             document.getElementById('currentSongTitle').innerText = title;
             document.getElementById('currentSongArtist').innerText = artist;
-            alert(`Now streaming: ${title} by ${artist}`);
+
+            // Increment stream count for music monetization (2 streams = $0.05 -> $0.025 per stream)
+            let userStreams = parseInt(localStorage.getItem('texus_music_streams_' + currentUserId) || '0') + 1;
+            localStorage.setItem('texus_music_streams_' + currentUserId, userStreams);
+
+            loadProfileData();
+            alert(`Now streaming: ${title} by ${artist} (+1 stream counted!)`);
         }
 
         function createPostPrompt() {
@@ -617,6 +624,8 @@
                 if (data.success) {
                     alert(`Success! $${totalEarningsDollars.toFixed(2)} transferred to your bank. Transfer ID: ${data.transferId}`);
                     
+                    // Reset music streams and ad earnings trackers post-withdrawal
+                    localStorage.setItem('texus_music_streams_' + currentUserId, '0');
                     db.collection("posts")
                       .where("username", "==", currentUsername)
                       .where("isAd", "==", true)
@@ -996,14 +1005,14 @@
             db.collection("posts").where("username", "==", currentUsername).onSnapshot(snapshot => {
                 userProfileMedia = [];
                 let postCount = 0;
-                let calculatedBalance = 0;
+                let calculatedAdBalance = 0;
 
                 snapshot.forEach(doc => {
                     const post = doc.data();
                     if (!post.isArchived) {
                         postCount++;
                         if (post.isAd) {
-                            calculatedBalance += (post.viewsCount || 0) * 0.10;
+                            calculatedAdBalance += (post.viewsCount || 0) * 0.10;
                         }
                         if (post.mediaUrl) {
                             userProfileMedia.push({ id: doc.id, ...post });
@@ -1011,7 +1020,11 @@
                     }
                 });
 
-                totalCurrentBalance = calculatedBalance;
+                // Calculate music stream earnings: 2 streams = $0.05 ($0.025 per stream)
+                let userStreams = parseInt(localStorage.getItem('texus_music_streams_' + currentUserId) || '0');
+                let calculatedMusicBalance = (userStreams / 2) * 0.05;
+
+                totalCurrentBalance = calculatedAdBalance + calculatedMusicBalance;
                 document.getElementById('adEarningsDisplay').innerText = `$${totalCurrentBalance.toFixed(2)}`;
                 document.getElementById('postsCount').innerText = postCount;
                 renderProfileMedia(currentFilter);
