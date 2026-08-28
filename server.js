@@ -7,11 +7,11 @@ const app = express();
 // Middleware to parse incoming JSON requests
 app.use(express.json());
 
-// Serve static frontend files (like dashboard.html) from the current directory
+// Serve static frontend files (like dashboard.html)
 app.use(express.static(__dirname));
 
-// Replace with your actual Secret Key from your Stripe Dashboard
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_YOUR_STRIPE_SECRET_KEY';
+// Pull secret key safely from Render Environment Variables
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
 /**
  * Bank Payout Endpoint
@@ -20,7 +20,6 @@ const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_YOUR_STRIPE_
 app.post('/api/withdraw-to-bank', async (req, res) => {
     const { stripeConnectedAccountId, amountInCents } = req.body;
 
-    // Validate request input
     if (!stripeConnectedAccountId || !amountInCents) {
         return res.status(400).json({ 
             success: false, 
@@ -36,7 +35,6 @@ app.post('/api/withdraw-to-bank', async (req, res) => {
     }
 
     try {
-        // Axios POST request to Stripe Transfers API
         const response = await axios({
             method: 'post',
             url: 'https://api.stripe.com/v1/transfers',
@@ -45,13 +43,12 @@ app.post('/api/withdraw-to-bank', async (req, res) => {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             data: new URLSearchParams({
-                amount: amountInCents, // Amount in cents (e.g., $10.00 = 1000)
+                amount: amountInCents,
                 currency: 'usd',
-                destination: stripeConnectedAccountId // User's linked Stripe Connect Bank Account ID
+                destination: stripeConnectedAccountId
             }).toString()
         });
 
-        // Return success response to frontend
         return res.status(200).json({
             success: true,
             transferId: response.data.id,
@@ -73,13 +70,12 @@ app.post('/api/withdraw-to-bank', async (req, res) => {
     }
 });
 
-// Route to serve dashboard.html on root access
+// Serve dashboard on root path
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
-// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 TexUs Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
