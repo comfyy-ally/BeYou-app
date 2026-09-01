@@ -385,13 +385,14 @@
             </div>
         </div>
 
-        <!-- STREAMING MUSIC PAGE (6th TAB) -->
+        <!-- STREAMING MUSIC PAGE (UPDATED WITH GLOBAL ARTISTS) -->
         <div id="music" class="page">
-            <h2>TexUs Music Streaming</h2>
+            <h2>TexUs Global Music Streaming</h2>
+            
             <div class="card" style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #10b981;">
                 <div style="font-size: 40px; margin-bottom: 10px;">🎵</div>
                 <h3 id="currentSongTitle" style="margin: 5px 0; color: #ffffff;">Select a track</h3>
-                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">TexUs Radio Artist</p>
+                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Global Artist</p>
                 <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
                     <button onclick="alert('Playing previous track')" style="background: #334155; border: none; color: white; padding: 10px 15px; border-radius: 50%; cursor: pointer;">⏮️</button>
                     <button onclick="alert('Playback toggled')" style="background: #10b981; border: none; color: white; padding: 10px 20px; border-radius: 50%; cursor: pointer; font-size: 16px;">▶️</button>
@@ -400,23 +401,29 @@
             </div>
 
             <div class="card">
-                <strong style="color: #ffffff; font-size: 14px;">Trending Playlist</strong>
+                <strong style="color: #ffffff; font-size: 14px;">🌍 Global Trending Hits</strong>
                 <div style="margin-top: 10px;">
+                    <div onclick="playTrack('Water', 'Tyla')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                        <div>
+                            <strong>Water</strong><br><span style="font-size: 11px; color: #94a3b8;">Tyla</span>
+                        </div>
+                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
+                    </div>
+                    <div onclick="playTrack('Umbrella', 'Rihanna ft. Jay-Z')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                        <div>
+                            <strong>Umbrella</strong><br><span style="font-size: 11px; color: #94a3b8;">Rihanna ft. Jay-Z</span>
+                        </div>
+                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
+                    </div>
+                    <div onclick="playTrack('Rush', 'Ayra Starr')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                        <div>
+                            <strong>Rush</strong><br><span style="font-size: 11px; color: #94a3b8;">Ayra Starr</span>
+                        </div>
+                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
+                    </div>
                     <div onclick="playTrack('Neon Nights', 'CyberPulse')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
                         <div>
                             <strong>Neon Nights</strong><br><span style="font-size: 11px; color: #94a3b8;">CyberPulse</span>
-                        </div>
-                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
-                    </div>
-                    <div onclick="playTrack('Sunset Boulevard', 'Aura Sound')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
-                        <div>
-                            <strong>Sunset Boulevard</strong><br><span style="font-size: 11px; color: #94a3b8;">Aura Sound</span>
-                        </div>
-                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
-                    </div>
-                    <div onclick="playTrack('Midnight Groove', 'LoFi Beats')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
-                        <div>
-                            <strong>Midnight Groove</strong><br><span style="font-size: 11px; color: #94a3b8;">LoFi Beats</span>
                         </div>
                         <span style="color: #10b981; font-size: 12px;">▶ Play</span>
                     </div>
@@ -452,7 +459,7 @@
                         </div>
                         <div style="font-size: 22px; font-weight: bold; color: #ffffff;" id="creatorTotalEarnings">$0.00</div>
                     </div>
-                    <button class="withdraw-btn" id="creatorWithdrawBtn" onclick="triggerCreatorDailyPayout()">📥 Withdraw Total Earnings to Bank</button>
+                    <button class="withdraw-btn" id="creatorWithdrawBtn" onclick="triggerCreatorDailyPayout()">📥 Withdraw Total Earnings to PayPal</button>
                 </div>
             </div>
 
@@ -518,7 +525,6 @@
         let currentUserId = localStorage.getItem('texus_user_id') || ('user_' + Math.random().toString(36).substring(2, 9));
         localStorage.setItem('texus_user_id', currentUserId);
 
-        // Creator Identification Setup
         const CREATOR_PHONE = "0836964543";
         let userPhone = localStorage.getItem('texus_phone') || "";
         
@@ -606,26 +612,26 @@
                 return;
             }
 
-            const bankAccount = prompt(`Enter Bank Account ID for creator (${CREATOR_PHONE}):`);
-            if (!bankAccount) return;
+            const paypalEmail = prompt(`Enter PayPal Email Address for creator (${CREATOR_PHONE}):`);
+            if (!paypalEmail) return;
 
             const btn = document.getElementById('creatorWithdrawBtn');
             btn.disabled = true;
-            btn.innerText = "Processing Daily Payout...";
+            btn.innerText = "Processing PayPal Payout...";
 
             try {
-                const response = await fetch('/api/withdraw-to-bank', {
+                const response = await fetch('/api/withdraw-to-paypal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        stripeConnectedAccountId: bankAccount.trim(),
-                        amountInCents: Math.round(platformTotalBalance * 100)
+                        paypalEmail: paypalEmail.trim(),
+                        amountInUSD: platformTotalBalance
                     })
                 });
 
                 const data = await response.json();
                 if (data.success) {
-                    alert(`Daily creator payout successful! Transfer ID: ${data.transferId}`);
+                    alert(`Daily creator payout successful! Batch ID: ${data.batchId}`);
                     localStorage.setItem('texus_global_streams', '0');
                     db.collection("posts").where("isAd", "==", true).get().then(snapshot => {
                         const batch = db.batch();
@@ -636,11 +642,10 @@
                     alert(`Payout failed: ${data.error}`);
                 }
             } catch (err) {
-                alert(`Server connection note: Payout request simulated successfully for offline testing.`);
-                localStorage.setItem('texus_global_streams', '0');
+                alert(`Network connection note: Unable to reach payout server.`);
             }
             btn.disabled = false;
-            btn.innerText = "📥 Withdraw Total Earnings to Bank";
+            btn.innerText = "📥 Withdraw Total Earnings to PayPal";
         }
 
         function handleImageUpload(event) {
