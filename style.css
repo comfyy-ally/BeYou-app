@@ -1,0 +1,43 @@
+.music-section {
+    padding: 20px;
+    color: #fff;
+}
+
+.song-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.song-card {
+    background: #1e1e1e;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.song-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.song-info h3 {
+    font-size: 16px;
+    margin: 10px 0 5px 0;
+}
+
+.song-info p {
+    font-size: 14px;
+    color: #b3b3b3;
+    margin-bottom: 10px;
+}
+
+.song-card audio {
+    width: 100%;
+    height: 35px;
+}
