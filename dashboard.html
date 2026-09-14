@@ -7,10 +7,16 @@
 
     <meta
         name="viewport"
-        content="width=device-width,initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0"
     >
 
     <title>TexUs - Dashboard</title>
+
+    <!-- Handwritten TexUs font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+        rel="stylesheet"
+    >
 
     <style>
 
@@ -20,42 +26,21 @@
 
         body {
             margin: 0;
-
             background: #0f172a;
-
             color: white;
-
             font-family: Arial, sans-serif;
-
             padding-bottom: 75px;
         }
 
-        header {
-            position: sticky;
-
-            top: 0;
-
-            z-index: 5;
-
-            background: #1e293b;
-
-            padding: 13px 16px;
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            border-bottom:
-                1px solid #334155;
-        }
+        /* =========================
+           TEXUS LOGO
+        ========================= */
 
         .logo {
-            font-family:
-                "Brush Script MT", cursive;
-
-            font-size: 34px;
+            font-family: "Pacifico", cursive;
+            font-size: 36px;
+            letter-spacing: 0;
+            line-height: 1;
         }
 
         .tex {
@@ -66,11 +51,29 @@
             color: #10b981;
         }
 
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+
+            background: #1e293b;
+
+            padding: 13px 16px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            border-bottom: 1px solid #334155;
+        }
+
         .logout {
             background: #334155;
-
             border: none;
-
             color: white;
 
             padding: 8px 12px;
@@ -80,11 +83,17 @@
             cursor: pointer;
         }
 
+        .logout:hover {
+            background: #475569;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
         main {
             max-width: 720px;
-
             margin: auto;
-
             padding: 16px;
         }
 
@@ -96,6 +105,10 @@
             display: block;
         }
 
+        /* =========================
+           CARDS
+        ========================= */
+
         .card {
             background: #1e293b;
 
@@ -106,6 +119,10 @@
             margin-bottom: 15px;
         }
 
+        /* =========================
+           INPUTS
+        ========================= */
+
         textarea,
         input {
             width: 100%;
@@ -114,21 +131,31 @@
 
             color: white;
 
-            border:
-                1px solid #475569;
+            border: 1px solid #475569;
 
             border-radius: 8px;
 
             padding: 11px;
 
             margin: 6px 0;
+
+            font-family: Arial, sans-serif;
         }
 
         textarea {
             min-height: 90px;
-
             resize: vertical;
         }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
 
         .primary {
             background: #ec4899;
@@ -146,6 +173,10 @@
             cursor: pointer;
         }
 
+        .primary:hover {
+            opacity: 0.9;
+        }
+
         .secondary {
             background: #10b981;
 
@@ -160,12 +191,17 @@
             cursor: pointer;
         }
 
+        .secondary:hover {
+            opacity: 0.9;
+        }
+
+        /* =========================
+           POSTS
+        ========================= */
+
         .post {
-            border-top:
-                1px solid #334155;
-
+            border-top: 1px solid #334155;
             padding-top: 14px;
-
             margin-top: 14px;
         }
 
@@ -184,17 +220,34 @@
 
         .meta {
             color: #94a3b8;
-
             font-size: 13px;
         }
 
         .empty {
             color: #94a3b8;
-
             text-align: center;
-
             padding: 25px;
         }
+
+        /* =========================
+           USERS
+        ========================= */
+
+        .user-row {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 12px 0;
+
+            border-bottom: 1px solid #334155;
+        }
+
+        /* =========================
+           BOTTOM NAVIGATION
+        ========================= */
 
         nav {
             position: fixed;
@@ -209,13 +262,11 @@
 
             background: #1e293b;
 
-            border-top:
-                1px solid #334155;
+            border-top: 1px solid #334155;
 
             display: flex;
 
-            justify-content:
-                space-around;
+            justify-content: space-around;
 
             z-index: 10;
         }
@@ -236,7 +287,6 @@
 
         nav button.active {
             color: #10b981;
-
             font-weight: bold;
         }
 
@@ -252,21 +302,9 @@
             margin-top: 4px;
         }
 
-        .user-row {
-            display: flex;
-
-            align-items: center;
-
-            justify-content:
-                space-between;
-
-            padding: 12px 0;
-
-            border-bottom:
-                1px solid #334155;
-        }
-
     </style>
+
+    <!-- Firebase -->
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 
@@ -278,15 +316,19 @@
 
 </head>
 
+
 <body>
 
+
+<!-- =========================
+     HEADER
+========================= -->
 
 <header>
 
     <div class="logo">
 
-        <span class="tex">Tex</span>
-        <span class="us">Us</span>
+        <span class="tex">Tex</span><span class="us">Us</span>
 
     </div>
 
@@ -303,7 +345,9 @@
 <main>
 
 
-<!-- HOME -->
+<!-- =========================
+     HOME
+========================= -->
 
 <section
     id="home"
@@ -312,16 +356,19 @@
 
     <h2>Home Feed</h2>
 
+
     <div class="card">
 
         <strong id="welcome">
             Welcome!
         </strong>
 
+
         <textarea
             id="postText"
             placeholder="Tell us something fun about yourself! 🚀"
         ></textarea>
+
 
         <input
             id="mediaFile"
@@ -329,12 +376,14 @@
             accept="image/*,video/*"
         >
 
+
         <button
             class="primary"
             onclick="createPost()"
         >
             Post
         </button>
+
 
         <div
             id="postMessage"
@@ -355,20 +404,26 @@
 </section>
 
 
-<!-- FRIENDS -->
+<!-- =========================
+     FRIENDS
+========================= -->
 
 <section
     id="friends"
     class="page"
 >
 
-    <h2>Friends & Requests</h2>
+    <h2>
+        Friends & Requests
+    </h2>
+
 
     <div class="card">
 
         <p class="meta">
             Users on TexUs
         </p>
+
 
         <div id="usersList">
 
@@ -383,25 +438,32 @@
 </section>
 
 
-<!-- CHAT -->
+<!-- =========================
+     CHAT
+========================= -->
 
 <section
     id="chat"
     class="page"
 >
 
-    <h2>Messages</h2>
+    <h2>
+        Messages
+    </h2>
+
 
     <div class="card">
 
         <p class="meta">
-            Basic TexUs messaging
+            TexUs messaging
         </p>
+
 
         <input
             id="messageText"
             placeholder="Aa"
         >
+
 
         <button
             class="secondary"
@@ -409,6 +471,7 @@
         >
             Send
         </button>
+
 
         <div id="messages">
 
@@ -423,7 +486,9 @@
 </section>
 
 
-<!-- MUSIC -->
+<!-- =========================
+     MUSIC
+========================= -->
 
 <section
     id="music"
@@ -434,23 +499,28 @@
         TexUs Global Music Streaming
     </h2>
 
+
     <div class="card">
 
         <h3>
             🌍 Global Trending Hits
         </h3>
 
+
         <p>
             🎵 Water — Tyla
         </p>
+
 
         <p>
             🎵 Umbrella — Rihanna ft. Jay-Z
         </p>
 
+
         <p>
             🎵 Rush — Ayra Starr
         </p>
+
 
         <p class="meta">
             Music playback can be connected
@@ -462,7 +532,9 @@
 </section>
 
 
-<!-- PROFILE -->
+<!-- =========================
+     PROFILE
+========================= -->
 
 <section
     id="profile"
@@ -473,16 +545,19 @@
         My Profile
     </h2>
 
+
     <div class="card">
 
         <h3 id="profileName">
             Loading...
         </h3>
 
+
         <p
             id="profileEmail"
             class="meta"
         ></p>
+
 
         <p class="meta">
             TexUs member
@@ -496,7 +571,9 @@
 </main>
 
 
-<!-- BOTTOM NAVIGATION -->
+<!-- =========================
+     BOTTOM NAVIGATION
+========================= -->
 
 <nav>
 
@@ -504,36 +581,55 @@
         class="active"
         onclick="showPage('home', this)"
     >
+
         <span>🏠</span>
+
         Home
+
     </button>
+
 
     <button
         onclick="showPage('friends', this)"
     >
+
         <span>👥</span>
+
         Friends
+
     </button>
+
 
     <button
         onclick="showPage('chat', this)"
     >
+
         <span>💬</span>
+
         Chat
+
     </button>
+
 
     <button
         onclick="showPage('music', this)"
     >
+
         <span>🎵</span>
+
         Music
+
     </button>
+
 
     <button
         onclick="showPage('profile', this)"
     >
+
         <span>👤</span>
+
         Profile
+
     </button>
 
 </nav>
@@ -542,7 +638,9 @@
 <script>
 
 
-/* FIREBASE CONFIG */
+/* =========================
+   FIREBASE CONFIG
+========================= */
 
 const firebaseConfig = {
 
@@ -566,8 +664,11 @@ const firebaseConfig = {
 
     measurementId:
         "G-KCF9J53BGH"
+
 };
 
+
+/* INITIALIZE FIREBASE */
 
 firebase.initializeApp(
     firebaseConfig
@@ -585,41 +686,48 @@ const storage =
 let currentUser = null;
 
 
-/* CHECK LOGIN */
+/* =========================
+   CHECK LOGIN
+========================= */
 
 firebase.auth()
-.onAuthStateChanged(async function(user) {
+.onAuthStateChanged(
+    async function(user) {
 
-    if (!user) {
+        if (!user) {
 
-        window.location.href =
-            "login.html";
+            window.location.href =
+                "login.html";
 
-        return;
+            return;
+
+        }
+
+
+        currentUser = user;
+
+
+        document.getElementById(
+            "profileEmail"
+        ).textContent =
+            user.email || "";
+
+
+        loadProfile(user.uid);
+
+        loadFeed();
+
+        loadUsers();
+
+        loadMessages();
+
     }
+);
 
 
-    currentUser = user;
-
-
-    document.getElementById(
-        "profileEmail"
-    ).textContent =
-        user.email || "";
-
-
-    loadProfile(user.uid);
-
-    loadFeed();
-
-    loadUsers();
-
-    loadMessages();
-
-});
-
-
-/* LOAD PROFILE */
+/* =========================
+   LOAD PROFILE
+========================= */
 
 async function loadProfile(uid) {
 
@@ -670,7 +778,9 @@ async function loadProfile(uid) {
 }
 
 
-/* CREATE POST */
+/* =========================
+   CREATE POST
+========================= */
 
 async function createPost() {
 
@@ -704,6 +814,7 @@ async function createPost() {
             "Write something or choose a photo/video.";
 
         return;
+
     }
 
 
@@ -814,6 +925,7 @@ async function createPost() {
 
         console.error(error);
 
+
         status.textContent =
             "Could not post: " +
             error.message;
@@ -823,7 +935,9 @@ async function createPost() {
 }
 
 
-/* LOAD FEED */
+/* =========================
+   LOAD FEED
+========================= */
 
 async function loadFeed() {
 
@@ -854,102 +968,105 @@ async function loadFeed() {
                 '</div>';
 
             return;
+
         }
 
 
         feed.innerHTML = "";
 
 
-        snapshot.forEach(function(doc) {
+        snapshot.forEach(
+            function(doc) {
 
-            const p =
-                doc.data();
-
-
-            const div =
-                document.createElement(
-                    "div"
-                );
+                const p =
+                    doc.data();
 
 
-            div.className =
-                "card post";
+                const div =
+                    document.createElement(
+                        "div"
+                    );
 
 
-            const date =
-                p.createdAt
-                    ? p.createdAt
-                        .toDate()
-                        .toLocaleString()
-                    : "Just now";
+                div.className =
+                    "card post";
 
 
-            let media = "";
+                const date =
+                    p.createdAt
+                        ? p.createdAt
+                            .toDate()
+                            .toLocaleString()
+                        : "Just now";
 
 
-            if (
-                p.mediaUrl &&
-                p.mediaType === "image"
-            ) {
+                let media = "";
 
-                media =
-                    '<img src="' +
-                    escapeAttr(
-                        p.mediaUrl
+
+                if (
+                    p.mediaUrl &&
+                    p.mediaType === "image"
+                ) {
+
+                    media =
+                        '<img src="' +
+                        escapeAttr(
+                            p.mediaUrl
+                        ) +
+                        '" alt="Post image">';
+
+                }
+
+
+                if (
+                    p.mediaUrl &&
+                    p.mediaType === "video"
+                ) {
+
+                    media =
+                        '<video src="' +
+                        escapeAttr(
+                            p.mediaUrl
+                        ) +
+                        '" controls></video>';
+
+                }
+
+
+                div.innerHTML =
+
+                    "<strong>" +
+
+                    escapeHtml(
+                        p.username ||
+                        "TexUs User"
                     ) +
-                    '" alt="Post image">';
+
+                    "</strong>" +
+
+                    '<div class="meta">' +
+
+                    escapeHtml(date) +
+
+                    "</div>" +
+
+                    (
+                        p.text
+                            ? "<p>" +
+                              escapeHtml(
+                                  p.text
+                              ) +
+                              "</p>"
+                            : ""
+                    ) +
+
+                    media;
+
+
+                feed.appendChild(div);
 
             }
-
-
-            if (
-                p.mediaUrl &&
-                p.mediaType === "video"
-            ) {
-
-                media =
-                    '<video src="' +
-                    escapeAttr(
-                        p.mediaUrl
-                    ) +
-                    '" controls></video>';
-
-            }
-
-
-            div.innerHTML =
-
-                "<strong>" +
-
-                escapeHtml(
-                    p.username ||
-                    "TexUs User"
-                ) +
-
-                "</strong>" +
-
-                '<div class="meta">' +
-
-                escapeHtml(date) +
-
-                "</div>" +
-
-                (
-                    p.text
-                        ? "<p>" +
-                          escapeHtml(
-                              p.text
-                          ) +
-                          "</p>"
-                        : ""
-                ) +
-
-                media;
-
-
-            feed.appendChild(div);
-
-        });
+        );
 
     }
 
@@ -968,7 +1085,9 @@ async function loadFeed() {
 }
 
 
-/* LOAD USERS */
+/* =========================
+   LOAD USERS
+========================= */
 
 async function loadUsers() {
 
@@ -990,53 +1109,57 @@ async function loadUsers() {
         list.innerHTML = "";
 
 
-        snapshot.forEach(function(doc) {
+        snapshot.forEach(
+            function(doc) {
 
-            const u =
-                doc.data();
+                const u =
+                    doc.data();
 
 
-            if (
-                doc.id ===
-                currentUser.uid
-            ) {
-                return;
+                if (
+                    doc.id ===
+                    currentUser.uid
+                ) {
+
+                    return;
+
+                }
+
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                row.className =
+                    "user-row";
+
+
+                row.innerHTML =
+
+                    "<span>👤 " +
+
+                    escapeHtml(
+                        u.username ||
+                        "TexUs User"
+                    ) +
+
+                    "</span>" +
+
+                    '<button class="secondary" ' +
+
+                    'onclick="alert(\'Friend requests will be connected next.\')">' +
+
+                    "Add Friend" +
+
+                    "</button>";
+
+
+                list.appendChild(row);
+
             }
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "user-row";
-
-
-            row.innerHTML =
-
-                "<span>👤 " +
-
-                escapeHtml(
-                    u.username ||
-                    "TexUs User"
-                ) +
-
-                "</span>" +
-
-                '<button class="secondary" ' +
-
-                'onclick="alert(\'Friend requests will be connected next.\')">' +
-
-                "Add Friend" +
-
-                "</button>";
-
-
-            list.appendChild(row);
-
-        });
+        );
 
 
         if (!list.innerHTML) {
@@ -1065,7 +1188,9 @@ async function loadUsers() {
 }
 
 
-/* SEND MESSAGE */
+/* =========================
+   SEND MESSAGE
+========================= */
 
 async function sendMessage() {
 
@@ -1131,7 +1256,9 @@ async function sendMessage() {
 }
 
 
-/* LOAD MESSAGES */
+/* =========================
+   LOAD MESSAGES
+========================= */
 
 async function loadMessages() {
 
@@ -1162,42 +1289,45 @@ async function loadMessages() {
                 "</div>";
 
             return;
+
         }
 
 
         box.innerHTML = "";
 
 
-        snapshot.forEach(function(doc) {
+        snapshot.forEach(
+            function(doc) {
 
-            const m =
-                doc.data();
-
-
-            const row =
-                document.createElement(
-                    "p"
-                );
+                const m =
+                    doc.data();
 
 
-            row.innerHTML =
-                "<strong>" +
-
-                escapeHtml(
-                    m.senderEmail ||
-                    "User"
-                ) +
-
-                ":</strong> " +
-
-                escapeHtml(
-                    m.text || ""
-                );
+                const row =
+                    document.createElement(
+                        "p"
+                    );
 
 
-            box.appendChild(row);
+                row.innerHTML =
+                    "<strong>" +
 
-        });
+                    escapeHtml(
+                        m.senderEmail ||
+                        "User"
+                    ) +
+
+                    ":</strong> " +
+
+                    escapeHtml(
+                        m.text || ""
+                    );
+
+
+                box.appendChild(row);
+
+            }
+        );
 
     }
 
@@ -1216,19 +1346,26 @@ async function loadMessages() {
 }
 
 
-/* CHANGE PAGE */
+/* =========================
+   CHANGE PAGE
+========================= */
 
-function showPage(id, button) {
+function showPage(
+    id,
+    button
+) {
 
     document
         .querySelectorAll(".page")
-        .forEach(function(page) {
+        .forEach(
+            function(page) {
 
-            page.classList.remove(
-                "active"
-            );
+                page.classList.remove(
+                    "active"
+                );
 
-        });
+            }
+        );
 
 
     document
@@ -1242,13 +1379,15 @@ function showPage(id, button) {
         .querySelectorAll(
             "nav button"
         )
-        .forEach(function(btn) {
+        .forEach(
+            function(btn) {
 
-            btn.classList.remove(
-                "active"
-            );
+                btn.classList.remove(
+                    "active"
+                );
 
-        });
+            }
+        );
 
 
     button.classList.add(
@@ -1258,23 +1397,29 @@ function showPage(id, button) {
 }
 
 
-/* LOG OUT */
+/* =========================
+   LOG OUT
+========================= */
 
 function logout() {
 
     firebase.auth()
     .signOut()
-    .then(function() {
+    .then(
+        function() {
 
-        window.location.href =
-            "login.html";
+            window.location.href =
+                "login.html";
 
-    });
+        }
+    );
 
 }
 
 
-/* ESCAPE HTML */
+/* =========================
+   SECURITY
+========================= */
 
 function escapeHtml(value) {
 
@@ -1311,4 +1456,5 @@ function escapeAttr(value) {
 </script>
 
 </body>
+
 </html>
