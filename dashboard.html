@@ -12,299 +12,16 @@
 
     <title>TexUs - Dashboard</title>
 
-    <!-- Handwritten TexUs font -->
+
+    <!-- TEXUS HANDWRITTEN FONT -->
+
     <link
         href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
         rel="stylesheet"
     >
 
-    <style>
 
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: #0f172a;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding-bottom: 75px;
-        }
-
-        /* =========================
-           TEXUS LOGO
-        ========================= */
-
-        .logo {
-            font-family: "Pacifico", cursive;
-            font-size: 36px;
-            letter-spacing: 0;
-            line-height: 1;
-        }
-
-        .tex {
-            color: #ec4899;
-        }
-
-        .us {
-            color: #10b981;
-        }
-
-        /* =========================
-           HEADER
-        ========================= */
-
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 5;
-
-            background: #1e293b;
-
-            padding: 13px 16px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            border-bottom: 1px solid #334155;
-        }
-
-        .logout {
-            background: #334155;
-            border: none;
-            color: white;
-
-            padding: 8px 12px;
-
-            border-radius: 7px;
-
-            cursor: pointer;
-        }
-
-        .logout:hover {
-            background: #475569;
-        }
-
-        /* =========================
-           MAIN
-        ========================= */
-
-        main {
-            max-width: 720px;
-            margin: auto;
-            padding: 16px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* =========================
-           CARDS
-        ========================= */
-
-        .card {
-            background: #1e293b;
-
-            border-radius: 14px;
-
-            padding: 16px;
-
-            margin-bottom: 15px;
-        }
-
-        /* =========================
-           INPUTS
-        ========================= */
-
-        textarea,
-        input {
-            width: 100%;
-
-            background: #0f172a;
-
-            color: white;
-
-            border: 1px solid #475569;
-
-            border-radius: 8px;
-
-            padding: 11px;
-
-            margin: 6px 0;
-
-            font-family: Arial, sans-serif;
-        }
-
-        textarea {
-            min-height: 90px;
-            resize: vertical;
-        }
-
-        textarea:focus,
-        input:focus {
-            outline: none;
-            border-color: #10b981;
-        }
-
-        /* =========================
-           BUTTONS
-        ========================= */
-
-        .primary {
-            background: #ec4899;
-
-            color: white;
-
-            border: none;
-
-            border-radius: 8px;
-
-            padding: 11px 16px;
-
-            font-weight: bold;
-
-            cursor: pointer;
-        }
-
-        .primary:hover {
-            opacity: 0.9;
-        }
-
-        .secondary {
-            background: #10b981;
-
-            color: white;
-
-            border: none;
-
-            border-radius: 8px;
-
-            padding: 10px 14px;
-
-            cursor: pointer;
-        }
-
-        .secondary:hover {
-            opacity: 0.9;
-        }
-
-        /* =========================
-           POSTS
-        ========================= */
-
-        .post {
-            border-top: 1px solid #334155;
-            padding-top: 14px;
-            margin-top: 14px;
-        }
-
-        .post img,
-        .post video {
-            width: 100%;
-
-            max-height: 430px;
-
-            object-fit: cover;
-
-            border-radius: 10px;
-
-            margin-top: 10px;
-        }
-
-        .meta {
-            color: #94a3b8;
-            font-size: 13px;
-        }
-
-        .empty {
-            color: #94a3b8;
-            text-align: center;
-            padding: 25px;
-        }
-
-        /* =========================
-           USERS
-        ========================= */
-
-        .user-row {
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 12px 0;
-
-            border-bottom: 1px solid #334155;
-        }
-
-        /* =========================
-           BOTTOM NAVIGATION
-        ========================= */
-
-        nav {
-            position: fixed;
-
-            bottom: 0;
-
-            left: 0;
-
-            right: 0;
-
-            height: 68px;
-
-            background: #1e293b;
-
-            border-top: 1px solid #334155;
-
-            display: flex;
-
-            justify-content: space-around;
-
-            z-index: 10;
-        }
-
-        nav button {
-            flex: 1;
-
-            background: none;
-
-            border: none;
-
-            color: #94a3b8;
-
-            font-size: 12px;
-
-            cursor: pointer;
-        }
-
-        nav button.active {
-            color: #10b981;
-            font-weight: bold;
-        }
-
-        nav span {
-            display: block;
-
-            font-size: 22px;
-
-            margin-bottom: 2px;
-        }
-
-        h2 {
-            margin-top: 4px;
-        }
-
-    </style>
-
-    <!-- Firebase -->
+    <!-- FIREBASE -->
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 
@@ -314,15 +31,746 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
+
+<style>
+
+/* =========================================
+   BASIC
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    background: #0f172a;
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+
+    padding-bottom: 80px;
+}
+
+
+/* =========================================
+   TEXUS LOGO
+========================================= */
+
+.logo {
+    font-family: "Pacifico", cursive;
+
+    font-size: 36px;
+
+    line-height: 1;
+}
+
+.tex {
+    color: #ec4899;
+}
+
+.us {
+    color: #10b981;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+header {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    height: 65px;
+
+    background: #1e293b;
+
+    border-bottom: 1px solid #334155;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 16px;
+}
+
+
+.logout {
+
+    background: #334155;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 9px 14px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+main {
+
+    max-width: 760px;
+
+    margin: auto;
+
+    padding: 16px;
+}
+
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+
+/* =========================================
+   CARDS
+========================================= */
+
+.card {
+
+    background: #1e293b;
+
+    border-radius: 14px;
+
+    padding: 16px;
+
+    margin-bottom: 16px;
+}
+
+
+/* =========================================
+   STORIES
+========================================= */
+
+.story-section {
+
+    margin-bottom: 20px;
+}
+
+
+.story-title {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 12px;
+}
+
+
+.story-title h3 {
+
+    margin: 0;
+
+    font-size: 19px;
+}
+
+
+.story-container {
+
+    display: flex;
+
+    gap: 12px;
+
+    overflow-x: auto;
+
+    padding: 3px 2px 10px;
+
+    scrollbar-width: none;
+}
+
+
+.story-container::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* STORY CARD */
+
+.story-card {
+
+    position: relative;
+
+    flex: 0 0 145px;
+
+    height: 220px;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    background: #334155;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 3px 10px rgba(0,0,0,0.35);
+}
+
+
+.story-card img,
+.story-card video {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+}
+
+
+/* DARK GRADIENT */
+
+.story-card::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    right: 0;
+
+    bottom: 0;
+
+    height: 90px;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(0,0,0,0.75)
+        );
+
+    pointer-events: none;
+}
+
+
+/* STORY NAME */
+
+.story-name {
+
+    position: absolute;
+
+    left: 10px;
+
+    right: 7px;
+
+    bottom: 10px;
+
+    z-index: 3;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    color: white;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================
+   YOUR STORY
+========================================= */
+
+.my-story {
+
+    background: white;
+
+    border: 1px solid #d1d5db;
+}
+
+
+.my-story-placeholder {
+
+    width: 100%;
+
+    height: 150px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e2e8f0,
+            #f8fafc
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+/* PLUS BUTTON */
+
+.plus-button {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 150px;
+
+    transform:
+        translate(-50%, -50%);
+
+    width: 58px;
+
+    height: 58px;
+
+    border-radius: 50%;
+
+    background: #1877f2;
+
+    border: 5px solid white;
+
+    color: white;
+
+    font-size: 39px;
+
+    line-height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 5;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.3);
+}
+
+
+.plus-button:hover {
+
+    transform:
+        translate(-50%, -50%)
+        scale(1.05);
+}
+
+
+.my-story .story-name {
+
+    color: #111827;
+
+    bottom: 10px;
+
+    text-align: center;
+}
+
+
+/* =========================================
+   UPLOAD MESSAGE
+========================================= */
+
+.upload-status {
+
+    display: none;
+
+    background: #334155;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    margin-top: 10px;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* =========================================
+   FEED
+========================================= */
+
+textarea,
+input {
+
+    width: 100%;
+
+    background: #0f172a;
+
+    color: white;
+
+    border: 1px solid #475569;
+
+    border-radius: 9px;
+
+    padding: 12px;
+
+    margin: 6px 0;
+
+    font-family: Arial, sans-serif;
+}
+
+
+textarea {
+
+    min-height: 90px;
+
+    resize: vertical;
+}
+
+
+textarea:focus,
+input:focus {
+
+    outline: none;
+
+    border-color: #10b981;
+}
+
+
+.primary {
+
+    background: #ec4899;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 11px 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    margin-top: 5px;
+}
+
+
+.secondary {
+
+    background: #10b981;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 10px 14px;
+
+    cursor: pointer;
+}
+
+
+.post {
+
+    border-top: 1px solid #334155;
+
+    padding-top: 14px;
+
+    margin-top: 14px;
+}
+
+
+.post img,
+.post video {
+
+    width: 100%;
+
+    max-height: 450px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    margin-top: 10px;
+}
+
+
+.meta {
+
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+
+.empty {
+
+    color: #94a3b8;
+
+    text-align: center;
+
+    padding: 25px;
+}
+
+
+/* =========================================
+   STORY VIEWER
+========================================= */
+
+.story-viewer {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.94);
+
+    z-index: 1000;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+}
+
+
+.story-viewer.active {
+
+    display: flex;
+}
+
+
+.story-viewer-content {
+
+    position: relative;
+
+    width: min(420px, 95vw);
+
+    height: min(750px, 90vh);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: black;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+}
+
+
+.story-viewer-content img,
+.story-viewer-content video {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+}
+
+
+.close-story {
+
+    position: absolute;
+
+    top: 12px;
+
+    right: 12px;
+
+    z-index: 20;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    border: none;
+
+    background: rgba(0,0,0,0.7);
+
+    color: white;
+
+    font-size: 25px;
+
+    cursor: pointer;
+}
+
+
+.viewer-name {
+
+    position: absolute;
+
+    top: 15px;
+
+    left: 15px;
+
+    z-index: 20;
+
+    background: rgba(0,0,0,0.55);
+
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+}
+
+
+/* =========================================
+   USERS
+========================================= */
+
+.user-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #334155;
+}
+
+
+/* =========================================
+   BOTTOM NAVIGATION
+========================================= */
+
+nav {
+
+    position: fixed;
+
+    left: 0;
+
+    right: 0;
+
+    bottom: 0;
+
+    height: 70px;
+
+    background: #1e293b;
+
+    border-top: 1px solid #334155;
+
+    display: flex;
+
+    justify-content: space-around;
+
+    z-index: 100;
+}
+
+
+nav button {
+
+    flex: 1;
+
+    background: none;
+
+    border: none;
+
+    color: #94a3b8;
+
+    cursor: pointer;
+
+    font-size: 12px;
+}
+
+
+nav button.active {
+
+    color: #10b981;
+
+    font-weight: bold;
+}
+
+
+nav span {
+
+    display: block;
+
+    font-size: 22px;
+
+    margin-bottom: 2px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 500px) {
+
+    main {
+        padding: 10px;
+    }
+
+    .story-card {
+        flex-basis: 135px;
+        height: 210px;
+    }
+
+    .my-story-placeholder {
+        height: 140px;
+    }
+
+    .plus-button {
+        top: 140px;
+    }
+
+}
+
+</style>
+
 </head>
 
 
 <body>
 
 
-<!-- =========================
+<!-- =========================================
      HEADER
-========================= -->
+========================================= -->
 
 <header>
 
@@ -331,6 +779,7 @@
         <span class="tex">Tex</span><span class="us">Us</span>
 
     </div>
+
 
     <button
         class="logout"
@@ -342,20 +791,118 @@
 </header>
 
 
+
 <main>
 
 
-<!-- =========================
+<!-- =========================================
      HOME
-========================= -->
+========================================= -->
 
 <section
     id="home"
     class="page active"
 >
 
-    <h2>Home Feed</h2>
 
+    <!-- STORIES -->
+
+    <div class="story-section">
+
+
+        <div class="story-title">
+
+            <h3>
+                Stories
+            </h3>
+
+            <span
+                class="meta"
+                id="storyCount"
+            ></span>
+
+        </div>
+
+
+        <div
+            class="story-container"
+            id="storyContainer"
+        >
+
+
+            <!-- YOUR STORY -->
+
+            <div
+                class="story-card my-story"
+                onclick="openStoryUpload()"
+            >
+
+                <div
+                    class="my-story-placeholder"
+                    id="myStoryImage"
+                >
+
+                    Your Story
+
+                </div>
+
+
+                <!-- PLUS -->
+
+                <div class="plus-button">
+
+                    +
+
+                </div>
+
+
+                <div class="story-name">
+
+                    Add to Story
+
+                </div>
+
+            </div>
+
+
+            <!-- STORIES FROM USERS -->
+
+            <div
+                id="otherStories"
+                style="display:flex; gap:12px;"
+            >
+
+            </div>
+
+
+        </div>
+
+
+        <!-- HIDDEN FILE INPUT -->
+
+        <input
+            type="file"
+            id="storyFile"
+            accept="image/*,video/*"
+            style="display:none"
+            onchange="uploadStory()"
+        >
+
+
+        <div
+            id="uploadStatus"
+            class="upload-status"
+        >
+
+            Uploading story...
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CREATE POST -->
 
     <div class="card">
 
@@ -393,20 +940,27 @@
     </div>
 
 
+
+    <!-- FEED -->
+
     <div id="feed">
 
         <div class="empty">
+
             Loading live feed...
+
         </div>
 
     </div>
 
+
 </section>
 
 
-<!-- =========================
+
+<!-- =========================================
      FRIENDS
-========================= -->
+========================================= -->
 
 <section
     id="friends"
@@ -421,7 +975,7 @@
     <div class="card">
 
         <p class="meta">
-            Users on TexUs
+            People on TexUs
         </p>
 
 
@@ -438,9 +992,10 @@
 </section>
 
 
-<!-- =========================
+
+<!-- =========================================
      CHAT
-========================= -->
+========================================= -->
 
 <section
     id="chat"
@@ -486,9 +1041,10 @@
 </section>
 
 
-<!-- =========================
+
+<!-- =========================================
      MUSIC
-========================= -->
+========================================= -->
 
 <section
     id="music"
@@ -523,8 +1079,10 @@
 
 
         <p class="meta">
-            Music playback can be connected
-            to a licensed music service later.
+
+            More music features can be
+            connected later.
+
         </p>
 
     </div>
@@ -532,9 +1090,10 @@
 </section>
 
 
-<!-- =========================
+
+<!-- =========================================
      PROFILE
-========================= -->
+========================================= -->
 
 <section
     id="profile"
@@ -571,11 +1130,52 @@
 </main>
 
 
-<!-- =========================
-     BOTTOM NAVIGATION
-========================= -->
+
+<!-- =========================================
+     STORY VIEWER
+========================================= -->
+
+<div
+    id="storyViewer"
+    class="story-viewer"
+>
+
+
+    <div class="story-viewer-content">
+
+
+        <button
+            class="close-story"
+            onclick="closeStory()"
+        >
+            ×
+        </button>
+
+
+        <div
+            id="viewerName"
+            class="viewer-name"
+        ></div>
+
+
+        <div
+            id="viewerMedia"
+            style="width:100%;height:100%;"
+        ></div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================
+     BOTTOM NAV
+========================================= -->
 
 <nav>
+
 
     <button
         class="active"
@@ -632,15 +1232,16 @@
 
     </button>
 
+
 </nav>
+
 
 
 <script>
 
-
-/* =========================
+/* =========================================
    FIREBASE CONFIG
-========================= */
+========================================= */
 
 const firebaseConfig = {
 
@@ -668,7 +1269,7 @@ const firebaseConfig = {
 };
 
 
-/* INITIALIZE FIREBASE */
+/* INITIALIZE */
 
 firebase.initializeApp(
     firebaseConfig
@@ -686,9 +1287,10 @@ const storage =
 let currentUser = null;
 
 
-/* =========================
-   CHECK LOGIN
-========================= */
+
+/* =========================================
+   AUTH
+========================================= */
 
 firebase.auth()
 .onAuthStateChanged(
@@ -713,7 +1315,7 @@ firebase.auth()
             user.email || "";
 
 
-        loadProfile(user.uid);
+        await loadProfile(user.uid);
 
         loadFeed();
 
@@ -721,13 +1323,16 @@ firebase.auth()
 
         loadMessages();
 
+        loadStories();
+
     }
 );
 
 
-/* =========================
-   LOAD PROFILE
-========================= */
+
+/* =========================================
+   PROFILE
+========================================= */
 
 async function loadProfile(uid) {
 
@@ -757,15 +1362,14 @@ async function loadProfile(uid) {
         document.getElementById(
             "welcome"
         ).textContent =
-            "Welcome, " +
-            name +
-            "!";
+            "Welcome, " + name + "!";
 
 
         document.getElementById(
             "profileName"
         ).textContent =
             name;
+
 
     }
 
@@ -778,14 +1382,543 @@ async function loadProfile(uid) {
 }
 
 
-/* =========================
+
+/* =========================================
+   OPEN STORY UPLOAD
+========================================= */
+
+function openStoryUpload() {
+
+    if (!currentUser) {
+
+        alert(
+            "Please log in first."
+        );
+
+        return;
+
+    }
+
+
+    document
+        .getElementById("storyFile")
+        .click();
+
+}
+
+
+
+/* =========================================
+   UPLOAD STORY
+========================================= */
+
+async function uploadStory() {
+
+    const file =
+        document
+        .getElementById("storyFile")
+        .files[0];
+
+
+    if (!file || !currentUser) {
+
+        return;
+
+    }
+
+
+    /* FILE SIZE LIMIT */
+
+    if (
+        file.size >
+        100 * 1024 * 1024
+    ) {
+
+        alert(
+            "Please choose a file smaller than 100 MB."
+        );
+
+        return;
+
+    }
+
+
+    const status =
+        document.getElementById(
+            "uploadStatus"
+        );
+
+
+    status.style.display =
+        "block";
+
+
+    status.textContent =
+        "Uploading your story...";
+
+
+    try {
+
+
+        /* USERNAME */
+
+        const userDoc =
+            await db
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
+
+
+        const username =
+            userDoc.exists &&
+            userDoc.data().username
+                ? userDoc.data().username
+                : "TexUs User";
+
+
+        /* FILE TYPE */
+
+        const mediaType =
+            file.type.startsWith("video/")
+                ? "video"
+                : "image";
+
+
+        /* STORAGE LOCATION */
+
+        const fileName =
+            Date.now() +
+            "_" +
+            file.name;
+
+
+        const storageRef =
+            storage.ref(
+                "stories/" +
+                currentUser.uid +
+                "/" +
+                fileName
+            );
+
+
+        /* UPLOAD */
+
+        const snapshot =
+            await storageRef.put(file);
+
+
+        /* GET URL */
+
+        const mediaUrl =
+            await snapshot.ref
+                .getDownloadURL();
+
+
+        /* EXPIRY = 24 HOURS */
+
+        const expiresAt =
+            new Date(
+                Date.now() +
+                24 * 60 * 60 * 1000
+            );
+
+
+        /* SAVE TO FIRESTORE */
+
+        await db
+            .collection("stories")
+            .add({
+
+                uid:
+                    currentUser.uid,
+
+                username:
+                    username,
+
+                mediaUrl:
+                    mediaUrl,
+
+                mediaType:
+                    mediaType,
+
+                createdAt:
+                    firebase.firestore
+                    .FieldValue
+                    .serverTimestamp(),
+
+                expiresAt:
+                    firebase.firestore
+                    .Timestamp
+                    .fromDate(
+                        expiresAt
+                    )
+
+            });
+
+
+        status.textContent =
+            "Story uploaded successfully! 🎉";
+
+
+        /* RESET */
+
+        document
+            .getElementById("storyFile")
+            .value = "";
+
+
+        /* REFRESH STORIES */
+
+        setTimeout(
+            function() {
+
+                status.style.display =
+                    "none";
+
+            },
+            2500
+        );
+
+
+        loadStories();
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Story upload error:",
+            error
+        );
+
+
+        status.textContent =
+            "Upload failed: " +
+            error.message;
+
+    }
+
+}
+
+
+
+/* =========================================
+   LOAD STORIES
+========================================= */
+
+async function loadStories() {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    const container =
+        document.getElementById(
+            "otherStories"
+        );
+
+
+    container.innerHTML = "";
+
+
+    try {
+
+
+        const now =
+            firebase.firestore
+            .Timestamp.now();
+
+
+        const snapshot =
+            await db
+            .collection("stories")
+            .where(
+                "expiresAt",
+                ">",
+                now
+            )
+            .orderBy(
+                "expiresAt",
+                "asc"
+            )
+            .limit(30)
+            .get();
+
+
+        let count = 0;
+
+
+        snapshot.forEach(
+            function(doc) {
+
+                const story =
+                    doc.data();
+
+
+                /* DON'T DUPLICATE
+                   YOUR OWN STORY CARD */
+
+                if (
+                    story.uid ===
+                    currentUser.uid
+                ) {
+
+                    count++;
+
+                    return;
+
+                }
+
+
+                count++;
+
+
+                const card =
+                    document
+                    .createElement("div");
+
+
+                card.className =
+                    "story-card";
+
+
+                let media;
+
+
+                if (
+                    story.mediaType ===
+                    "video"
+                ) {
+
+                    media =
+                        document
+                        .createElement(
+                            "video"
+                        );
+
+                    media.src =
+                        story.mediaUrl;
+
+                    media.muted =
+                        true;
+
+                }
+
+                else {
+
+                    media =
+                        document
+                        .createElement(
+                            "img"
+                        );
+
+                    media.src =
+                        story.mediaUrl;
+
+                }
+
+
+                card.appendChild(
+                    media
+                );
+
+
+                const name =
+                    document
+                    .createElement(
+                        "div"
+                    );
+
+
+                name.className =
+                    "story-name";
+
+
+                name.textContent =
+                    story.username ||
+                    "TexUs User";
+
+
+                card.appendChild(
+                    name
+                );
+
+
+                card.onclick =
+                    function() {
+
+                        openStory(
+                            story.mediaUrl,
+                            story.mediaType,
+                            story.username
+                        );
+
+                    };
+
+
+                container.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+        document.getElementById(
+            "storyCount"
+        ).textContent =
+            count > 0
+                ? count + " active"
+                : "";
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Story loading error:",
+            error
+        );
+
+        /* If Firestore needs
+           an index, show message */
+
+        container.innerHTML =
+            '<div class="meta" style="padding:20px;">' +
+            'Stories are ready, but Firestore may need an index.' +
+            '</div>';
+
+    }
+
+}
+
+
+
+/* =========================================
+   OPEN STORY
+========================================= */
+
+function openStory(
+    url,
+    type,
+    username
+) {
+
+    const viewer =
+        document.getElementById(
+            "storyViewer"
+        );
+
+
+    const mediaBox =
+        document.getElementById(
+            "viewerMedia"
+        );
+
+
+    const nameBox =
+        document.getElementById(
+            "viewerName"
+        );
+
+
+    mediaBox.innerHTML = "";
+
+
+    nameBox.textContent =
+        username ||
+        "TexUs User";
+
+
+    if (type === "video") {
+
+        const video =
+            document
+            .createElement("video");
+
+
+        video.src = url;
+
+        video.controls = true;
+
+        video.autoplay = true;
+
+
+        mediaBox.appendChild(
+            video
+        );
+
+    }
+
+    else {
+
+        const image =
+            document
+            .createElement("img");
+
+
+        image.src = url;
+
+
+        mediaBox.appendChild(
+            image
+        );
+
+    }
+
+
+    viewer.classList.add(
+        "active"
+    );
+
+}
+
+
+
+/* =========================================
+   CLOSE STORY
+========================================= */
+
+function closeStory() {
+
+    const viewer =
+        document.getElementById(
+            "storyViewer"
+        );
+
+
+    const media =
+        document.getElementById(
+            "viewerMedia"
+        );
+
+
+    viewer.classList.remove(
+        "active"
+    );
+
+
+    media.innerHTML = "";
+
+}
+
+
+
+/* =========================================
    CREATE POST
-========================= */
+========================================= */
 
 async function createPost() {
 
     if (!currentUser) {
+
         return;
+
     }
 
 
@@ -824,6 +1957,7 @@ async function createPost() {
 
     try {
 
+
         let mediaUrl = "";
 
         let mediaType = "";
@@ -847,8 +1981,7 @@ async function createPost() {
 
 
             mediaUrl =
-                await snapshot
-                .ref
+                await snapshot.ref
                 .getDownloadURL();
 
 
@@ -877,30 +2010,30 @@ async function createPost() {
 
 
         await db
-        .collection("posts")
-        .add({
+            .collection("posts")
+            .add({
 
-            uid:
-                currentUser.uid,
+                uid:
+                    currentUser.uid,
 
-            username:
-                username,
+                username:
+                    username,
 
-            text:
-                text,
+                text:
+                    text,
 
-            mediaUrl:
-                mediaUrl,
+                mediaUrl:
+                    mediaUrl,
 
-            mediaType:
-                mediaType,
+                mediaType:
+                    mediaType,
 
-            createdAt:
-                firebase.firestore
-                .FieldValue
-                .serverTimestamp()
+                createdAt:
+                    firebase.firestore
+                    .FieldValue
+                    .serverTimestamp()
 
-        });
+            });
 
 
         document.getElementById(
@@ -935,9 +2068,10 @@ async function createPost() {
 }
 
 
-/* =========================
+
+/* =========================================
    LOAD FEED
-========================= */
+========================================= */
 
 async function loadFeed() {
 
@@ -983,9 +2117,8 @@ async function loadFeed() {
 
 
                 const div =
-                    document.createElement(
-                        "div"
-                    );
+                    document
+                    .createElement("div");
 
 
                 div.className =
@@ -1005,7 +2138,8 @@ async function loadFeed() {
 
                 if (
                     p.mediaUrl &&
-                    p.mediaType === "image"
+                    p.mediaType ===
+                    "image"
                 ) {
 
                     media =
@@ -1020,7 +2154,8 @@ async function loadFeed() {
 
                 if (
                     p.mediaUrl &&
-                    p.mediaType === "video"
+                    p.mediaType ===
+                    "video"
                 ) {
 
                     media =
@@ -1063,7 +2198,9 @@ async function loadFeed() {
                     media;
 
 
-                feed.appendChild(div);
+                feed.appendChild(
+                    div
+                );
 
             }
         );
@@ -1077,7 +2214,7 @@ async function loadFeed() {
 
         feed.innerHTML =
             '<div class="empty">' +
-            'Feed could not load. Check your Firestore rules.' +
+            'Feed could not load.' +
             '</div>';
 
     }
@@ -1085,9 +2222,10 @@ async function loadFeed() {
 }
 
 
-/* =========================
-   LOAD USERS
-========================= */
+
+/* =========================================
+   USERS
+========================================= */
 
 async function loadUsers() {
 
@@ -1127,9 +2265,8 @@ async function loadUsers() {
 
 
                 const row =
-                    document.createElement(
-                        "div"
-                    );
+                    document
+                    .createElement("div");
 
 
                 row.className =
@@ -1149,27 +2286,20 @@ async function loadUsers() {
 
                     '<button class="secondary" ' +
 
-                    'onclick="alert(\'Friend requests will be connected next.\')">' +
+                    'onclick="alert(\'Friend requests will be added next.\')">' +
 
                     "Add Friend" +
 
                     "</button>";
 
 
-                list.appendChild(row);
+                list.appendChild(
+                    row
+                );
 
             }
         );
 
-
-        if (!list.innerHTML) {
-
-            list.innerHTML =
-                '<div class="empty">' +
-                "No other users yet." +
-                "</div>";
-
-        }
 
     }
 
@@ -1180,22 +2310,25 @@ async function loadUsers() {
 
         list.innerHTML =
             '<div class="empty">' +
-            "Users could not load. Check Firestore rules." +
-            "</div>";
+            "Users could not load." +
+            '</div>';
 
     }
 
 }
 
 
-/* =========================
+
+/* =========================================
    SEND MESSAGE
-========================= */
+========================================= */
 
 async function sendMessage() {
 
     if (!currentUser) {
+
         return;
+
     }
 
 
@@ -1210,31 +2343,33 @@ async function sendMessage() {
 
 
     if (!text) {
+
         return;
+
     }
 
 
     try {
 
         await db
-        .collection("messages")
-        .add({
+            .collection("messages")
+            .add({
 
-            senderId:
-                currentUser.uid,
+                senderId:
+                    currentUser.uid,
 
-            senderEmail:
-                currentUser.email,
+                senderEmail:
+                    currentUser.email,
 
-            text:
-                text,
+                text:
+                    text,
 
-            createdAt:
-                firebase.firestore
-                .FieldValue
-                .serverTimestamp()
+                createdAt:
+                    firebase.firestore
+                    .FieldValue
+                    .serverTimestamp()
 
-        });
+            });
 
 
         input.value = "";
@@ -1256,9 +2391,10 @@ async function sendMessage() {
 }
 
 
-/* =========================
+
+/* =========================================
    LOAD MESSAGES
-========================= */
+========================================= */
 
 async function loadMessages() {
 
@@ -1304,9 +2440,8 @@ async function loadMessages() {
 
 
                 const row =
-                    document.createElement(
-                        "p"
-                    );
+                    document
+                    .createElement("p");
 
 
                 row.innerHTML =
@@ -1324,7 +2459,9 @@ async function loadMessages() {
                     );
 
 
-                box.appendChild(row);
+                box.appendChild(
+                    row
+                );
 
             }
         );
@@ -1335,20 +2472,15 @@ async function loadMessages() {
 
         console.error(error);
 
-
-        box.innerHTML =
-            '<div class="empty">' +
-            "Messages could not load. Check Firestore rules." +
-            "</div>";
-
     }
 
 }
 
 
-/* =========================
-   CHANGE PAGE
-========================= */
+
+/* =========================================
+   NAVIGATION
+========================================= */
 
 function showPage(
     id,
@@ -1376,9 +2508,7 @@ function showPage(
 
 
     document
-        .querySelectorAll(
-            "nav button"
-        )
+        .querySelectorAll("nav button")
         .forEach(
             function(btn) {
 
@@ -1397,29 +2527,31 @@ function showPage(
 }
 
 
-/* =========================
-   LOG OUT
-========================= */
+
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout() {
 
     firebase.auth()
-    .signOut()
-    .then(
-        function() {
+        .signOut()
+        .then(
+            function() {
 
-            window.location.href =
-                "login.html";
+                window.location.href =
+                    "login.html";
 
-        }
-    );
+            }
+        );
 
 }
 
 
-/* =========================
-   SECURITY
-========================= */
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
 
 function escapeHtml(value) {
 
@@ -1453,7 +2585,32 @@ function escapeAttr(value) {
 
 }
 
+
+
+/* =========================================
+   CLOSE STORY WHEN CLICKING OUTSIDE
+========================================= */
+
+document
+    .getElementById("storyViewer")
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target ===
+                this
+            ) {
+
+                closeStory();
+
+            }
+
+        }
+    );
+
 </script>
+
 
 </body>
 
