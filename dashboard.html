@@ -3,331 +3,280 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width,initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width,initial-scale=1.0"
+    >
 
-<title>TexUs - Dashboard</title>
+    <title>TexUs - Dashboard</title>
 
-<style>
+    <style>
 
-* {
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    margin: 0;
+        body {
+            margin: 0;
 
-    background: #0f172a;
+            background: #0f172a;
 
-    color: #fff;
+            color: white;
 
-    font-family: Arial, sans-serif;
+            font-family: Arial, sans-serif;
 
-    padding-bottom: 75px;
-}
+            padding-bottom: 75px;
+        }
 
+        header {
+            position: sticky;
 
-/* HEADER */
+            top: 0;
 
-header {
+            z-index: 5;
 
-    position: sticky;
+            background: #1e293b;
 
-    top: 0;
+            padding: 13px 16px;
 
-    z-index: 5;
+            display: flex;
 
-    background: #1e293b;
+            justify-content: space-between;
 
-    padding: 13px 16px;
+            align-items: center;
 
-    display: flex;
+            border-bottom:
+                1px solid #334155;
+        }
 
-    justify-content: space-between;
+        .logo {
+            font-family:
+                "Brush Script MT", cursive;
 
-    align-items: center;
+            font-size: 34px;
+        }
 
-    border-bottom: 1px solid #334155;
-}
+        .tex {
+            color: #ec4899;
+        }
 
+        .us {
+            color: #10b981;
+        }
 
-.logo {
+        .logout {
+            background: #334155;
 
-    font-family: "Brush Script MT", cursive;
+            border: none;
 
-    font-size: 34px;
-}
+            color: white;
 
+            padding: 8px 12px;
 
-.tex {
-    color: #ec4899;
-}
+            border-radius: 7px;
 
+            cursor: pointer;
+        }
 
-.us {
-    color: #10b981;
-}
+        main {
+            max-width: 720px;
 
+            margin: auto;
 
-.logout {
+            padding: 16px;
+        }
 
-    background: #334155;
+        .page {
+            display: none;
+        }
 
-    border: 0;
+        .page.active {
+            display: block;
+        }
 
-    color: #fff;
+        .card {
+            background: #1e293b;
 
-    padding: 8px 12px;
+            border-radius: 14px;
 
-    border-radius: 7px;
+            padding: 16px;
 
-    cursor: pointer;
-}
+            margin-bottom: 15px;
+        }
 
+        textarea,
+        input {
+            width: 100%;
 
-/* MAIN */
+            background: #0f172a;
 
-main {
+            color: white;
 
-    max-width: 720px;
+            border:
+                1px solid #475569;
 
-    margin: auto;
+            border-radius: 8px;
 
-    padding: 16px;
-}
+            padding: 11px;
 
+            margin: 6px 0;
+        }
 
-.page {
-    display: none;
-}
+        textarea {
+            min-height: 90px;
 
+            resize: vertical;
+        }
 
-.page.active {
-    display: block;
-}
+        .primary {
+            background: #ec4899;
 
+            color: white;
 
-/* CARDS */
+            border: none;
 
-.card {
+            border-radius: 8px;
 
-    background: #1e293b;
+            padding: 11px 16px;
 
-    border-radius: 14px;
+            font-weight: bold;
 
-    padding: 16px;
+            cursor: pointer;
+        }
 
-    margin-bottom: 15px;
-}
+        .secondary {
+            background: #10b981;
 
+            color: white;
 
-/* INPUTS */
+            border: none;
 
-textarea,
-input {
+            border-radius: 8px;
 
-    width: 100%;
+            padding: 10px 14px;
 
-    background: #0f172a;
+            cursor: pointer;
+        }
 
-    color: #fff;
+        .post {
+            border-top:
+                1px solid #334155;
 
-    border: 1px solid #475569;
+            padding-top: 14px;
 
-    border-radius: 8px;
+            margin-top: 14px;
+        }
 
-    padding: 11px;
+        .post img,
+        .post video {
+            width: 100%;
 
-    margin: 6px 0;
-}
+            max-height: 430px;
 
+            object-fit: cover;
 
-textarea {
+            border-radius: 10px;
 
-    min-height: 90px;
+            margin-top: 10px;
+        }
 
-    resize: vertical;
-}
+        .meta {
+            color: #94a3b8;
 
+            font-size: 13px;
+        }
 
-/* BUTTONS */
+        .empty {
+            color: #94a3b8;
 
-.primary {
+            text-align: center;
 
-    background: #ec4899;
+            padding: 25px;
+        }
 
-    color: #fff;
+        nav {
+            position: fixed;
 
-    border: 0;
+            bottom: 0;
 
-    border-radius: 8px;
+            left: 0;
 
-    padding: 11px 16px;
+            right: 0;
 
-    font-weight: bold;
+            height: 68px;
 
-    cursor: pointer;
-}
+            background: #1e293b;
 
+            border-top:
+                1px solid #334155;
 
-.secondary {
+            display: flex;
 
-    background: #10b981;
+            justify-content:
+                space-around;
 
-    color: #fff;
+            z-index: 10;
+        }
 
-    border: 0;
+        nav button {
+            flex: 1;
 
-    border-radius: 8px;
+            background: none;
 
-    padding: 10px 14px;
+            border: none;
 
-    cursor: pointer;
-}
+            color: #94a3b8;
 
+            font-size: 12px;
 
-/* POSTS */
+            cursor: pointer;
+        }
 
-.post {
+        nav button.active {
+            color: #10b981;
 
-    border-top: 1px solid #334155;
+            font-weight: bold;
+        }
 
-    padding-top: 14px;
+        nav span {
+            display: block;
 
-    margin-top: 14px;
-}
+            font-size: 22px;
 
+            margin-bottom: 2px;
+        }
 
-.post img,
-.post video {
+        h2 {
+            margin-top: 4px;
+        }
 
-    width: 100%;
+        .user-row {
+            display: flex;
 
-    max-height: 430px;
+            align-items: center;
 
-    object-fit: cover;
+            justify-content:
+                space-between;
 
-    border-radius: 10px;
+            padding: 12px 0;
 
-    margin-top: 10px;
-}
+            border-bottom:
+                1px solid #334155;
+        }
 
+    </style>
 
-/* TEXT */
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 
-.meta {
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-    color: #94a3b8;
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    font-size: 13px;
-}
-
-
-.empty {
-
-    color: #94a3b8;
-
-    text-align: center;
-
-    padding: 25px;
-}
-
-
-/* NAVIGATION */
-
-nav {
-
-    position: fixed;
-
-    bottom: 0;
-
-    left: 0;
-
-    right: 0;
-
-    height: 68px;
-
-    background: #1e293b;
-
-    border-top: 1px solid #334155;
-
-    display: flex;
-
-    justify-content: space-around;
-
-    z-index: 10;
-}
-
-
-nav button {
-
-    flex: 1;
-
-    background: none;
-
-    border: 0;
-
-    color: #94a3b8;
-
-    font-size: 12px;
-
-    cursor: pointer;
-}
-
-
-nav button.active {
-
-    color: #10b981;
-
-    font-weight: bold;
-}
-
-
-nav span {
-
-    display: block;
-
-    font-size: 22px;
-
-    margin-bottom: 2px;
-}
-
-
-h2 {
-    margin-top: 4px;
-}
-
-
-.user-row {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 12px 0;
-
-    border-bottom: 1px solid #334155;
-}
-
-</style>
-
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
 </head>
-
 
 <body>
 
@@ -340,7 +289,6 @@ h2 {
         <span class="us">Us</span>
 
     </div>
-
 
     <button
         class="logout"
@@ -364,19 +312,16 @@ h2 {
 
     <h2>Home Feed</h2>
 
-
     <div class="card">
 
         <strong id="welcome">
             Welcome!
         </strong>
 
-
         <textarea
             id="postText"
             placeholder="Tell us something fun about yourself! 🚀"
         ></textarea>
-
 
         <input
             id="mediaFile"
@@ -384,14 +329,12 @@ h2 {
             accept="image/*,video/*"
         >
 
-
         <button
             class="primary"
             onclick="createPost()"
         >
             Post
         </button>
-
 
         <div
             id="postMessage"
@@ -421,13 +364,11 @@ h2 {
 
     <h2>Friends & Requests</h2>
 
-
     <div class="card">
 
         <p class="meta">
             Users on TexUs
         </p>
-
 
         <div id="usersList">
 
@@ -451,19 +392,16 @@ h2 {
 
     <h2>Messages</h2>
 
-
     <div class="card">
 
         <p class="meta">
             Basic TexUs messaging
         </p>
 
-
         <input
             id="messageText"
             placeholder="Aa"
         >
-
 
         <button
             class="secondary"
@@ -471,7 +409,6 @@ h2 {
         >
             Send
         </button>
-
 
         <div id="messages">
 
@@ -497,28 +434,23 @@ h2 {
         TexUs Global Music Streaming
     </h2>
 
-
     <div class="card">
 
         <h3>
             🌍 Global Trending Hits
         </h3>
 
-
         <p>
             🎵 Water — Tyla
         </p>
-
 
         <p>
             🎵 Umbrella — Rihanna ft. Jay-Z
         </p>
 
-
         <p>
             🎵 Rush — Ayra Starr
         </p>
-
 
         <p class="meta">
             Music playback can be connected
@@ -541,19 +473,16 @@ h2 {
         My Profile
     </h2>
 
-
     <div class="card">
 
         <h3 id="profileName">
             Loading...
         </h3>
 
-
         <p
             id="profileEmail"
             class="meta"
         ></p>
-
 
         <p class="meta">
             TexUs member
@@ -567,45 +496,41 @@ h2 {
 </main>
 
 
-<!-- NAVIGATION -->
+<!-- BOTTOM NAVIGATION -->
 
 <nav>
 
     <button
         class="active"
-        onclick="showPage('home',this)"
+        onclick="showPage('home', this)"
     >
         <span>🏠</span>
         Home
     </button>
 
-
     <button
-        onclick="showPage('friends',this)"
+        onclick="showPage('friends', this)"
     >
         <span>👥</span>
         Friends
     </button>
 
-
     <button
-        onclick="showPage('chat',this)"
+        onclick="showPage('chat', this)"
     >
         <span>💬</span>
         Chat
     </button>
 
-
     <button
-        onclick="showPage('music',this)"
+        onclick="showPage('music', this)"
     >
         <span>🎵</span>
         Music
     </button>
 
-
     <button
-        onclick="showPage('profile',this)"
+        onclick="showPage('profile', this)"
     >
         <span>👤</span>
         Profile
@@ -621,7 +546,8 @@ h2 {
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyAwGvF8YZ6hQVPTHLe0QzmTPewWQvrO0o",
+    apiKey:
+        "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
 
     authDomain:
         "texus-5c99e.firebaseapp.com",
@@ -643,7 +569,9 @@ const firebaseConfig = {
 };
 
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(
+    firebaseConfig
+);
 
 
 const db =
@@ -657,10 +585,10 @@ const storage =
 let currentUser = null;
 
 
-/* AUTH CHECK */
+/* CHECK LOGIN */
 
 firebase.auth()
-.onAuthStateChanged(async user => {
+.onAuthStateChanged(async function(user) {
 
     if (!user) {
 
@@ -691,7 +619,7 @@ firebase.auth()
 });
 
 
-/* PROFILE */
+/* LOAD PROFILE */
 
 async function loadProfile(uid) {
 
@@ -721,7 +649,9 @@ async function loadProfile(uid) {
         document.getElementById(
             "welcome"
         ).textContent =
-            "Welcome, " + name + "!";
+            "Welcome, " +
+            name +
+            "!";
 
 
         document.getElementById(
@@ -729,10 +659,11 @@ async function loadProfile(uid) {
         ).textContent =
             name;
 
+    }
 
-    } catch (e) {
+    catch (error) {
 
-        console.error(e);
+        console.error(error);
 
     }
 
@@ -743,7 +674,9 @@ async function loadProfile(uid) {
 
 async function createPost() {
 
-    if (!currentUser) return;
+    if (!currentUser) {
+        return;
+    }
 
 
     const text =
@@ -785,8 +718,6 @@ async function createPost() {
         let mediaType = "";
 
 
-        /* UPLOAD MEDIA */
-
         if (file) {
 
             const ref =
@@ -820,8 +751,6 @@ async function createPost() {
         }
 
 
-        /* GET USERNAME */
-
         const userDoc =
             await db
             .collection("users")
@@ -835,8 +764,6 @@ async function createPost() {
                 ? userDoc.data().username
                 : "TexUs User";
 
-
-        /* SAVE POST */
 
         await db
         .collection("posts")
@@ -881,11 +808,11 @@ async function createPost() {
 
         loadFeed();
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
         console.error(error);
-
 
         status.textContent =
             "Could not post: " +
@@ -933,7 +860,7 @@ async function loadFeed() {
         feed.innerHTML = "";
 
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(function(doc) {
 
             const p =
                 doc.data();
@@ -992,25 +919,29 @@ async function loadFeed() {
 
             div.innerHTML =
 
-                '<strong>' +
+                "<strong>" +
+
                 escapeHtml(
                     p.username ||
                     "TexUs User"
                 ) +
-                '</strong>' +
+
+                "</strong>" +
 
                 '<div class="meta">' +
+
                 escapeHtml(date) +
-                '</div>' +
+
+                "</div>" +
 
                 (
                     p.text
-                        ? '<p>' +
+                        ? "<p>" +
                           escapeHtml(
                               p.text
                           ) +
-                          '</p>'
-                        : ''
+                          "</p>"
+                        : ""
                 ) +
 
                 media;
@@ -1020,15 +951,16 @@ async function loadFeed() {
 
         });
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
         console.error(error);
 
 
         feed.innerHTML =
             '<div class="empty">' +
-            'Feed could not load. Check your Firestore rules/indexes.' +
+            'Feed could not load. Check your Firestore rules.' +
             '</div>';
 
     }
@@ -1058,7 +990,7 @@ async function loadUsers() {
         list.innerHTML = "";
 
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(function(doc) {
 
             const u =
                 doc.data();
@@ -1084,17 +1016,22 @@ async function loadUsers() {
 
             row.innerHTML =
 
-                '<span>👤 ' +
+                "<span>👤 " +
+
                 escapeHtml(
                     u.username ||
                     "TexUs User"
                 ) +
-                '</span>' +
+
+                "</span>" +
 
                 '<button class="secondary" ' +
-                'onclick="alert(\'Friend requests are the next feature to connect.\')">' +
-                'Add Friend' +
-                '</button>';
+
+                'onclick="alert(\'Friend requests will be connected next.\')">' +
+
+                "Add Friend" +
+
+                "</button>";
 
 
             list.appendChild(row);
@@ -1106,21 +1043,22 @@ async function loadUsers() {
 
             list.innerHTML =
                 '<div class="empty">' +
-                'No other users yet.' +
-                '</div>';
+                "No other users yet." +
+                "</div>";
 
         }
 
+    }
 
-    } catch (e) {
+    catch (error) {
 
-        console.error(e);
+        console.error(error);
 
 
         list.innerHTML =
             '<div class="empty">' +
-            'Users could not load. Check Firestore rules.' +
-            '</div>';
+            "Users could not load. Check Firestore rules." +
+            "</div>";
 
     }
 
@@ -1131,7 +1069,9 @@ async function loadUsers() {
 
 async function sendMessage() {
 
-    if (!currentUser) return;
+    if (!currentUser) {
+        return;
+    }
 
 
     const input =
@@ -1144,7 +1084,9 @@ async function sendMessage() {
         input.value.trim();
 
 
-    if (!text) return;
+    if (!text) {
+        return;
+    }
 
 
     try {
@@ -1175,12 +1117,13 @@ async function sendMessage() {
 
         loadMessages();
 
+    }
 
-    } catch (e) {
+    catch (error) {
 
         alert(
             "Message could not be sent: " +
-            e.message
+            error.message
         );
 
     }
@@ -1215,8 +1158,8 @@ async function loadMessages() {
 
             box.innerHTML =
                 '<div class="empty">' +
-                'No messages yet.' +
-                '</div>';
+                "No messages yet." +
+                "</div>";
 
             return;
         }
@@ -1225,7 +1168,7 @@ async function loadMessages() {
         box.innerHTML = "";
 
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(function(doc) {
 
             const m =
                 doc.data();
@@ -1239,11 +1182,14 @@ async function loadMessages() {
 
             row.innerHTML =
                 "<strong>" +
+
                 escapeHtml(
                     m.senderEmail ||
                     "User"
                 ) +
+
                 ":</strong> " +
+
                 escapeHtml(
                     m.text || ""
                 );
@@ -1253,16 +1199,17 @@ async function loadMessages() {
 
         });
 
+    }
 
-    } catch (e) {
+    catch (error) {
 
-        console.error(e);
+        console.error(error);
 
 
         box.innerHTML =
             '<div class="empty">' +
-            'Messages could not load. Check Firestore rules.' +
-            '</div>';
+            "Messages could not load. Check Firestore rules." +
+            "</div>";
 
     }
 
@@ -1275,11 +1222,13 @@ function showPage(id, button) {
 
     document
         .querySelectorAll(".page")
-        .forEach(p =>
-            p.classList.remove(
+        .forEach(function(page) {
+
+            page.classList.remove(
                 "active"
-            )
-        );
+            );
+
+        });
 
 
     document
@@ -1293,11 +1242,13 @@ function showPage(id, button) {
         .querySelectorAll(
             "nav button"
         )
-        .forEach(b =>
-            b.classList.remove(
+        .forEach(function(btn) {
+
+            btn.classList.remove(
                 "active"
-            )
-        );
+            );
+
+        });
 
 
     button.classList.add(
@@ -1313,7 +1264,7 @@ function logout() {
 
     firebase.auth()
     .signOut()
-    .then(() => {
+    .then(function() {
 
         window.location.href =
             "login.html";
@@ -1323,21 +1274,30 @@ function logout() {
 }
 
 
-/* SECURITY HELPERS */
+/* ESCAPE HTML */
 
 function escapeHtml(value) {
 
-    return String(value)
-        .replace(
-            /[&<>"']/g,
-            c => ({
+    return String(value).replace(
+        /[&<>"']/g,
+        function(character) {
+
+            return {
+
                 "&": "&amp;",
+
                 "<": "&lt;",
+
                 ">": "&gt;",
+
                 '"': "&quot;",
+
                 "'": "&#039;"
-            }[c])
-        );
+
+            }[character];
+
+        }
+    );
 
 }
 

@@ -1,177 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Register - TexUs</title>
+    <title>Register - TexUs</title>
 
-<style>
+    <style>
 
-* {
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    margin: 0;
-    min-height: 100vh;
+        body {
+            margin: 0;
+            min-height: 100vh;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-    background: #0f172a;
-    color: #fff;
+            background: #0f172a;
+            color: white;
 
-    font-family: Arial, sans-serif;
-}
+            font-family: Arial, sans-serif;
+        }
 
-.card {
-    width: 92%;
-    max-width: 390px;
+        .auth-card {
+            width: 92%;
+            max-width: 390px;
 
-    background: #1e293b;
+            background: #1e293b;
 
-    padding: 30px;
+            padding: 30px;
 
-    border-radius: 18px;
+            border-radius: 18px;
 
-    box-shadow: 0 10px 35px #0008;
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.5);
 
-    text-align: center;
-}
+            text-align: center;
+        }
 
-.logo {
-    font-family: "Brush Script MT", cursive;
+        .logo {
+            font-family: "Brush Script MT", cursive;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
 
-    font-size: 48px;
+        .tex {
+            color: #ec4899;
+        }
 
-    margin-bottom: 8px;
-}
+        .us {
+            color: #10b981;
+        }
 
-.tex {
-    color: #ec4899;
-}
+        h2 {
+            margin-bottom: 22px;
+        }
 
-.us {
-    color: #10b981;
-}
+        input {
+            width: 100%;
 
-h2 {
-    margin: 8px 0 22px;
-}
+            padding: 13px;
 
-input {
-    width: 100%;
+            margin: 8px 0;
 
-    padding: 13px;
+            border: 1px solid #475569;
 
-    margin: 8px 0;
+            border-radius: 8px;
 
-    border: 1px solid #475569;
+            background: #0f172a;
 
-    border-radius: 8px;
+            color: white;
 
-    background: #0f172a;
+            font-size: 15px;
+        }
 
-    color: white;
+        button {
+            width: 100%;
 
-    font-size: 15px;
-}
+            padding: 13px;
 
-button {
-    width: 100%;
+            margin-top: 12px;
 
-    padding: 13px;
+            border: none;
 
-    margin-top: 12px;
+            border-radius: 8px;
 
-    border: 0;
+            background: #ec4899;
 
-    border-radius: 8px;
+            color: white;
 
-    background: #ec4899;
+            font-weight: bold;
 
-    color: white;
+            font-size: 16px;
 
-    font-weight: bold;
+            cursor: pointer;
+        }
 
-    font-size: 16px;
+        button:disabled {
+            opacity: 0.6;
+        }
 
-    cursor: pointer;
-}
+        .message {
+            min-height: 22px;
 
-button:disabled {
-    opacity: 0.6;
-}
+            margin-top: 14px;
 
-.message {
-    min-height: 22px;
+            color: #fda4af;
 
-    margin-top: 12px;
+            font-size: 14px;
+        }
 
-    color: #fda4af;
+        p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
 
-    font-size: 14px;
-}
+        a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-p {
-    color: #94a3b8;
+    </style>
 
-    font-size: 14px;
-}
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 
-a {
-    color: #10b981;
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-    text-decoration: none;
-
-    font-weight: bold;
-}
-
-</style>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 </head>
 
 <body>
 
-<div class="card">
+<div class="auth-card">
 
     <div class="logo">
-        <span class="tex">Tex</span><span class="us">Us</span>
+        <span class="tex">Tex</span>
+        <span class="us">Us</span>
     </div>
 
     <h2>Create Account</h2>
 
     <input
-        id="username"
         type="text"
+        id="username"
         placeholder="Username"
         autocomplete="username"
     >
 
     <input
-        id="email"
         type="email"
+        id="email"
         placeholder="Email"
         autocomplete="email"
     >
 
     <input
-        id="password"
         type="password"
+        id="password"
         placeholder="Password (6+ characters)"
         autocomplete="new-password"
     >
@@ -196,7 +192,7 @@ a {
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyAwGvF8YZ6hQVPTHLe0QzmTPewWQvrO0o",
+    apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
 
     authDomain:
         "texus-5c99e.firebaseapp.com",
@@ -225,18 +221,23 @@ const db = firebase.firestore();
 function registerUser() {
 
     const username =
-        document.getElementById("username").value.trim();
+        document.getElementById("username")
+        .value
+        .trim();
 
     const email =
-        document.getElementById("email").value.trim();
+        document.getElementById("email")
+        .value
+        .trim();
 
     const password =
-        document.getElementById("password").value;
+        document.getElementById("password")
+        .value;
 
     const message =
         document.getElementById("message");
 
-    const btn =
+    const button =
         document.getElementById("registerBtn");
 
 
@@ -267,7 +268,7 @@ function registerUser() {
     }
 
 
-    btn.disabled = true;
+    button.disabled = true;
 
     message.textContent =
         "Creating your account...";
@@ -279,7 +280,7 @@ function registerUser() {
             password
         )
 
-        .then(credential => {
+        .then(function(credential) {
 
             const user =
                 credential.user;
@@ -319,14 +320,14 @@ function registerUser() {
 
         })
 
-        .then(() => {
+        .then(function() {
 
             window.location.href =
                 "dashboard.html";
 
         })
 
-        .catch(error => {
+        .catch(function(error) {
 
             console.error(error);
 
@@ -370,7 +371,7 @@ function registerUser() {
             }
 
 
-            btn.disabled = false;
+            button.disabled = false;
 
         });
 
