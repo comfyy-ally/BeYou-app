@@ -1,1120 +1,1354 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TexUs</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #ffffff;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .top-header {
-            text-align: center;
-            padding: 15px;
-            background-color: #1e293b;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-        .app-title {
-            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 0;
-        }
-        .tex-part { color: #ec4899; }
-        .us-part { color: #10b981; }
-        .content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            padding-bottom: 90px;
-        }
-        .page {
-            display: none;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .page.active {
-            display: block;
-        }
-        h2 { color: #10b981; }
-        .card {
-            background-color: #1e293b;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-top: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .stories-container {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            scrollbar-width: none;
-        }
-        .stories-container::-webkit-scrollbar { display: none; }
-        .story-card {
-            min-width: 110px;
-            height: 180px;
-            background-color: #334155;
-            border-radius: 12px;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 10px;
-            transition: transform 0.2s;
-        }
-        .story-card:hover { transform: scale(1.03); }
-        .story-card.create-story {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 2px dashed #10b981;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .story-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background-color: #3b82f6;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 6px;
-            z-index: 2;
-        }
-        .story-name {
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            margin: 0;
-            z-index: 2;
-        }
-        .story-media {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-        .post-creator {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: #1e293b;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #334155;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-            cursor: pointer;
-            overflow: hidden;
-        }
-        .post-input-mock {
-            flex: 1;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            padding: 10px 15px;
-            border-radius: 20px;
-            color: #94a3b8;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .photo-btn, .ad-btn {
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            padding: 0;
-        }
-        .feed-post {
-            background-color: #1e293b;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .ad-post {
-            border: 2px solid #f59e0b;
-            background-color: #1c1917;
-        }
-        .ad-badge {
-            background-color: #f59e0b;
-            color: #000;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .post-user { font-weight: bold; font-size: 14px; color: #ffffff; }
-        .post-media-container {
-            margin: 10px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            max-height: 350px;
-            background-color: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .post-media-container img, .post-media-container video {
-            width: 100%;
-            height: auto;
-            max-height: 350px;
-            object-fit: cover;
-        }
-        .post-actions-row {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #334155;
-            margin-top: 12px;
-            padding-top: 10px;
-        }
-        .feed-action-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .feed-action-btn:hover { color: #10b981; }
-        #commentsView { display: none; }
-        .comment-item {
-            background-color: #0f172a;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
-            background-color: #1e293b;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-        }
-        .nav-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 11px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            flex: 1;
-            min-width: 55px;
-            position: relative;
-        }
-        .nav-btn span { font-size: 18px; margin-bottom: 2px; }
-        .nav-btn.active { color: #10b981; font-weight: bold; }
-        .notification-dot {
-            position: absolute;
-            top: 2px;
-            right: 12px;
-            width: 9px;
-            height: 9px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            display: none;
-            border: 1px solid #1e293b;
-        }
-        .creator-banner {
-            background: linear-gradient(135deg, #065f46, #047857);
-            border: 1px solid #10b981;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        .withdraw-btn {
-            background: #10b981;
-            color: #ffffff;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .withdraw-btn:hover { background: #059669; }
-    </style>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0"
+>
+
+<title>TexUs - Dashboard</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    background: #0f172a;
+
+    color: #fff;
+
+    font-family: Arial, sans-serif;
+
+    padding-bottom: 75px;
+}
+
+
+/* HEADER */
+
+header {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 5;
+
+    background: #1e293b;
+
+    padding: 13px 16px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    border-bottom: 1px solid #334155;
+}
+
+
+.logo {
+
+    font-family: "Brush Script MT", cursive;
+
+    font-size: 34px;
+}
+
+
+.tex {
+    color: #ec4899;
+}
+
+
+.us {
+    color: #10b981;
+}
+
+
+.logout {
+
+    background: #334155;
+
+    border: 0;
+
+    color: #fff;
+
+    padding: 8px 12px;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+
+/* MAIN */
+
+main {
+
+    max-width: 720px;
+
+    margin: auto;
+
+    padding: 16px;
+}
+
+
+.page {
+    display: none;
+}
+
+
+.page.active {
+    display: block;
+}
+
+
+/* CARDS */
+
+.card {
+
+    background: #1e293b;
+
+    border-radius: 14px;
+
+    padding: 16px;
+
+    margin-bottom: 15px;
+}
+
+
+/* INPUTS */
+
+textarea,
+input {
+
+    width: 100%;
+
+    background: #0f172a;
+
+    color: #fff;
+
+    border: 1px solid #475569;
+
+    border-radius: 8px;
+
+    padding: 11px;
+
+    margin: 6px 0;
+}
+
+
+textarea {
+
+    min-height: 90px;
+
+    resize: vertical;
+}
+
+
+/* BUTTONS */
+
+.primary {
+
+    background: #ec4899;
+
+    color: #fff;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    padding: 11px 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+.secondary {
+
+    background: #10b981;
+
+    color: #fff;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    padding: 10px 14px;
+
+    cursor: pointer;
+}
+
+
+/* POSTS */
+
+.post {
+
+    border-top: 1px solid #334155;
+
+    padding-top: 14px;
+
+    margin-top: 14px;
+}
+
+
+.post img,
+.post video {
+
+    width: 100%;
+
+    max-height: 430px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    margin-top: 10px;
+}
+
+
+/* TEXT */
+
+.meta {
+
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+
+.empty {
+
+    color: #94a3b8;
+
+    text-align: center;
+
+    padding: 25px;
+}
+
+
+/* NAVIGATION */
+
+nav {
+
+    position: fixed;
+
+    bottom: 0;
+
+    left: 0;
+
+    right: 0;
+
+    height: 68px;
+
+    background: #1e293b;
+
+    border-top: 1px solid #334155;
+
+    display: flex;
+
+    justify-content: space-around;
+
+    z-index: 10;
+}
+
+
+nav button {
+
+    flex: 1;
+
+    background: none;
+
+    border: 0;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+
+nav button.active {
+
+    color: #10b981;
+
+    font-weight: bold;
+}
+
+
+nav span {
+
+    display: block;
+
+    font-size: 22px;
+
+    margin-bottom: 2px;
+}
+
+
+h2 {
+    margin-top: 4px;
+}
+
+
+.user-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #334155;
+}
+
+</style>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
 </head>
+
+
 <body>
 
-    <div class="top-header">
-        <div class="app-title">
-            <span class="tex-part">Tex</span><span class="us-part">Us</span>
-        </div>
+
+<header>
+
+    <div class="logo">
+
+        <span class="tex">Tex</span>
+        <span class="us">Us</span>
+
     </div>
 
-    <div class="content">
-        <!-- HOME PAGE -->
-        <div id="home" class="page active">
-            <div id="mainFeedView">
-                <h2>Home Feed</h2>
-                <div class="post-creator">
-                    <div class="user-avatar" onclick="goToProfile()">
-                        <img id="homeUserAvatar" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                        <span id="homeUserAvatarPlaceholder">👤</span>
-                    </div>
-                    <div class="post-input-mock" onclick="createPostPrompt()">Tell us something fun about yourself! 🚀</div>
-                    <input type="file" id="imageUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleImageUpload(event)">
-                    <button class="photo-btn" onclick="document.getElementById('imageUploadInput').click()" title="Add Image/Video">📷</button>
-                    <button class="ad-btn" onclick="createAdPrompt()" title="Create Sponsored Ad">📢</button>
-                </div>
 
-                <div class="stories-container" id="storiesContainer">
-                    <input type="file" id="storyUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleStoryUpload(event)">
-                    <div class="story-card create-story" onclick="document.getElementById('storyUploadInput').click()">
-                        <div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-bottom: 5px;">+</div>
-                        <span style="font-size: 11px; font-weight: bold; color: #10b981;">Create story</span>
-                    </div>
-                </div>
+    <button
+        class="logout"
+        onclick="logout()"
+    >
+        Log out
+    </button>
 
-                <div id="feedPostsContainer">
-                    <p style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">Loading live feed...</p>
-                </div>
-            </div>
+</header>
 
-            <div id="commentsView">
-                <button onclick="backToFeed()" style="background:#334155; border:none; color:white; padding: 6px 12px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 15px;">← Back to Feed</button>
-                <h2>Comments</h2>
-                <div class="card">
-                    <div id="activePostPreview" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #334155;"></div>
-                    <div id="commentsListContainer" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
-                        <p style="color: #94a3b8; font-size: 13px;">Loading comments...</p>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="commentInputField" placeholder="Write a comment..." style="flex:1; padding: 10px; border:1px solid #334155; background:#0f172a; color:white; border-radius:5px;">
-                        <button onclick="submitComment()" style="background:#10b981; border:none; color:white; padding: 10px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- COMBINED FRIENDS & REQUESTS PAGE -->
-        <div id="friends" class="page">
-            <h2>Friends & Requests</h2>
-            
-            <div class="card">
-                <strong style="color: #10b981; font-size: 14px;">Incoming Friend Requests</strong>
-                <div id="friendRequestsContainer" style="margin-top: 10px;">
-                    <p style="color: #94a3b8; font-size: 13px;">No incoming requests.</p>
-                </div>
-            </div>
+<main>
 
-            <div class="card" style="margin-top: 15px;">
-                <strong style="color: #ffffff; font-size: 14px;">Suggested Users</strong>
-                <div id="suggestedUsersContainer" style="margin-top: 10px;">
-                    <p style="color: #94a3b8; font-size: 13px;">Loading suggested users...</p>
-                </div>
-            </div>
-        </div>
 
-        <!-- CHAT PAGE -->
-        <div id="chat" class="page">
-            <div id="chatListView">
-                <h2>Messages</h2>
-                <div class="card" style="background-color: #1e293b; padding: 10px 15px;">
-                    <div id="acceptedConnectionsContainer">
-                        <p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px;">No active connections yet.</p>
-                    </div>
-                </div>
-            </div>
+<!-- HOME -->
 
-            <div id="activeChatView" style="display: none;">
-                <button onclick="backToChatList()" style="background:#334155; border:none; color:white; padding: 6px 12px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 15px;">← Back to Messages</button>
-                <h2 id="activeChatTitle">Chat</h2>
-                <div class="card" style="height: 380px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div id="privateMessagesContainer" style="overflow-y: auto; flex:1; padding-right: 5px;">
-                        <p style="color: #94a3b8; font-size: 13px;">Loading messages...</p>
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-top: 10px;">
-                        <input type="text" id="privateMessageInput" placeholder="Aa" style="flex:1; padding: 12px; border:1px solid #334155; background:#0f172a; color:white; border-radius:20px;">
-                        <button onclick="sendPrivateMessage()" style="background:#10b981; border:none; color:white; padding: 0 18px; border-radius:20px; cursor:pointer; font-weight:bold;">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+<section
+    id="home"
+    class="page active"
+>
 
-        <!-- STREAMING MUSIC PAGE (UPDATED WITH GLOBAL ARTISTS) -->
-        <div id="music" class="page">
-            <h2>TexUs Global Music Streaming</h2>
-            
-            <div class="card" style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #10b981;">
-                <div style="font-size: 40px; margin-bottom: 10px;">🎵</div>
-                <h3 id="currentSongTitle" style="margin: 5px 0; color: #ffffff;">Select a track</h3>
-                <p id="currentSongArtist" style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Global Artist</p>
-                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
-                    <button onclick="alert('Playing previous track')" style="background: #334155; border: none; color: white; padding: 10px 15px; border-radius: 50%; cursor: pointer;">⏮️</button>
-                    <button onclick="alert('Playback toggled')" style="background: #10b981; border: none; color: white; padding: 10px 20px; border-radius: 50%; cursor: pointer; font-size: 16px;">▶️</button>
-                    <button onclick="alert('Playing next track')" style="background: #334155; border: none; color: white; padding: 10px 15px; border-radius: 50%; cursor: pointer;">⏭️</button>
-                </div>
-            </div>
+    <h2>Home Feed</h2>
 
-            <div class="card">
-                <strong style="color: #ffffff; font-size: 14px;">🌍 Global Trending Hits</strong>
-                <div style="margin-top: 10px;">
-                    <div onclick="playTrack('Water', 'Tyla')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
-                        <div>
-                            <strong>Water</strong><br><span style="font-size: 11px; color: #94a3b8;">Tyla</span>
-                        </div>
-                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
-                    </div>
-                    <div onclick="playTrack('Umbrella', 'Rihanna ft. Jay-Z')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
-                        <div>
-                            <strong>Umbrella</strong><br><span style="font-size: 11px; color: #94a3b8;">Rihanna ft. Jay-Z</span>
-                        </div>
-                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
-                    </div>
-                    <div onclick="playTrack('Rush', 'Ayra Starr')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
-                        <div>
-                            <strong>Rush</strong><br><span style="font-size: 11px; color: #94a3b8;">Ayra Starr</span>
-                        </div>
-                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
-                    </div>
-                    <div onclick="playTrack('Neon Nights', 'CyberPulse')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
-                        <div>
-                            <strong>Neon Nights</strong><br><span style="font-size: 11px; color: #94a3b8;">CyberPulse</span>
-                        </div>
-                        <span style="color: #10b981; font-size: 12px;">▶ Play</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- PROFILE PAGE -->
-        <div id="profile" class="page">
-            <div style="position: relative; background: #334155; height: 120px; border-radius: 12px 12px 0 0;">
-                <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadProfilePicture(event)">
-                <div style="position: absolute; bottom: -30px; left: 20px; width: 85px; height: 85px; border-radius: 50%; background: #0f172a; border: 3px solid #1e293b; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="document.getElementById('avatarFileInput').click()">
-                    <img id="userAvatarImg" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                    <span id="userAvatarPlaceholder" style="font-size: 36px;">👤</span>
-                    <div style="position: absolute; bottom: 4px; right: 4px; background: #10b981; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px;">📷</div>
-                </div>
-            </div>
+    <div class="card">
 
-            <div style="margin-top: 35px; padding: 0 10px;">
-                <h2 id="profileUsernameDisplay" style="margin: 0; color: #ffffff;">User</h2>
-                <p style="margin: 5px 0 15px; font-size: 13px; color: #94a3b8;">
-                    <span id="friendsCount">0</span> friends · <span id="postsCount">0</span> posts
-                </p>
-            </div>
+        <strong id="welcome">
+            Welcome!
+        </strong>
 
-            <!-- CREATOR ADMIN PAYOUT PANEL (Only visible for creator contact 0836964543) -->
-            <div id="creatorAdminSection" style="display: none;">
-                <div class="creator-banner">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <strong style="color: #ffffff; font-size: 15px;">👑 App Creator Daily Payout</strong>
-                            <p style="margin: 3px 0 0; font-size: 12px; color: #d1fae5;">Aggregated streams & ads pool (Phone: 0836964543)</p>
-                        </div>
-                        <div style="font-size: 22px; font-weight: bold; color: #ffffff;" id="creatorTotalEarnings">$0.00</div>
-                    </div>
-                    <button class="withdraw-btn" id="creatorWithdrawBtn" onclick="triggerCreatorDailyPayout()">📥 Withdraw Total Earnings to PayPal</button>
-                </div>
-            </div>
 
-            <div class="card" style="margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <strong style="color: #ffffff; font-size: 15px;">Friends</strong>
-                    <span style="color: #10b981; font-size: 12px; cursor: pointer;" onclick="switchPage('friends', document.getElementById('nav-friends'))">See all</span>
-                </div>
-                <div id="profileFriendsGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    <p style="grid-column: span 4; font-size: 12px; color: #94a3b8;">Loading friends...</p>
-                </div>
-            </div>
+        <textarea
+            id="postText"
+            placeholder="Tell us something fun about yourself! 🚀"
+        ></textarea>
 
-            <div style="display: flex; border-bottom: 2px solid #334155; margin-top: 20px;">
-                <button id="tab-all" onclick="filterProfileMedia('all')" style="flex: 1; padding: 10px; background: none; border: none; color: #10b981; border-bottom: 2px solid #10b981; font-weight: bold; cursor: pointer;">All</button>
-                <button id="tab-reels" onclick="filterProfileMedia('reels')" style="flex: 1; padding: 10px; background: none; border: none; color: #94a3b8; font-weight: bold; cursor: pointer;">Reels</button>
-                <button id="tab-photos" onclick="filterProfileMedia('photos')" style="flex: 1; padding: 10px; background: none; border: none; color: #94a3b8; font-weight: bold; cursor: pointer;">Photos</button>
-            </div>
 
-            <div id="profilePostsContainer" style="margin-top: 15px;">
-                <p style="font-size: 13px; color: #94a3b8; text-align: center;">Loading user content...</p>
-            </div>
-        </div>
+        <input
+            id="mediaFile"
+            type="file"
+            accept="image/*,video/*"
+        >
 
-        <!-- SETTINGS PAGE -->
-        <div id="settings" class="page">
-            <h2>Settings</h2>
-            <div class="card">
-                <p>App Theme: <strong>Dark Mode</strong></p>
-                <button onclick="logout()" style="background:#ef4444; border:none; color:white; padding:8px 15px; border-radius:5px; cursor:pointer; margin-top:15px; font-weight:bold;">Logout</button>
-            </div>
-        </div>
-    </div>
 
-    <div class="bottom-nav">
-        <button class="nav-btn active" id="nav-home" onclick="switchPage('home', this)"><span>🏠</span> Home</button>
-        <button class="nav-btn" id="nav-friends" onclick="switchPage('friends', this)">
-            <span>👥</span> Friends
-            <div class="notification-dot" id="friendNotificationDot"></div>
+        <button
+            class="primary"
+            onclick="createPost()"
+        >
+            Post
         </button>
-        <button class="nav-btn" id="nav-chat" onclick="switchPage('chat', this)"><span>💬</span> Chat</button>
-        <button class="nav-btn" id="nav-music" onclick="switchPage('music', this)"><span>🎵</span> Music</button>
-        <button class="nav-btn" id="nav-profile" onclick="switchPage('profile', this)"><span>👤</span> Profile</button>
-        <button class="nav-btn" id="nav-settings" onclick="switchPage('settings', this)"><span>⚙️</span> Settings</button>
+
+
+        <div
+            id="postMessage"
+            class="meta"
+        ></div>
+
     </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBLWsJhuxdhDJgvnMnclXdYhAcQv5RrGm0",
-            authDomain: "texus-5c99e.firebaseapp.com",
-            projectId: "texus-5c99e",
-            storageBucket: "texus-5c99e.firebasestorage.app",
-            messagingSenderId: "1040040305137",
-            appId: "1:1040040305137:web:86f4f717204378a22da450",
-            measurementId: "G-KCF9J53BGH"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
 
-        let currentUsername = localStorage.getItem('texus_username') || ("User_" + Math.random().toString(36).substring(2, 9));
-        localStorage.setItem('texus_username', currentUsername);
-        let currentUserId = localStorage.getItem('texus_user_id') || ('user_' + Math.random().toString(36).substring(2, 9));
-        localStorage.setItem('texus_user_id', currentUserId);
+    <div id="feed">
 
-        const CREATOR_PHONE = "0836964543";
-        let userPhone = localStorage.getItem('texus_phone') || "";
-        
-        if (!userPhone) {
-            let inputPhone = prompt("Enter contact phone number:") || "";
-            localStorage.setItem('texus_phone', inputPhone);
-            userPhone = inputPhone;
+        <div class="empty">
+            Loading live feed...
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FRIENDS -->
+
+<section
+    id="friends"
+    class="page"
+>
+
+    <h2>Friends & Requests</h2>
+
+
+    <div class="card">
+
+        <p class="meta">
+            Users on TexUs
+        </p>
+
+
+        <div id="usersList">
+
+            <div class="empty">
+                Loading users...
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CHAT -->
+
+<section
+    id="chat"
+    class="page"
+>
+
+    <h2>Messages</h2>
+
+
+    <div class="card">
+
+        <p class="meta">
+            Basic TexUs messaging
+        </p>
+
+
+        <input
+            id="messageText"
+            placeholder="Aa"
+        >
+
+
+        <button
+            class="secondary"
+            onclick="sendMessage()"
+        >
+            Send
+        </button>
+
+
+        <div id="messages">
+
+            <div class="empty">
+                No messages yet.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- MUSIC -->
+
+<section
+    id="music"
+    class="page"
+>
+
+    <h2>
+        TexUs Global Music Streaming
+    </h2>
+
+
+    <div class="card">
+
+        <h3>
+            🌍 Global Trending Hits
+        </h3>
+
+
+        <p>
+            🎵 Water — Tyla
+        </p>
+
+
+        <p>
+            🎵 Umbrella — Rihanna ft. Jay-Z
+        </p>
+
+
+        <p>
+            🎵 Rush — Ayra Starr
+        </p>
+
+
+        <p class="meta">
+            Music playback can be connected
+            to a licensed music service later.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- PROFILE -->
+
+<section
+    id="profile"
+    class="page"
+>
+
+    <h2>
+        My Profile
+    </h2>
+
+
+    <div class="card">
+
+        <h3 id="profileName">
+            Loading...
+        </h3>
+
+
+        <p
+            id="profileEmail"
+            class="meta"
+        ></p>
+
+
+        <p class="meta">
+            TexUs member
+        </p>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- NAVIGATION -->
+
+<nav>
+
+    <button
+        class="active"
+        onclick="showPage('home',this)"
+    >
+        <span>🏠</span>
+        Home
+    </button>
+
+
+    <button
+        onclick="showPage('friends',this)"
+    >
+        <span>👥</span>
+        Friends
+    </button>
+
+
+    <button
+        onclick="showPage('chat',this)"
+    >
+        <span>💬</span>
+        Chat
+    </button>
+
+
+    <button
+        onclick="showPage('music',this)"
+    >
+        <span>🎵</span>
+        Music
+    </button>
+
+
+    <button
+        onclick="showPage('profile',this)"
+    >
+        <span>👤</span>
+        Profile
+    </button>
+
+</nav>
+
+
+<script>
+
+
+/* FIREBASE CONFIG */
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyAwGvF8YZ6hQVPTHLe0QzmTPewWQvrO0o",
+
+    authDomain:
+        "texus-5c99e.firebaseapp.com",
+
+    projectId:
+        "texus-5c99e",
+
+    storageBucket:
+        "texus-5c99e.firebasestorage.app",
+
+    messagingSenderId:
+        "1040040305137",
+
+    appId:
+        "1:1040040305137:web:86f4f717204378a22da450",
+
+    measurementId:
+        "G-KCF9J53BGH"
+};
+
+
+firebase.initializeApp(firebaseConfig);
+
+
+const db =
+    firebase.firestore();
+
+
+const storage =
+    firebase.storage();
+
+
+let currentUser = null;
+
+
+/* AUTH CHECK */
+
+firebase.auth()
+.onAuthStateChanged(async user => {
+
+    if (!user) {
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+
+    currentUser = user;
+
+
+    document.getElementById(
+        "profileEmail"
+    ).textContent =
+        user.email || "";
+
+
+    loadProfile(user.uid);
+
+    loadFeed();
+
+    loadUsers();
+
+    loadMessages();
+
+});
+
+
+/* PROFILE */
+
+async function loadProfile(uid) {
+
+    try {
+
+        const doc =
+            await db
+            .collection("users")
+            .doc(uid)
+            .get();
+
+
+        const data =
+            doc.exists
+                ? doc.data()
+                : {};
+
+
+        const name =
+            data.username ||
+            localStorage.getItem(
+                "texus_username"
+            ) ||
+            "TexUs User";
+
+
+        document.getElementById(
+            "welcome"
+        ).textContent =
+            "Welcome, " + name + "!";
+
+
+        document.getElementById(
+            "profileName"
+        ).textContent =
+            name;
+
+
+    } catch (e) {
+
+        console.error(e);
+
+    }
+
+}
+
+
+/* CREATE POST */
+
+async function createPost() {
+
+    if (!currentUser) return;
+
+
+    const text =
+        document
+        .getElementById("postText")
+        .value
+        .trim();
+
+
+    const file =
+        document
+        .getElementById("mediaFile")
+        .files[0];
+
+
+    const status =
+        document.getElementById(
+            "postMessage"
+        );
+
+
+    if (!text && !file) {
+
+        status.textContent =
+            "Write something or choose a photo/video.";
+
+        return;
+    }
+
+
+    status.textContent =
+        "Posting...";
+
+
+    try {
+
+        let mediaUrl = "";
+
+        let mediaType = "";
+
+
+        /* UPLOAD MEDIA */
+
+        if (file) {
+
+            const ref =
+                storage.ref(
+                    "posts/" +
+                    currentUser.uid +
+                    "/" +
+                    Date.now() +
+                    "_" +
+                    file.name
+                );
+
+
+            const snapshot =
+                await ref.put(file);
+
+
+            mediaUrl =
+                await snapshot
+                .ref
+                .getDownloadURL();
+
+
+            mediaType =
+                file.type.startsWith(
+                    "video/"
+                )
+                ? "video"
+                : "image";
+
         }
 
-        let activeSelectedPostId = null;
-        let activeChatPeer = null;
-        let userProfileMedia = [];
-        let currentFilter = 'all';
-        let platformTotalBalance = 0;
 
-        function switchPage(pageId, btnElement) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            if (btnElement) btnElement.classList.add('active');
+        /* GET USERNAME */
+
+        const userDoc =
+            await db
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
+
+
+        const username =
+            userDoc.exists &&
+            userDoc.data().username
+                ? userDoc.data().username
+                : "TexUs User";
+
+
+        /* SAVE POST */
+
+        await db
+        .collection("posts")
+        .add({
+
+            uid:
+                currentUser.uid,
+
+            username:
+                username,
+
+            text:
+                text,
+
+            mediaUrl:
+                mediaUrl,
+
+            mediaType:
+                mediaType,
+
+            createdAt:
+                firebase.firestore
+                .FieldValue
+                .serverTimestamp()
+
+        });
+
+
+        document.getElementById(
+            "postText"
+        ).value = "";
+
+
+        document.getElementById(
+            "mediaFile"
+        ).value = "";
+
+
+        status.textContent =
+            "Posted!";
+
+
+        loadFeed();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        status.textContent =
+            "Could not post: " +
+            error.message;
+
+    }
+
+}
+
+
+/* LOAD FEED */
+
+async function loadFeed() {
+
+    const feed =
+        document.getElementById(
+            "feed"
+        );
+
+
+    try {
+
+        const snapshot =
+            await db
+            .collection("posts")
+            .orderBy(
+                "createdAt",
+                "desc"
+            )
+            .limit(30)
+            .get();
+
+
+        if (snapshot.empty) {
+
+            feed.innerHTML =
+                '<div class="empty">' +
+                'No posts yet. Be the first to post! 🚀' +
+                '</div>';
+
+            return;
         }
 
-        function goToProfile() { switchPage('profile', document.getElementById('nav-profile')); }
 
-        function playTrack(title, artist) {
-            document.getElementById('currentSongTitle').innerText = title;
-            document.getElementById('currentSongArtist').innerText = artist;
+        feed.innerHTML = "";
 
-            let globalStreams = parseInt(localStorage.getItem('texus_global_streams') || '0') + 1;
-            localStorage.setItem('texus_global_streams', globalStreams);
 
-            alert(`Now streaming: ${title} by ${artist}`);
-        }
+        snapshot.forEach(doc => {
 
-        function createPostPrompt() {
-            const postText = prompt("Tell us something fun about yourself!");
-            if (postText && postText.trim() !== "") savePostToFirebase(postText, null, false);
-        }
+            const p =
+                doc.data();
 
-        function createAdPrompt() {
-            const adText = prompt("Enter your Ad title/description:");
-            if (!adText || adText.trim() === "") return;
-            const targetUrl = prompt("Enter Destination Link/URL (Optional):") || "";
 
-            db.collection("posts").add({
-                text: adText,
-                targetUrl: targetUrl,
-                isAd: true,
-                viewsCount: 0,
-                viewers: [],
-                username: currentUsername,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                likes: 0,
-                likedBy: []
-            }).then(() => alert("Your Sponsored Ad is now live on the feed! 📢")).catch(err => alert(err.message));
-        }
+            const div =
+                document.createElement(
+                    "div"
+                );
 
-        function registerAdView(postId) {
-            const postRef = db.collection("posts").doc(postId);
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(postRef);
-                if (!doc.exists) return;
-                let data = doc.data();
-                let viewers = data.viewers || [];
-                
-                if (!viewers.includes(currentUserId)) {
-                    viewers.push(currentUserId);
-                    let newViewsCount = (data.viewsCount || 0) + 1;
-                    transaction.update(postRef, {
-                        viewsCount: newViewsCount,
-                        viewers: viewers
-                    });
-                }
-            });
-        }
 
-        async function triggerCreatorDailyPayout() {
-            if (userPhone !== CREATOR_PHONE) {
-                alert("Unauthorized: Only app creator can access daily payouts.");
+            div.className =
+                "card post";
+
+
+            const date =
+                p.createdAt
+                    ? p.createdAt
+                        .toDate()
+                        .toLocaleString()
+                    : "Just now";
+
+
+            let media = "";
+
+
+            if (
+                p.mediaUrl &&
+                p.mediaType === "image"
+            ) {
+
+                media =
+                    '<img src="' +
+                    escapeAttr(
+                        p.mediaUrl
+                    ) +
+                    '" alt="Post image">';
+
+            }
+
+
+            if (
+                p.mediaUrl &&
+                p.mediaType === "video"
+            ) {
+
+                media =
+                    '<video src="' +
+                    escapeAttr(
+                        p.mediaUrl
+                    ) +
+                    '" controls></video>';
+
+            }
+
+
+            div.innerHTML =
+
+                '<strong>' +
+                escapeHtml(
+                    p.username ||
+                    "TexUs User"
+                ) +
+                '</strong>' +
+
+                '<div class="meta">' +
+                escapeHtml(date) +
+                '</div>' +
+
+                (
+                    p.text
+                        ? '<p>' +
+                          escapeHtml(
+                              p.text
+                          ) +
+                          '</p>'
+                        : ''
+                ) +
+
+                media;
+
+
+            feed.appendChild(div);
+
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        feed.innerHTML =
+            '<div class="empty">' +
+            'Feed could not load. Check your Firestore rules/indexes.' +
+            '</div>';
+
+    }
+
+}
+
+
+/* LOAD USERS */
+
+async function loadUsers() {
+
+    const list =
+        document.getElementById(
+            "usersList"
+        );
+
+
+    try {
+
+        const snapshot =
+            await db
+            .collection("users")
+            .limit(30)
+            .get();
+
+
+        list.innerHTML = "";
+
+
+        snapshot.forEach(doc => {
+
+            const u =
+                doc.data();
+
+
+            if (
+                doc.id ===
+                currentUser.uid
+            ) {
                 return;
             }
 
-            if (platformTotalBalance <= 0) {
-                alert("No accumulated platform earnings available right now.");
-                return;
-            }
 
-            const paypalEmail = prompt(`Enter PayPal Email Address for creator (${CREATOR_PHONE}):`);
-            if (!paypalEmail) return;
+            const row =
+                document.createElement(
+                    "div"
+                );
 
-            const btn = document.getElementById('creatorWithdrawBtn');
-            btn.disabled = true;
-            btn.innerText = "Processing PayPal Payout...";
 
-            try {
-                const response = await fetch('/api/withdraw-to-paypal', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        paypalEmail: paypalEmail.trim(),
-                        amountInUSD: platformTotalBalance
-                    })
-                });
+            row.className =
+                "user-row";
 
-                const data = await response.json();
-                if (data.success) {
-                    alert(`Daily creator payout successful! Batch ID: ${data.batchId}`);
-                    localStorage.setItem('texus_global_streams', '0');
-                    db.collection("posts").where("isAd", "==", true).get().then(snapshot => {
-                        const batch = db.batch();
-                        snapshot.forEach(doc => batch.update(doc.ref, { viewsCount: 0, viewers: [] }));
-                        return batch.commit();
-                    });
-                } else {
-                    alert(`Payout failed: ${data.error}`);
-                }
-            } catch (err) {
-                alert(`Network connection note: Unable to reach payout server.`);
-            }
-            btn.disabled = false;
-            btn.innerText = "📥 Withdraw Total Earnings to PayPal";
+
+            row.innerHTML =
+
+                '<span>👤 ' +
+                escapeHtml(
+                    u.username ||
+                    "TexUs User"
+                ) +
+                '</span>' +
+
+                '<button class="secondary" ' +
+                'onclick="alert(\'Friend requests are the next feature to connect.\')">' +
+                'Add Friend' +
+                '</button>';
+
+
+            list.appendChild(row);
+
+        });
+
+
+        if (!list.innerHTML) {
+
+            list.innerHTML =
+                '<div class="empty">' +
+                'No other users yet.' +
+                '</div>';
+
         }
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const caption = prompt("Add a caption for your post:") || "";
-                const isVideo = file.type.startsWith('video');
-                storage.ref('posts/' + Date.now() + '_' + file.name).put(file).then(snapshot => {
-                    snapshot.ref.getDownloadURL().then(downloadURL => savePostToFirebase(caption, downloadURL, isVideo));
-                }).catch(err => alert("Upload error: " + err.message));
-            }
-            event.target.value = '';
+
+    } catch (e) {
+
+        console.error(e);
+
+
+        list.innerHTML =
+            '<div class="empty">' +
+            'Users could not load. Check Firestore rules.' +
+            '</div>';
+
+    }
+
+}
+
+
+/* SEND MESSAGE */
+
+async function sendMessage() {
+
+    if (!currentUser) return;
+
+
+    const input =
+        document.getElementById(
+            "messageText"
+        );
+
+
+    const text =
+        input.value.trim();
+
+
+    if (!text) return;
+
+
+    try {
+
+        await db
+        .collection("messages")
+        .add({
+
+            senderId:
+                currentUser.uid,
+
+            senderEmail:
+                currentUser.email,
+
+            text:
+                text,
+
+            createdAt:
+                firebase.firestore
+                .FieldValue
+                .serverTimestamp()
+
+        });
+
+
+        input.value = "";
+
+
+        loadMessages();
+
+
+    } catch (e) {
+
+        alert(
+            "Message could not be sent: " +
+            e.message
+        );
+
+    }
+
+}
+
+
+/* LOAD MESSAGES */
+
+async function loadMessages() {
+
+    const box =
+        document.getElementById(
+            "messages"
+        );
+
+
+    try {
+
+        const snapshot =
+            await db
+            .collection("messages")
+            .orderBy(
+                "createdAt",
+                "asc"
+            )
+            .limit(30)
+            .get();
+
+
+        if (snapshot.empty) {
+
+            box.innerHTML =
+                '<div class="empty">' +
+                'No messages yet.' +
+                '</div>';
+
+            return;
         }
 
-        function savePostToFirebase(text, mediaUrl, isVideo) {
-            db.collection("posts").add({
-                text: text, mediaUrl: mediaUrl || "", isVideo: isVideo || false,
-                username: currentUsername,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                likes: 0, likedBy: []
-            }).then(() => alert("Post is live! 🚀")).catch(err => alert(err.message));
-        }
 
-        function handleStoryUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const isVideo = file.type.startsWith('video');
-                storage.ref('stories/' + Date.now() + '_' + file.name).put(file).then(snapshot => {
-                    snapshot.ref.getDownloadURL().then(downloadURL => {
-                        db.collection("stories").add({
-                            mediaUrl: downloadURL, isVideo: isVideo,
-                            username: currentUsername,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        }).then(() => alert("Story added! ✨"));
-                    });
-                }).catch(err => alert("Story upload error: " + err.message));
-            }
-            event.target.value = '';
-        }
+        box.innerHTML = "";
 
-        function loadLiveFeed() {
-            db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                const feedContainer = document.getElementById('feedPostsContainer');
-                feedContainer.innerHTML = '';
-                if (snapshot.empty) {
-                    feedContainer.innerHTML = '<p style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 30px;">No posts yet. Be the first to share something! ✨</p>';
-                    return;
-                }
 
-                const hiddenPosts = JSON.parse(localStorage.getItem('texus_hidden_posts') || '[]');
+        snapshot.forEach(doc => {
 
-                snapshot.forEach((doc) => {
-                    const post = doc.data(), postId = doc.id;
-                    
-                    if (hiddenPosts.includes(postId) || post.isArchived) {
-                        return;
-                    }
+            const m =
+                doc.data();
 
-                    const postCard = document.createElement('div');
-                    const isOwner = post.username === currentUsername;
 
-                    const managementMenu = `
-                        <div style="display: flex; gap: 6px;">
-                            ${isOwner ? `<button onclick="deletePost('${postId}')" style="background:#ef4444; border:none; color:white; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Delete</button>` : ''}
-                            ${isOwner ? `<button onclick="archivePost('${postId}')" style="background:#64748b; border:none; color:white; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Archive</button>` : ''}
-                            <button onclick="hidePost('${postId}')" style="background:#334155; border:none; color:#94a3b8; padding:3px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">Hide</button>
-                        </div>
-                    `;
-                    
-                    if (post.isAd) {
-                        postCard.className = 'feed-post ad-post';
-                        registerAdView(postId);
-                        
-                        postCard.innerHTML = `
-                            <div class="post-header">
-                                <span class="post-user">📢 ${escapeHtml(post.username)} <span class="ad-badge">SPONSORED AD</span></span>
-                                ${managementMenu}
-                            </div>
-                            <p style="font-size: 15px; color: #ffffff; font-weight: bold; margin: 10px 0;">${escapeHtml(post.text)}</p>
-                            ${post.targetUrl ? `<a href="${escapeHtml(post.targetUrl)}" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; padding: 8px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 12px; margin-bottom: 10px;">Learn More 🔗</a>` : ''}
-                            <div class="post-actions-row">
-                                <button class="feed-action-btn" onclick="toggleLike('${postId}')">❤️ ${post.likes || 0} Likes</button>
-                                <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text)}')">💬 Comments</button>
-                            </div>`;
-                    } else {
-                        postCard.className = 'feed-post';
-                        let mediaHtml = post.mediaUrl ? (post.isVideo ? `<div class="post-media-container"><video src="${post.mediaUrl}" controls></video></div>` : `<div class="post-media-container"><img src="${post.mediaUrl}"></div>`) : '';
-                        postCard.innerHTML = `
-                            <div class="post-header">
-                                <span class="post-user">👤 ${escapeHtml(post.username)}</span>
-                                ${managementMenu}
-                            </div>
-                            <p style="font-size: 14px; color: #e2e8f0; margin-bottom: 5px;">${escapeHtml(post.text)}</p>
-                            ${mediaHtml}
-                            <div class="post-actions-row">
-                                <button class="feed-action-btn" onclick="toggleLike('${postId}')">❤️ ${post.likes || 0} Likes</button>
-                                <button class="feed-action-btn" onclick="openCommentsView('${postId}', '${escapeHtml(post.username)}', '${escapeHtml(post.text)}')">💬 Comments</button>
-                            </div>`;
-                    }
-                    feedContainer.appendChild(postCard);
-                });
-            });
-        }
+            const row =
+                document.createElement(
+                    "p"
+                );
 
-        function deletePost(postId) {
-            if (confirm("Are you sure you want to delete this post?")) {
-                db.collection("posts").doc(postId).delete().then(() => alert("Post deleted.")).catch(err => alert(err.message));
-            }
-        }
 
-        function archivePost(postId) {
-            db.collection("posts").doc(postId).update({ isArchived: true }).then(() => alert("Post archived.")).catch(err => alert(err.message));
-        }
+            row.innerHTML =
+                "<strong>" +
+                escapeHtml(
+                    m.senderEmail ||
+                    "User"
+                ) +
+                ":</strong> " +
+                escapeHtml(
+                    m.text || ""
+                );
 
-        function hidePost(postId) {
-            let hidden = JSON.parse(localStorage.getItem('texus_hidden_posts') || '[]');
-            if (!hidden.includes(postId)) hidden.push(postId);
-            localStorage.setItem('texus_hidden_posts', JSON.stringify(hidden));
-            loadLiveFeed();
-        }
 
-        function toggleLike(postId) {
-            const postRef = db.collection("posts").doc(postId);
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(postRef);
-                if (!doc.exists) return;
-                let data = doc.data();
-                let likedBy = data.likedBy || [];
-                let likes = data.likes || 0;
-                
-                if (likedBy.includes(currentUserId)) {
-                    likedBy = likedBy.filter(id => id !== currentUserId);
-                    likes = Math.max(0, likes - 1);
-                } else {
-                    likedBy.push(currentUserId);
-                    likes += 1;
-                }
-                transaction.update(postRef, { likes: likes, likedBy: likedBy });
-            });
-        }
+            box.appendChild(row);
 
-        function openCommentsView(postId, username, text) {
-            activeSelectedPostId = postId;
-            document.getElementById('mainFeedView').style.display = 'none';
-            document.getElementById('commentsView').style.display = 'block';
-            document.getElementById('activePostPreview').innerHTML = `<strong>${escapeHtml(username)}</strong>: <p style="color:#94a3b8; font-size:13px; margin-top:3px;">${escapeHtml(text)}</p>`;
-            
-            db.collection("posts").doc(postId).collection("comments").orderBy("timestamp", "asc").onSnapshot(snapshot => {
-                const container = document.getElementById('commentsListContainer');
-                container.innerHTML = '';
-                if (snapshot.empty) {
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No comments yet. Be the first!</p>';
-                    return;
-                }
-                snapshot.forEach(doc => {
-                    const comment = doc.data();
-                    const item = document.createElement('div');
-                    item.className = 'comment-item';
-                    item.innerHTML = `<strong style="color: #10b981;">${escapeHtml(comment.username)}</strong>: ${escapeHtml(comment.text)}`;
-                    container.appendChild(item);
-                });
-            });
-        }
+        });
 
-        function backToFeed() {
-            document.getElementById('commentsView').style.display = 'none';
-            document.getElementById('mainFeedView').style.display = 'block';
-            activeSelectedPostId = null;
-        }
 
-        function submitComment() {
-            const input = document.getElementById('commentInputField');
-            const text = input.value.trim();
-            if (!text || !activeSelectedPostId) return;
+    } catch (e) {
 
-            db.collection("posts").doc(activeSelectedPostId).collection("comments").add({
-                text: text,
-                username: currentUsername,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => input.value = '').catch(err => alert(err.message));
-        }
+        console.error(e);
 
-        function loadStories() {
-            db.collection("stories").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                const container = document.getElementById('storiesContainer');
-                const defaultCard = container.querySelector('.create-story');
-                container.innerHTML = '';
-                container.appendChild(defaultCard);
 
-                snapshot.forEach(doc => {
-                    const story = doc.data();
-                    const card = document.createElement('div');
-                    card.className = 'story-card';
-                    let mediaContent = story.isVideo ? `<video class="story-media" src="${story.mediaUrl}"></video>` : `<img class="story-media" src="${story.mediaUrl}">`;
-                    card.innerHTML = `
-                        <div class="story-badge">Story</div>
-                        ${mediaContent}
-                        <p class="story-name">${escapeHtml(story.username)}</p>
-                    `;
-                    container.appendChild(card);
-                });
-            });
-        }
+        box.innerHTML =
+            '<div class="empty">' +
+            'Messages could not load. Check Firestore rules.' +
+            '</div>';
 
-        function loadSuggestedUsers() {
-            db.collection("users").onSnapshot(snapshot => {
-                const container = document.getElementById('suggestedUsersContainer');
-                container.innerHTML = '';
-                let count = 0;
-                snapshot.forEach(doc => {
-                    const user = doc.data();
-                    if (user.username !== currentUsername) {
-                        count++;
-                        const item = document.createElement('div');
-                        item.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155;";
-                        item.innerHTML = `
-                            <span>👤 <strong>${escapeHtml(user.username)}</strong></span>
-                            <button onclick="sendFriendRequest('${doc.id}', '${escapeHtml(user.username)}')" style="background:#10b981; border:none; color:white; padding: 6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Add Friend</button>
-                        `;
-                        container.appendChild(item);
-                    }
-                });
-                if (count === 0) container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No other users found.</p>';
-            });
-        }
+    }
 
-        function sendFriendRequest(targetUid, targetUsername) {
-            db.collection("friendRequests").add({
-                fromUid: currentUserId,
-                fromUsername: currentUsername,
-                toUid: targetUid,
-                toUsername: targetUsername,
-                status: 'pending',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => alert(`Friend request sent to ${targetUsername}!`)).catch(err => alert(err.message));
-        }
+}
 
-        function loadFriendRequests() {
-            db.collection("friendRequests").where("toUid", "==", currentUserId).where("status", "==", "pending").onSnapshot(snapshot => {
-                const container = document.getElementById('friendRequestsContainer');
-                const dot = document.getElementById('friendNotificationDot');
-                container.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    container.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No incoming requests.</p>';
-                    dot.style.display = 'none';
-                    return;
-                }
 
-                dot.style.display = 'block';
-                snapshot.forEach(doc => {
-                    const req = doc.data();
-                    const item = document.createElement('div');
-                    item.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155;";
-                    item.innerHTML = `
-                        <span>👤 <strong>${escapeHtml(req.fromUsername)}</strong></span>
-                        <div style="display: flex; gap: 6px;">
-                            <button onclick="acceptRequest('${doc.id}', '${req.fromUid}', '${escapeHtml(req.fromUsername)}')" style="background:#10b981; border:none; color:white; padding: 6px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Accept</button>
-                            <button onclick="rejectRequest('${doc.id}')" style="background:#ef4444; border:none; color:white; padding: 6px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">Decline</button>
-                        </div>
-                    `;
-                    container.appendChild(item);
-                });
-            });
-        }
+/* CHANGE PAGE */
 
-        function acceptRequest(requestId, fromUid, fromUsername) {
-            const batch = db.batch();
-            batch.update(db.collection("friendRequests").doc(requestId), { status: 'accepted' });
-            batch.set(db.collection("friends").doc(), { user1: currentUserId, user2: fromUid, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            batch.commit().then(() => alert(`You are now friends with ${fromUsername}!`)).catch(err => alert(err.message));
-        }
+function showPage(id, button) {
 
-        function rejectRequest(requestId) {
-            db.collection("friendRequests").doc(requestId).delete();
-        }
+    document
+        .querySelectorAll(".page")
+        .forEach(p =>
+            p.classList.remove(
+                "active"
+            )
+        );
 
-        function loadAcceptedConnections() {
-            db.collection("friends").where("user1", "==", currentUserId).onSnapshot(snapshot1 => {
-                db.collection("friends").where("user2", "==", currentUserId).onSnapshot(snapshot2 => {
-                    const container = document.getElementById('acceptedConnectionsContainer');
-                    container.innerHTML = '';
-                    let friendsList = [];
 
-                    snapshot1.forEach(doc => friendsList.push(doc.data().user2));
-                    snapshot2.forEach(doc => friendsList.push(doc.data().user1));
+    document
+        .getElementById(id)
+        .classList.add(
+            "active"
+        );
 
-                    if (friendsList.length === 0) {
-                        container.innerHTML = '<p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px;">No active connections yet.</p>';
-                        return;
-                    }
 
-                    friendsList.forEach(friendId => {
-                        db.collection("users").doc(friendId).get().then(userDoc => {
-                            if (userDoc.exists) {
-                                const friendData = userDoc.data();
-                                const item = document.createElement('div');
-                                item.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px; background:#0f172a; border-radius:8px; margin-bottom:8px; cursor:pointer;";
-                                item.innerHTML = `<span>👤 <strong>${escapeHtml(friendData.username)}</strong></span> <span style="font-size: 12px; color: #10b981;">Chat →</span>`;
-                                item.onclick = () => openChat(friendId, friendData.username);
-                                container.appendChild(item);
-                            }
-                        });
-                    });
-                });
-            });
-        }
+    document
+        .querySelectorAll(
+            "nav button"
+        )
+        .forEach(b =>
+            b.classList.remove(
+                "active"
+            )
+        );
 
-        function openChat(peerId, peerUsername) {
-            activeChatPeer = peerId;
-            document.getElementById('chatListView').style.display = 'none';
-            document.getElementById('activeChatView').style.display = 'block';
-            document.getElementById('activeChatTitle').innerText = "Chat with " + peerUsername;
-            
-            db.collection("messages")
-              .where("participants", "array-contains", currentUserId)
-              .orderBy("timestamp", "asc")
-              .onSnapshot(snapshot => {
-                  const container = document.getElementById('privateMessagesContainer');
-                  container.innerHTML = '';
-                  snapshot.forEach(doc => {
-                      const msg = doc.data();
-                      if ((msg.sender === currentUserId && msg.receiver === peerId) || (msg.sender === peerId && msg.receiver === currentUserId)) {
-                          const bubble = document.createElement('div');
-                          const isMe = msg.sender === currentUserId;
-                          bubble.style.cssText = `max-width: 70%; padding: 10px 14px; border-radius: 12px; margin-bottom: 8px; font-size: 13px; ${isMe ? 'background: #10b981; color: white; margin-left: auto;' : 'background: #334155; color: white; margin-right: auto;'}`;
-                          bubble.innerText = msg.text;
-                          container.appendChild(bubble);
-                      }
-                  });
-              });
-        }
 
-        function backToChatList() {
-            document.getElementById('activeChatView').style.display = 'none';
-            document.getElementById('chatListView').style.display = 'block';
-            activeChatPeer = null;
-        }
+    button.classList.add(
+        "active"
+    );
 
-        function sendPrivateMessage() {
-            const input = document.getElementById('privateMessageInput');
-            const text = input.value.trim();
-            if (!text || !activeChatPeer) return;
+}
 
-            db.collection("messages").add({
-                sender: currentUserId,
-                receiver: activeChatPeer,
-                participants: [currentUserId, activeChatPeer],
-                text: text,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => input.value = '').catch(err => alert(err.message));
-        }
 
-        function loadProfileData() {
-            document.getElementById('profileUsernameDisplay').innerText = currentUsername;
+/* LOG OUT */
 
-            if (userPhone === CREATOR_PHONE) {
-                document.getElementById('creatorAdminSection').style.display = 'block';
-            }
-            
-            db.collection("posts").onSnapshot(snapshot => {
-                userProfileMedia = [];
-                let postCount = 0;
-                let calculatedAdPool = 0;
+function logout() {
 
-                snapshot.forEach(doc => {
-                    const post = doc.data();
-                    if (post.username === currentUsername && !post.isArchived) {
-                        postCount++;
-                        if (post.mediaUrl) {
-                            userProfileMedia.push({ id: doc.id, ...post });
-                        }
-                    }
-                    if (post.isAd) {
-                        calculatedAdPool += (post.viewsCount || 0) * 0.10;
-                    }
-                });
+    firebase.auth()
+    .signOut()
+    .then(() => {
 
-                let globalStreams = parseInt(localStorage.getItem('texus_global_streams') || '0');
-                let calculatedMusicPool = (globalStreams / 2) * 0.05;
+        window.location.href =
+            "login.html";
 
-                platformTotalBalance = calculatedAdPool + calculatedMusicPool;
-                
-                if (userPhone === CREATOR_PHONE) {
-                    document.getElementById('creatorTotalEarnings').innerText = `$${platformTotalBalance.toFixed(2)}`;
-                }
+    });
 
-                document.getElementById('postsCount').innerText = postCount;
-                renderProfileMedia(currentFilter);
-            });
-        }
+}
 
-        function filterProfileMedia(filter) {
-            currentFilter = filter;
-            ['all', 'reels', 'photos'].forEach(f => {
-                const btn = document.getElementById(`tab-${f}`);
-                if (f === filter) {
-                    btn.style.color = '#10b981';
-                    btn.style.borderBottom = '2px solid #10b981';
-                } else {
-                    btn.style.color = '#94a3b8';
-                    btn.style.borderBottom = 'none';
-                }
-            });
-            renderProfileMedia(filter);
-        }
 
-        function renderProfileMedia(filter) {
-            const container = document.getElementById('profilePostsContainer');
-            container.innerHTML = '';
-            
-            let filtered = userProfileMedia.filter(item => {
-                if (filter === 'reels') return item.isVideo;
-                if (filter === 'photos') return !item.isVideo;
-                return true;
-            });
+/* SECURITY HELPERS */
 
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="font-size: 13px; color: #94a3b8; text-align: center; margin-top: 20px;">No media found.</p>';
-                return;
-            }
+function escapeHtml(value) {
 
-            const grid = document.createElement('div');
-            grid.style.cssText = "display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;";
-            
-            filtered.forEach(item => {
-                const cell = document.createElement('div');
-                cell.style.cssText = "aspect-ratio: 1; background: #334155; overflow: hidden; border-radius: 4px;";
-                cell.innerHTML = item.isVideo ? `<video src="${item.mediaUrl}" style="width:100%; height:100%; object-fit:cover;"></video>` : `<img src="${item.mediaUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-                grid.appendChild(cell);
-            });
-            container.appendChild(grid);
-        }
+    return String(value)
+        .replace(
+            /[&<>"']/g,
+            c => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[c])
+        );
 
-        function uploadProfilePicture(event) {
-            const file = event.target.files[0];
-            if (file) {
-                storage.ref('avatars/' + currentUserId).put(file).then(snapshot => {
-                    snapshot.ref.getDownloadURL().then(downloadURL => {
-                        document.getElementById('userAvatarImg').src = downloadURL;
-                        document.getElementById('userAvatarImg').style.display = 'block';
-                        document.getElementById('userAvatarPlaceholder').style.display = 'none';
-                        
-                        document.getElementById('homeUserAvatar').src = downloadURL;
-                        document.getElementById('homeUserAvatar').style.display = 'block';
-                        document.getElementById('homeUserAvatarPlaceholder').style.display = 'none';
-                        
-                        alert("Profile picture updated! ✨");
-                    });
-                });
-            }
-        }
+}
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
+function escapeAttr(value) {
 
-        loadLiveFeed();
-        loadStories();
-        loadSuggestedUsers();
-        loadFriendRequests();
-        loadAcceptedConnections();
-        loadProfileData();
-    </script>
+    return escapeHtml(value);
+
+}
+
+</script>
+
 </body>
 </html>

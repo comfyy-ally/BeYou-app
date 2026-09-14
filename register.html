@@ -1,271 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - TexUs</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-        .auth-card {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-        }
+<title>Register - TexUs</title>
 
-        .app-title {
-            font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 46px;
-            margin-bottom: 10px;
-        }
+<style>
 
-        .tex-part {
-            color: #ec4899;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        .us-part {
-            color: #10b981;
-        }
+body {
+    margin: 0;
+    min-height: 100vh;
 
-        h2 {
-            margin-top: 5px;
-            margin-bottom: 25px;
-        }
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-        input {
-            width: 100%;
-            padding: 13px;
-            margin: 7px 0;
-            border-radius: 7px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            font-size: 15px;
-            outline: none;
-        }
+    background: #0f172a;
+    color: #fff;
 
-        input:focus {
-            border-color: #10b981;
-        }
+    font-family: Arial, sans-serif;
+}
 
-        button {
-            width: 100%;
-            padding: 13px;
-            margin-top: 15px;
-            border-radius: 7px;
-            border: none;
-            background: #ec4899;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+.card {
+    width: 92%;
+    max-width: 390px;
 
-        button:hover {
-            opacity: 0.9;
-        }
+    background: #1e293b;
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+    padding: 30px;
 
-        .message {
-            display: none;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 7px;
-            font-size: 14px;
-        }
+    border-radius: 18px;
 
-        .error {
-            display: block;
-            background: #7f1d1d;
-            color: white;
-        }
+    box-shadow: 0 10px 35px #0008;
 
-        .success {
-            display: block;
-            background: #065f46;
-            color: white;
-        }
+    text-align: center;
+}
 
-        .link-text {
-            margin-top: 18px;
-            font-size: 14px;
-            color: #94a3b8;
-        }
+.logo {
+    font-family: "Brush Script MT", cursive;
 
-        .link-text a {
-            color: #10b981;
-            text-decoration: none;
-            font-weight: bold;
-        }
-    </style>
+    font-size: 48px;
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    margin-bottom: 8px;
+}
+
+.tex {
+    color: #ec4899;
+}
+
+.us {
+    color: #10b981;
+}
+
+h2 {
+    margin: 8px 0 22px;
+}
+
+input {
+    width: 100%;
+
+    padding: 13px;
+
+    margin: 8px 0;
+
+    border: 1px solid #475569;
+
+    border-radius: 8px;
+
+    background: #0f172a;
+
+    color: white;
+
+    font-size: 15px;
+}
+
+button {
+    width: 100%;
+
+    padding: 13px;
+
+    margin-top: 12px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: #ec4899;
+
+    color: white;
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.6;
+}
+
+.message {
+    min-height: 22px;
+
+    margin-top: 12px;
+
+    color: #fda4af;
+
+    font-size: 14px;
+}
+
+p {
+    color: #94a3b8;
+
+    font-size: 14px;
+}
+
+a {
+    color: #10b981;
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 </head>
 
 <body>
 
-    <div class="auth-card">
+<div class="card">
 
-        <div class="app-title">
-            <span class="tex-part">Tex</span><span class="us-part">Us</span>
-        </div>
-
-        <h2>Create Account</h2>
-
-        <input
-            type="text"
-            id="username"
-            placeholder="Username"
-            autocomplete="username"
-        >
-
-        <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            autocomplete="email"
-        >
-
-        <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            autocomplete="new-password"
-        >
-
-        <button id="signupButton" onclick="registerUser()">
-            Sign Up
-        </button>
-
-        <div id="message" class="message"></div>
-
-        <p class="link-text">
-            Already have an account?
-            <a href="login.html">Login here</a>
-        </p>
-
+    <div class="logo">
+        <span class="tex">Tex</span><span class="us">Us</span>
     </div>
 
-    <script>
+    <h2>Create Account</h2>
 
-        // ==========================================
-        // FIREBASE CONFIGURATION
-        // ==========================================
+    <input
+        id="username"
+        type="text"
+        placeholder="Username"
+        autocomplete="username"
+    >
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
-            authDomain: "texus-5c99e.firebaseapp.com",
-            projectId: "texus-5c99e",
-            storageBucket: "texus-5c99e.firebasestorage.app",
-            messagingSenderId: "1040040305137",
-            appId: "1:1040040305137:web:86f4f717204378a22da450",
-            measurementId: "G-KCF9J53BGH"
-        };
+    <input
+        id="email"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+    >
 
-        // Start Firebase
-        firebase.initializeApp(firebaseConfig);
+    <input
+        id="password"
+        type="password"
+        placeholder="Password (6+ characters)"
+        autocomplete="new-password"
+    >
 
-        // Start Firestore
-        const db = firebase.firestore();
+    <button
+        id="registerBtn"
+        onclick="registerUser()"
+    >
+        Sign Up
+    </button>
 
-        // ==========================================
-        // REGISTER USER
-        // ==========================================
+    <div id="message" class="message"></div>
 
-        async function registerUser() {
+    <p>
+        Already have an account?
+        <a href="login.html">Log in</a>
+    </p>
 
-            const username =
-                document.getElementById("username").value.trim();
+</div>
 
-            const email =
-                document.getElementById("email").value.trim();
+<script>
 
-            const password =
-                document.getElementById("password").value;
+const firebaseConfig = {
 
-            const button =
-                document.getElementById("signupButton");
+    apiKey: "AIzaSyAwGvF8YZ6hQVPTHLe0QzmTPewWQvrO0o",
 
-            const message =
-                document.getElementById("message");
+    authDomain:
+        "texus-5c99e.firebaseapp.com",
 
-            // Clear old message
-            message.className = "message";
-            message.textContent = "";
+    projectId:
+        "texus-5c99e",
 
-            // ==========================================
-            // VALIDATION
-            // ==========================================
+    storageBucket:
+        "texus-5c99e.firebasestorage.app",
 
-            if (!username) {
-                showError("Please enter a username.");
-                return;
+    messagingSenderId:
+        "1040040305137",
+
+    appId:
+        "1:1040040305137:web:86f4f717204378a22da450",
+
+    measurementId:
+        "G-KCF9J53BGH"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+
+function registerUser() {
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("message");
+
+    const btn =
+        document.getElementById("registerBtn");
+
+
+    if (!username) {
+
+        message.textContent =
+            "Please enter a username.";
+
+        return;
+    }
+
+
+    if (!email) {
+
+        message.textContent =
+            "Please enter an email.";
+
+        return;
+    }
+
+
+    if (password.length < 6) {
+
+        message.textContent =
+            "Password must be at least 6 characters.";
+
+        return;
+    }
+
+
+    btn.disabled = true;
+
+    message.textContent =
+        "Creating your account...";
+
+
+    firebase.auth()
+        .createUserWithEmailAndPassword(
+            email,
+            password
+        )
+
+        .then(credential => {
+
+            const user =
+                credential.user;
+
+
+            localStorage.setItem(
+                "texus_username",
+                username
+            );
+
+
+            localStorage.setItem(
+                "texus_user_id",
+                user.uid
+            );
+
+
+            return db
+                .collection("users")
+                .doc(user.uid)
+                .set({
+
+                    username: username,
+
+                    email: email,
+
+                    earningsBalance: 0,
+
+                    payoutEmail: "",
+
+                    createdAt:
+                        firebase.firestore
+                        .FieldValue
+                        .serverTimestamp()
+
+                });
+
+        })
+
+        .then(() => {
+
+            window.location.href =
+                "dashboard.html";
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+
+            if (
+                error.code ===
+                "auth/email-already-in-use"
+            ) {
+
+                message.textContent =
+                    "That email is already registered.";
+
             }
 
-            if (username.length < 3) {
-                showError("Username must be at least 3 characters.");
-                return;
+            else if (
+                error.code ===
+                "auth/invalid-email"
+            ) {
+
+                message.textContent =
+                    "Please enter a valid email address.";
+
             }
 
-            if (!email) {
-                showError("Please enter your email.");
-                return;
+            else if (
+                error.code ===
+                "auth/weak-password"
+            ) {
+
+                message.textContent =
+                    "Please choose a stronger password.";
+
             }
 
-            if (!password) {
-                showError("Please enter a password.");
-                return;
+            else {
+
+                message.textContent =
+                    error.message ||
+                    "Registration failed.";
+
             }
 
-            if (password.length < 6) {
-                showError("Password must be at least 6 characters.");
-                return;
-            }
 
-            // Disable button while registering
-            button.disabled = true;
-            button.textContent = "Creating account...";
+            btn.disabled = false;
 
-            try {
+        });
 
-                // ==========================================
-                // CREATE FIREBASE AUTH ACCOUNT
-                // ==========================================
+}
 
-                const userCredential =
-                    await firebase.auth()
-                    .createUserWithEmailAndPassword(
-                        email,
-                        password
-                    );
+</script>
 
-                const user = userCredential.user;
-
-                // ==========================================
-                // SAVE
+</body>
+</html>

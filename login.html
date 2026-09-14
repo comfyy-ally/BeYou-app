@@ -1,546 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - TexUs</title>
 
-    <title>Login - TexUs</title>
+<style>
+* {
+    box-sizing: border-box;
+}
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0f172a;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+.card {
+    width: 92%;
+    max-width: 390px;
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 10px 35px #0008;
+    text-align: center;
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+.logo {
+    font-family: "Brush Script MT", cursive;
+    font-size: 48px;
+    margin-bottom: 8px;
+}
 
-        .auth-card {
-            background-color: #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-        }
+.tex {
+    color: #ec4899;
+}
 
-        .app-title {
-            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive, sans-serif;
-            font-size: 42px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
+.us {
+    color: #10b981;
+}
 
-        .tex-part {
-            color: #ec4899;
-        }
+h2 {
+    margin: 8px 0 22px;
+}
 
-        .us-part {
-            color: #10b981;
-        }
+input {
+    width: 100%;
+    padding: 13px;
+    margin: 8px 0;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    background: #0f172a;
+    color: white;
+    font-size: 15px;
+}
 
-        h2 {
-            margin: 5px 0 20px;
-        }
+button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 12px;
+    border: 0;
+    border-radius: 8px;
+    background: #ec4899;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-        .input-group {
-            position: relative;
-            margin: 10px 0;
-        }
+button:disabled {
+    opacity: 0.6;
+}
 
-        input {
-            width: 100%;
-            padding: 13px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background-color: #0f172a;
-            color: #ffffff;
-            outline: none;
-            font-size: 14px;
-        }
+.message {
+    min-height: 22px;
+    margin-top: 12px;
+    color: #fda4af;
+    font-size: 14px;
+}
 
-        input:focus {
-            border-color: #10b981;
-        }
+p {
+    color: #94a3b8;
+    font-size: 14px;
+}
 
-        .password-input {
-            padding-right: 75px;
-        }
+a {
+    color: #10b981;
+    text-decoration: none;
+    font-weight: bold;
+}
+</style>
 
-        .show-password {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            color: #10b981;
-            cursor: pointer;
-            font-size: 12px;
-            width: auto;
-            padding: 5px;
-            margin: 0;
-        }
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-        .login-button {
-            width: 100%;
-            padding: 13px;
-            margin-top: 15px;
-            border-radius: 6px;
-            border: none;
-            background-color: #10b981;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        .login-button:hover {
-            background-color: #059669;
-        }
-
-        .login-button:disabled {
-            background-color: #64748b;
-            cursor: not-allowed;
-        }
-
-        .forgot-password {
-            display: block;
-            margin-top: 15px;
-            color: #10b981;
-            font-size: 13px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-
-        .link-text {
-            margin-top: 20px;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-
-        .link-text a {
-            color: #ec4899;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .link-text a:hover {
-            text-decoration: underline;
-        }
-
-        .status-message {
-            display: none;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
-        .error-message {
-            background-color: #450a0a;
-            color: #fecaca;
-            border: 1px solid #ef4444;
-        }
-
-        .success-message {
-            background-color: #064e3b;
-            color: #d1fae5;
-            border: 1px solid #10b981;
-        }
-    </style>
 </head>
 
 <body>
 
-    <div class="auth-card">
+<div class="card">
 
-        <!-- TEXUS LOGO -->
-        <div class="app-title">
-            <span class="tex-part">Tex</span><span class="us-part">Us</span>
-        </div>
-
-        <h2>Welcome Back</h2>
-
-        <!-- EMAIL -->
-        <div class="input-group">
-            <input
-                type="email"
-                id="email"
-                placeholder="Email address"
-                autocomplete="email"
-            >
-        </div>
-
-        <!-- PASSWORD -->
-        <div class="input-group">
-            <input
-                type="password"
-                id="password"
-                class="password-input"
-                placeholder="Password"
-                autocomplete="current-password"
-            >
-
-            <button
-                type="button"
-                class="show-password"
-                onclick="togglePassword()"
-                id="showPasswordButton"
-            >
-                Show
-            </button>
-        </div>
-
-        <!-- LOGIN BUTTON -->
-        <button
-            type="button"
-            class="login-button"
-            id="loginButton"
-            onclick="loginUser()"
-        >
-            Sign In
-        </button>
-
-        <!-- FORGOT PASSWORD -->
-        <a
-            class="forgot-password"
-            onclick="forgotPassword()"
-        >
-            Forgot your password?
-        </a>
-
-        <!-- STATUS -->
-        <div
-            id="statusMessage"
-            class="status-message"
-        ></div>
-
-        <!-- REGISTER -->
-        <p class="link-text">
-            Don't have an account?
-            <a href="register.html">Register here</a>
-        </p>
-
+    <div class="logo">
+        <span class="tex">Tex</span><span class="us">Us</span>
     </div>
 
+    <h2>Welcome Back</h2>
 
-    <script>
+    <input
+        id="email"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+    >
 
-        // =====================================================
-        // TEXUS FIREBASE CONFIGURATION
-        // =====================================================
+    <input
+        id="password"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+    >
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBLWsJhuxdhDJgvnMnclXdYhAcQv5RrGm0",
-            authDomain: "texus-5c99e.firebaseapp.com",
-            projectId: "texus-5c99e",
-            storageBucket: "texus-5c99e.firebasestorage.app",
-            messagingSenderId: "1040040305137",
-            appId: "1:1040040305137:web:86f4f717204378a22da450",
-            measurementId: "G-KCF9J53BGH"
-        };
+    <button id="loginBtn" onclick="loginUser()">
+        Log In
+    </button>
 
+    <div id="message" class="message"></div>
 
-        // Start Firebase
-        firebase.initializeApp(firebaseConfig);
+    <p>
+        Don't have an account?
+        <a href="register.html">Create one</a>
+    </p>
 
-        // Firebase Authentication
-        const auth = firebase.auth();
+</div>
 
+<script>
 
-        // =====================================================
-        // CHECK IF USER IS ALREADY LOGGED IN
-        // =====================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyAwGvF8YZ6hQVPTHLe0QzmTPewWQvrO0o",
+    authDomain: "texus-5c99e.firebaseapp.com",
+    projectId: "texus-5c99e",
+    storageBucket: "texus-5c99e.firebasestorage.app",
+    messagingSenderId: "1040040305137",
+    appId: "1:1040040305137:web:86f4f717204378a22da450",
+    measurementId: "G-KCF9J53BGH"
+};
 
-        auth.onAuthStateChanged(function(user) {
+firebase.initializeApp(firebaseConfig);
 
-            if (user) {
+firebase.auth().onAuthStateChanged(function(user) {
 
-                console.log("User already logged in:", user.email);
+    if (user) {
+        window.location.href = "dashboard.html";
+    }
 
-                // Send user to dashboard
-                window.location.href = "dashboard.html";
-            }
+});
+
+function loginUser() {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("message");
+
+    const btn =
+        document.getElementById("loginBtn");
+
+    if (!email || !password) {
+
+        message.textContent =
+            "Please enter your email and password.";
+
+        return;
+    }
+
+    btn.disabled = true;
+
+    message.textContent = "Logging in...";
+
+    firebase.auth()
+        .signInWithEmailAndPassword(email, password)
+
+        .then(() => {
+
+            window.location.href =
+                "dashboard.html";
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            message.textContent =
+                friendlyError(error);
+
+            btn.disabled = false;
 
         });
 
+}
 
-        // =====================================================
-        // LOGIN
-        // =====================================================
+function friendlyError(error) {
 
-        function loginUser() {
+    if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/wrong-password"
+    ) {
+        return "Email or password is incorrect.";
+    }
 
-            const email = document
-                .getElementById("email")
-                .value
-                .trim();
+    if (error.code === "auth/user-not-found") {
+        return "No account was found with this email.";
+    }
 
-            const password = document
-                .getElementById("password")
-                .value;
+    if (error.code === "auth/too-many-requests") {
+        return "Too many attempts. Please try again later.";
+    }
 
-            const loginButton = document.getElementById("loginButton");
+    if (error.code === "auth/network-request-failed") {
+        return "Network error. Check your internet connection.";
+    }
 
-            // Check email
-            if (!email) {
-                showError("Please enter your email address.");
-                return;
-            }
+    return error.message || "Login failed.";
+}
 
-            // Check password
-            if (!password) {
-                showError("Please enter your password.");
-                return;
-            }
-
-            // Disable button while logging in
-            loginButton.disabled = true;
-            loginButton.innerText = "Signing in...";
-
-            clearMessage();
-
-            auth.signInWithEmailAndPassword(email, password)
-
-                .then(function(userCredential) {
-
-                    const user = userCredential.user;
-
-                    console.log("Login successful:", user.uid);
-
-                    showSuccess("Login successful! Opening TexUs...");
-
-                    // Save Firebase user ID
-                    localStorage.setItem(
-                        "texus_user_id",
-                        user.uid
-                    );
-
-                    // Save email
-                    localStorage.setItem(
-                        "texus_email",
-                        user.email
-                    );
-
-                    // Go to dashboard
-                    setTimeout(function() {
-                        window.location.href = "dashboard.html";
-                    }, 700);
-
-                })
-
-                .catch(function(error) {
-
-                    console.error("Login error:", error);
-
-                    let message = "Unable to log in.";
-
-                    switch (error.code) {
-
-                        case "auth/invalid-email":
-                            message = "Please enter a valid email address.";
-                            break;
-
-                        case "auth/user-not-found":
-                            message = "No TexUs account was found with this email.";
-                            break;
-
-                        case "auth/wrong-password":
-                            message = "Incorrect password.";
-                            break;
-
-                        case "auth/invalid-credential":
-                            message = "Incorrect email or password.";
-                            break;
-
-                        case "auth/user-disabled":
-                            message = "This account has been disabled.";
-                            break;
-
-                        case "auth/too-many-requests":
-                            message = "Too many login attempts. Please try again later.";
-                            break;
-
-                        case "auth/network-request-failed":
-                            message = "Internet connection problem. Please check your connection.";
-                            break;
-
-                        default:
-                            message = error.message;
-                    }
-
-                    showError(message);
-
-                    loginButton.disabled = false;
-                    loginButton.innerText = "Sign In";
-                });
-        }
-
-
-        // =====================================================
-        // SHOW / HIDE PASSWORD
-        // =====================================================
-
-        function togglePassword() {
-
-            const passwordInput =
-                document.getElementById("password");
-
-            const button =
-                document.getElementById("showPasswordButton");
-
-            if (passwordInput.type === "password") {
-
-                passwordInput.type = "text";
-                button.innerText = "Hide";
-
-            } else {
-
-                passwordInput.type = "password";
-                button.innerText = "Show";
-            }
-        }
-
-
-        // =====================================================
-        // FORGOT PASSWORD
-        // =====================================================
-
-        function forgotPassword() {
-
-            const email = document
-                .getElementById("email")
-                .value
-                .trim();
-
-            if (!email) {
-
-                showError(
-                    "Enter your email address first, then click Forgot your password."
-                );
-
-                return;
-            }
-
-            auth.sendPasswordResetEmail(email)
-
-                .then(function() {
-
-                    showSuccess(
-                        "Password reset email sent. Check your email inbox."
-                    );
-
-                })
-
-                .catch(function(error) {
-
-                    console.error(
-                        "Password reset error:",
-                        error
-                    );
-
-                    let message =
-                        "Could not send password reset email.";
-
-                    if (error.code === "auth/user-not-found") {
-                        message =
-                            "No TexUs account was found with this email.";
-                    }
-
-                    if (error.code === "auth/invalid-email") {
-                        message =
-                            "Please enter a valid email address.";
-                    }
-
-                    showError(message);
-                });
-        }
-
-
-        // =====================================================
-        // DISPLAY ERROR
-        // =====================================================
-
-        function showError(message) {
-
-            const box =
-                document.getElementById("statusMessage");
-
-            box.className =
-                "status-message error-message";
-
-            box.innerText = message;
-
-            box.style.display = "block";
-        }
-
-
-        // =====================================================
-        // DISPLAY SUCCESS
-        // =====================================================
-
-        function showSuccess(message) {
-
-            const box =
-                document.getElementById("statusMessage");
-
-            box.className =
-                "status-message success-message";
-
-            box.innerText = message;
-
-            box.style.display = "block";
-        }
-
-
-        // =====================================================
-        // CLEAR MESSAGE
-        // =====================================================
-
-        function clearMessage() {
-
-            const box =
-                document.getElementById("statusMessage");
-
-            box.style.display = "none";
-            box.innerText = "";
-        }
-
-
-        // =====================================================
-        // PRESS ENTER TO LOGIN
-        // =====================================================
-
-        document
-            .getElementById("password")
-            .addEventListener("keydown", function(event) {
-
-                if (event.key === "Enter") {
-                    loginUser();
-                }
-
-            });
-
-    </script>
+</script>
 
 </body>
 </html>
