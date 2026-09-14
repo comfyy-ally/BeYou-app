@@ -4,124 +4,268 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - TexUs</title>
+
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #ffffff;
+            background: #0f172a;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
+
         .auth-card {
-            background-color: #1e293b;
+            background: #1e293b;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
             width: 100%;
-            max-width: 350px;
+            max-width: 380px;
             text-align: center;
         }
+
         .app-title {
             font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 36px;
-            margin-bottom: 20px;
+            font-size: 46px;
+            margin-bottom: 10px;
         }
-        .tex-part { color: #ec4899; }
-        .us-part { color: #10b981; }
+
+        .tex-part {
+            color: #ec4899;
+        }
+
+        .us-part {
+            color: #10b981;
+        }
+
+        h2 {
+            margin-top: 5px;
+            margin-bottom: 25px;
+        }
+
         input {
             width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
+            padding: 13px;
+            margin: 7px 0;
+            border-radius: 7px;
             border: 1px solid #334155;
-            background-color: #0f172a;
-            color: #ffffff;
-            box-sizing: border-box;
+            background: #0f172a;
+            color: white;
+            font-size: 15px;
+            outline: none;
         }
+
+        input:focus {
+            border-color: #10b981;
+        }
+
         button {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             margin-top: 15px;
-            border-radius: 6px;
+            border-radius: 7px;
             border: none;
-            background-color: #ec4899;
+            background: #ec4899;
             color: white;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
         }
-        .link-text {
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
             margin-top: 15px;
-            font-size: 13px;
+            padding: 10px;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .error {
+            display: block;
+            background: #7f1d1d;
+            color: white;
+        }
+
+        .success {
+            display: block;
+            background: #065f46;
+            color: white;
+        }
+
+        .link-text {
+            margin-top: 18px;
+            font-size: 14px;
             color: #94a3b8;
         }
+
         .link-text a {
             color: #10b981;
             text-decoration: none;
+            font-weight: bold;
         }
     </style>
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
+
 <body>
+
     <div class="auth-card">
+
         <div class="app-title">
             <span class="tex-part">Tex</span><span class="us-part">Us</span>
         </div>
+
         <h2>Create Account</h2>
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button onclick="registerUser()">Sign Up</button>
-        <p class="link-text">Already have an account? <a href="login.html">Login here</a></p>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Username"
+            autocomplete="username"
+        >
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            autocomplete="email"
+        >
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            autocomplete="new-password"
+        >
+
+        <button id="signupButton" onclick="registerUser()">
+            Sign Up
+        </button>
+
+        <div id="message" class="message"></div>
+
+        <p class="link-text">
+            Already have an account?
+            <a href="login.html">Login here</a>
+        </p>
+
     </div>
 
     <script>
+
+        // ==========================================
+        // FIREBASE CONFIGURATION
+        // ==========================================
+
         const firebaseConfig = {
-            apiKey: "YOUR_RESTRICTED_API_KEY",
+            apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
             authDomain: "texus-5c99e.firebaseapp.com",
             projectId: "texus-5c99e",
             storageBucket: "texus-5c99e.firebasestorage.app",
             messagingSenderId: "1040040305137",
-            appId: "1:1040040305137:web:86f4f717204378a22da450"
+            appId: "1:1040040305137:web:86f4f717204378a22da450",
+            measurementId: "G-KCF9J53BGH"
         };
+
+        // Start Firebase
         firebase.initializeApp(firebaseConfig);
+
+        // Start Firestore
         const db = firebase.firestore();
 
-        function registerUser() {
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // ==========================================
+        // REGISTER USER
+        // ==========================================
+
+        async function registerUser() {
+
+            const username =
+                document.getElementById("username").value.trim();
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const password =
+                document.getElementById("password").value;
+
+            const button =
+                document.getElementById("signupButton");
+
+            const message =
+                document.getElementById("message");
+
+            // Clear old message
+            message.className = "message";
+            message.textContent = "";
+
+            // ==========================================
+            // VALIDATION
+            // ==========================================
 
             if (!username) {
-                alert("Please enter a username");
+                showError("Please enter a username.");
                 return;
             }
 
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    
-                    // Save username to local storage & Firestore users collection
-                    localStorage.setItem('texus_username', username);
-                    localStorage.setItem('texus_user_id', user.uid);
+            if (username.length < 3) {
+                showError("Username must be at least 3 characters.");
+                return;
+            }
 
-                    return db.collection("users").doc(user.uid).set({
-                        username: username,
-                        email: email,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                })
-                .then(() => {
-                    window.location.href = 'dashboard.html';
-                })
-                .catch((error) => {
-                    alert("Error: " + error.message);
-                });
-        }
-    </script>
-</body>
-</html>
+            if (!email) {
+                showError("Please enter your email.");
+                return;
+            }
+
+            if (!password) {
+                showError("Please enter a password.");
+                return;
+            }
+
+            if (password.length < 6) {
+                showError("Password must be at least 6 characters.");
+                return;
+            }
+
+            // Disable button while registering
+            button.disabled = true;
+            button.textContent = "Creating account...";
+
+            try {
+
+                // ==========================================
+                // CREATE FIREBASE AUTH ACCOUNT
+                // ==========================================
+
+                const userCredential =
+                    await firebase.auth()
+                    .createUserWithEmailAndPassword(
+                        email,
+                        password
+                    );
+
+                const user = userCredential.user;
+
+                // ==========================================
+                // SAVE
