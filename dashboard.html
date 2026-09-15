@@ -6,43 +6,30 @@
 
   <title>TexUs</title>
 
-  <!-- =========================
-       TEXUS FONT
-  ========================== -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
-    rel="stylesheet"
-  >
+  <!-- TexUs handwritten logo font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 
-  <!-- =========================
-       FIREBASE
-  ========================== -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
-
   <style>
-
-    /* ==================================================
-       GENERAL
-    ================================================== */
-
     * {
       box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
-      padding-bottom: 75px;
-      background: #0b0f14;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
       color: white;
-      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 80px;
     }
 
     button,
@@ -55,15 +42,27 @@
       cursor: pointer;
     }
 
+    /* =========================
+       HEADER
+    ========================== */
 
-    /* ==================================================
-       TEXUS LOGO
-    ================================================== */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 65px;
+      background: #0f172a;
+      border-bottom: 1px solid #273449;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+    }
 
     .logo {
       font-family: "Pacifico", cursive;
-      font-size: 30px;
-      letter-spacing: 1px;
+      font-size: 31px;
+      line-height: 1;
     }
 
     .tex {
@@ -74,1201 +73,832 @@
       color: #10b981;
     }
 
-
-    /* ==================================================
-       TOP BAR
-    ================================================== */
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-
-      height: 68px;
-      padding: 10px 18px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      background: #111827;
-      border-bottom: 1px solid #263241;
-    }
-
-    .profile-top {
+    .header-profile {
       width: 42px;
       height: 42px;
-
-      border: none;
       border-radius: 50%;
-
-      background: #263241;
+      border: 2px solid #10b981;
+      background: #1e293b;
       color: white;
-
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 20px;
+      overflow: hidden;
     }
 
+    .header-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    /* ==================================================
+    /* =========================
        PAGES
-    ================================================== */
+    ========================== */
 
     .page {
       display: none;
-
-      max-width: 760px;
+      padding: 18px;
+      max-width: 900px;
       margin: auto;
-
-      padding: 20px;
     }
 
     .page.active {
       display: block;
     }
 
-    h2,
-    h3 {
-      color: white;
+    .page-title {
+      font-size: 26px;
+      margin-bottom: 18px;
+      font-weight: 700;
     }
 
-
-    /* ==================================================
-       HOME
-    ================================================== */
-
-    .post-box {
-      margin-bottom: 20px;
-      padding: 15px;
-
-      background: #1e293b;
-      border-radius: 15px;
-    }
-
-    .post-input {
-      width: 100%;
-      min-height: 85px;
-
-      padding: 13px;
-
-      border: none;
-      border-radius: 11px;
-
-      outline: none;
-      resize: vertical;
-
-      background: #334155;
-      color: white;
-
-      font-size: 15px;
-    }
-
-    .post-buttons {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .main-btn {
-      border: none;
-      border-radius: 9px;
-
-      padding: 10px 16px;
-
-      background: #10b981;
-      color: white;
-
-      font-weight: bold;
-    }
-
-    .pink-btn {
-      background: #ec4899;
-    }
-
-
-    /* ==================================================
+    /* =========================
        STORIES
-    ================================================== */
+    ========================== */
 
-    .stories-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .stories-section {
+      margin-bottom: 25px;
     }
 
-    .stories-title h3 {
+    .section-title {
+      font-size: 20px;
       margin-bottom: 12px;
     }
 
-    .stories-container {
+    .stories {
       display: flex;
-      gap: 10px;
-
+      gap: 12px;
       overflow-x: auto;
-
-      padding-bottom: 15px;
-
+      padding-bottom: 8px;
       scrollbar-width: none;
     }
 
-    .stories-container::-webkit-scrollbar {
+    .stories::-webkit-scrollbar {
       display: none;
     }
 
     .story-card {
-      position: relative;
-
-      width: 110px;
-      min-width: 110px;
-      height: 170px;
-
-      overflow: hidden;
-
+      min-width: 115px;
+      height: 180px;
       border-radius: 15px;
-
-      background: #334155;
-
-      cursor: pointer;
-    }
-
-    .your-story {
-      border: 2px solid #10b981;
       background: #1e293b;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      border: 1px solid #334155;
     }
 
-    .story-plus {
-      position: absolute;
-
-      top: 47px;
-      left: 50%;
-
-      width: 50px;
-      height: 50px;
-
-      transform: translateX(-50%);
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 50%;
-
-      background: #2563eb;
-
-      font-size: 30px;
+    .story-card img,
+    .story-card video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .story-name {
       position: absolute;
-
-      right: 5px;
       bottom: 8px;
-      left: 5px;
-
-      text-align: center;
-
-      font-size: 13px;
+      left: 8px;
+      right: 8px;
       font-weight: bold;
-
-      text-shadow: 0 1px 5px black;
+      font-size: 13px;
+      text-shadow: 0 1px 4px black;
+      z-index: 2;
     }
 
-    .story-placeholder {
-      width: 100%;
-      height: 100%;
+    .your-story {
+      background: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8px;
+    }
 
+    .your-story-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #334155;
+      border: 3px solid #10b981;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      color: #94a3b8;
+      overflow: hidden;
+      margin-bottom: 10px;
     }
 
-    .upload-status {
-      display: none;
+    .your-story-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-      margin: 10px 0;
-      padding: 10px;
+    .plus-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -20px;
+      z-index: 3;
+    }
 
-      border-radius: 10px;
-
-      background: #1e293b;
-      color: #94a3b8;
-
+    .your-story-name {
+      margin-top: 6px;
       font-size: 13px;
+      font-weight: bold;
     }
 
+    #storyFile {
+      display: none;
+    }
 
-    /* ==================================================
-       POSTS
-    ================================================== */
-
-    .post-card {
-      margin-bottom: 15px;
-      padding: 15px;
-
-      border-radius: 15px;
-
+    #uploadStatus {
+      display: none;
       background: #1e293b;
+      border: 1px solid #10b981;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
+      color: #10b981;
+      text-align: center;
     }
 
-    .post-author {
+    /* =========================
+       POSTS
+    ========================== */
+
+    .post-box {
+      background: #1e293b;
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 18px;
+      border: 1px solid #334155;
+    }
+
+    .post-input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 25px;
+      padding: 13px 17px;
+      color: white;
+      resize: none;
+      min-height: 50px;
+      outline: none;
+    }
+
+    .post-input:focus {
+      border-color: #10b981;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 9px;
+      padding: 10px 16px;
+      color: white;
+      background: #10b981;
+      font-weight: bold;
+    }
+
+    .btn.secondary {
+      background: #334155;
+    }
+
+    .btn.danger {
+      background: #ef4444;
+    }
+
+    .feed-post {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .post-header {
+      padding: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .post-user {
       font-weight: bold;
     }
 
     .post-time {
-      margin-top: 3px;
-
       color: #94a3b8;
       font-size: 12px;
     }
 
-    .post-content {
-      margin-top: 12px;
-
+    .post-text {
+      padding: 0 13px 13px;
       line-height: 1.5;
-
-      white-space: pre-wrap;
     }
 
-
-    /* ==================================================
-       FRIENDS PAGE
-    ================================================== */
-
-    .friends-header h2 {
-      margin-bottom: 5px;
+    .post-media {
+      width: 100%;
+      max-height: 600px;
+      object-fit: cover;
+      display: block;
     }
 
-    .friends-header p {
-      margin-top: 0;
-      color: #94a3b8;
-    }
-
-    .friends-tabs {
+    .post-buttons {
       display: flex;
-      gap: 6px;
-
-      margin: 20px 0;
-
-      padding: 6px;
-
-      border-radius: 14px;
-
-      background: #1e293b;
+      border-top: 1px solid #334155;
     }
 
-    .friends-tab {
+    .post-buttons button {
       flex: 1;
-
-      padding: 13px 8px;
-
       border: none;
-      border-radius: 10px;
-
       background: transparent;
       color: #cbd5e1;
-
-      font-weight: bold;
+      padding: 13px;
     }
 
-    .friends-tab.active {
+    .post-buttons button:hover {
+      background: #273449;
+    }
+
+    /* =========================
+       FRIENDS
+    ========================== */
+
+    .tabs {
+      display: flex;
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 18px;
+      border: 1px solid #334155;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 9px;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .tab.active {
       background: #10b981;
       color: white;
-    }
-
-    .request-count {
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      min-width: 21px;
-      height: 21px;
-
-      margin-left: 4px;
-      padding: 0 5px;
-
-      border-radius: 50%;
-
-      background: #ec4899;
-
-      font-size: 12px;
     }
 
     .friend-card {
-      display: flex;
-      align-items: center;
-
-      gap: 12px;
-
-      margin-bottom: 10px;
-      padding: 13px;
-
-      border-radius: 14px;
-
       background: #1e293b;
-    }
-
-    .friend-avatar {
-      width: 50px;
-      height: 50px;
-      min-width: 50px;
-
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px;
       display: flex;
       align-items: center;
-      justify-content: center;
-
-      border-radius: 50%;
-
-      background: #334155;
-
-      font-size: 18px;
-      font-weight: bold;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .friend-info {
-      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
       min-width: 0;
     }
 
-    .friend-info strong {
-      display: block;
-    }
-
-    .friend-info span {
-      display: block;
-
-      margin-top: 4px;
-
-      color: #94a3b8;
-      font-size: 13px;
-    }
-
-    .friend-action,
-    .accept-btn,
-    .decline-btn {
-      border: none;
-      border-radius: 9px;
-
-      padding: 9px 12px;
-
-      color: white;
+    .friend-name {
       font-weight: bold;
+      word-break: break-word;
     }
 
-    .friend-action {
-      background: #10b981;
-    }
-
-    .friend-action.pending {
-      background: #475569;
-    }
-
-    .accept-btn {
-      background: #10b981;
-    }
-
-    .decline-btn {
-      background: #475569;
-    }
-
-    .request-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .friends-empty,
-    .friends-loading {
-      padding: 30px 15px;
-
-      border-radius: 14px;
-
-      background: #1e293b;
-
+    .friend-email {
       color: #94a3b8;
-
-      text-align: center;
+      font-size: 12px;
+      margin-top: 3px;
     }
 
+    .friend-actions {
+      display: flex;
+      gap: 7px;
+      flex-shrink: 0;
+    }
 
-    /* ==================================================
-       CHAT
-    ================================================== */
+    .small-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-weight: bold;
+      color: white;
+      background: #10b981;
+    }
 
-    .chat-box {
-      padding: 15px;
+    .small-btn.decline {
+      background: #475569;
+    }
 
-      border-radius: 15px;
+    .small-btn.remove {
+      background: #ef4444;
+    }
 
+    .empty-message {
       background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 25px;
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    /* =========================
+       CHAT
+    ========================== */
+
+    .chat-users {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+    }
+
+    .chat-user {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 10px;
+      min-width: 100px;
+      text-align: center;
+      color: white;
+    }
+
+    .chat-user.selected {
+      border-color: #10b981;
+    }
+
+    .chat-user .avatar {
+      margin: auto auto 6px;
     }
 
     .messages {
-      height: 350px;
-
+      height: 430px;
       overflow-y: auto;
-
-      padding: 10px;
-      margin-bottom: 10px;
-
-      border-radius: 10px;
-
-      background: #0b0f14;
+      background: #111827;
+      border-radius: 14px;
+      padding: 15px;
+      border: 1px solid #334155;
+      margin-bottom: 12px;
     }
 
     .message {
-      width: fit-content;
-      max-width: 80%;
-
-      margin-bottom: 8px;
-      padding: 9px 12px;
-
-      border-radius: 12px;
-
-      background: #334155;
-
-      white-space: pre-wrap;
+      max-width: 75%;
+      padding: 10px 13px;
+      border-radius: 15px;
+      margin-bottom: 9px;
+      word-wrap: break-word;
     }
 
-    .message.mine {
+    .message.me {
       margin-left: auto;
       background: #10b981;
     }
 
-    .chat-input {
+    .message.them {
+      background: #334155;
+    }
+
+    .chat-input-area {
       display: flex;
       gap: 8px;
     }
 
-    .chat-input input {
+    .chat-input {
       flex: 1;
-
-      min-width: 0;
-
-      padding: 12px;
-
-      border: none;
-      border-radius: 10px;
-
-      outline: none;
-
-      background: #334155;
-      color: white;
-    }
-
-
-    /* ==================================================
-       MUSIC
-    ================================================== */
-
-    .music-card {
-      margin-bottom: 12px;
-      padding: 18px;
-
-      border-radius: 15px;
-
+      border: 1px solid #475569;
       background: #1e293b;
+      color: white;
+      border-radius: 25px;
+      padding: 13px 17px;
+      outline: none;
     }
 
-    .music-title {
-      font-size: 18px;
-      font-weight: bold;
+    /* =========================
+       MUSIC
+    ========================== */
+
+    .music-banner {
+      background: linear-gradient(135deg, #ec4899, #10b981);
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 18px;
     }
 
-    .music-artist {
-      margin-top: 5px;
-      color: #94a3b8;
+    .music-banner h2 {
+      margin-bottom: 6px;
     }
 
-
-    /* ==================================================
-       NEW PROFILE PAGE
-    ================================================== */
-
-    .profile-page {
-      max-width: 760px;
-
-      min-height: calc(100vh - 65px);
-
-      background: #0b0f14;
-    }
-
-
-    /* PROFILE HEADER */
-
-    .profile-top-area {
-      padding-top: 5px;
-    }
-
-    .profile-heading {
+    .track {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-
-      gap: 22px;
+      justify-content: space-between;
     }
 
-
-    /* PROFILE IMAGE */
-
-    .profile-avatar-wrap {
-      position: relative;
-
-      flex-shrink: 0;
+    .track-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .profile-avatar-large {
-      width: 105px;
-      height: 105px;
-
+    .track-cover {
+      width: 50px;
+      height: 50px;
+      background: #334155;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      overflow: hidden;
-
-      border: 3px solid #1e293b;
-      border-radius: 50%;
-
-      background: #e5e7eb;
-
-      color: #64748b;
-
-      font-size: 48px;
-    }
-
-    .profile-avatar-large img {
-      width: 100%;
-      height: 100%;
-
-      object-fit: cover;
-    }
-
-    .avatar-plus {
-      position: absolute;
-
-      right: -2px;
-      bottom: 0;
-
-      width: 31px;
-      height: 31px;
-
-      border: 3px solid #0b0f14;
-      border-radius: 50%;
-
-      background: #10b981;
-      color: white;
-
-      font-size: 19px;
-      font-weight: bold;
-    }
-
-
-    /* PROFILE DETAILS */
-
-    .profile-details {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .profile-details h2 {
-      margin: 0 0 5px;
-
-      font-size: 21px;
-
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .profile-details p {
-      margin: 0 0 14px;
-
-      color: #94a3b8;
-
-      font-size: 13px;
-    }
-
-
-    /* PROFILE STATS */
-
-    .profile-stats {
-      display: flex;
-      gap: 28px;
-    }
-
-    .profile-stats div {
-      text-align: center;
-    }
-
-    .profile-stats strong {
-      display: block;
-
-      font-size: 18px;
-    }
-
-    .profile-stats span {
-      display: block;
-
-      margin-top: 2px;
-
-      color: #cbd5e1;
-
-      font-size: 12px;
-    }
-
-
-    /* PROFILE ACTIONS */
-
-    .profile-actions {
-      display: flex;
-
-      gap: 8px;
-
-      margin-top: 25px;
-    }
-
-    .profile-action-btn {
-      flex: 1;
-
-      height: 48px;
-
-      border: none;
-      border-radius: 11px;
-
-      background: #252b34;
-
-      color: white;
-
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .profile-action-btn:hover {
-      background: #303743;
-    }
-
-    .profile-add-btn {
-      width: 55px;
-
-      border: none;
-      border-radius: 11px;
-
-      background: #252b34;
-
-      color: white;
-
-      font-size: 21px;
-    }
-
-
-    /* DISCOVER PEOPLE */
-
-    .discover-section {
-      margin-top: 32px;
-    }
-
-    .discover-heading {
-      display: flex;
-
-      align-items: center;
-      justify-content: space-between;
-
-      margin-bottom: 14px;
-    }
-
-    .discover-heading h3 {
-      margin: 0;
-
-      font-size: 20px;
-    }
-
-    .discover-heading button {
-      border: none;
-
-      background: transparent;
-
-      color: #10b981;
-
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .discover-scroll {
-      display: flex;
-
-      gap: 10px;
-
-      overflow-x: auto;
-
-      padding-bottom: 10px;
-
-      scrollbar-width: none;
-    }
-
-    .discover-scroll::-webkit-scrollbar {
-      display: none;
-    }
-
-    .discover-card {
-      position: relative;
-
-      width: 190px;
-      min-width: 190px;
-
-      padding: 15px;
-
-      border: 1px solid #303640;
-
-      border-radius: 17px;
-
-      background: #171c22;
-
-      text-align: center;
-    }
-
-    .discover-close {
-      position: absolute;
-
-      top: 9px;
-      right: 10px;
-
-      border: none;
-
-      background: transparent;
-
-      color: white;
-
       font-size: 22px;
     }
 
-    .discover-avatar {
-      width: 85px;
-      height: 85px;
+    .play-btn {
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #10b981;
+      color: white;
+      font-size: 18px;
+    }
 
-      margin: 3px auto 12px;
+    /* =========================
+       PROFILE
+    ========================== */
 
+    .profile-card {
+      background: #111827;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #273449;
+    }
+
+    .profile-cover {
+      height: 170px;
+      background: linear-gradient(135deg, #ec4899, #10b981);
+      position: relative;
+    }
+
+    .profile-content {
+      padding: 0 20px 20px;
+      position: relative;
+    }
+
+    .profile-avatar {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      background: #334155;
+      border: 5px solid #111827;
+      margin-top: -52px;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      border-radius: 50%;
-
-      background: #e5e7eb;
-
-      color: #64748b;
-
-      font-size: 35px;
-
-      overflow: hidden;
+      font-size: 40px;
     }
 
-    .discover-avatar img {
+    .profile-avatar img {
       width: 100%;
       height: 100%;
-
       object-fit: cover;
     }
 
-    .discover-name {
-      margin-bottom: 5px;
-
+    .profile-name {
+      font-size: 25px;
       font-weight: bold;
+      margin-top: 12px;
     }
 
-    .discover-mutual {
-      margin-bottom: 12px;
-
+    .profile-email {
       color: #94a3b8;
-
-      font-size: 12px;
+      margin-top: 4px;
     }
 
-    .discover-follow {
-      width: 100%;
-
-      padding: 10px;
-
-      border: none;
-      border-radius: 10px;
-
-      background: #10b981;
-
-      color: white;
-
-      font-weight: bold;
-    }
-
-
-    /* PROFILE TABS */
-
-    .profile-content-tabs {
+    .profile-stats {
       display: flex;
-
-      margin-top: 22px;
-
-      border-bottom: 1px solid #252b34;
+      gap: 35px;
+      margin-top: 20px;
     }
 
-    .profile-content-tab {
-      flex: 1;
+    .stat {
+      text-align: center;
+    }
 
-      height: 55px;
+    .stat-number {
+      font-size: 21px;
+      font-weight: bold;
+    }
 
-      border: none;
-
-      border-bottom: 2px solid transparent;
-
-      background: transparent;
-
+    .stat-label {
       color: #94a3b8;
-
-      font-size: 28px;
+      font-size: 13px;
     }
 
-    .profile-content-tab.active {
-      border-bottom-color: white;
+    .profile-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
 
+    .profile-tabs {
+      display: flex;
+      border-top: 1px solid #273449;
+      margin-top: 20px;
+    }
+
+    .profile-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      color: #94a3b8;
+      border: none;
+      background: transparent;
+      font-size: 22px;
+    }
+
+    .profile-tab.active {
       color: white;
+      border-bottom: 3px solid white;
     }
 
-
-    /* PROFILE POST GRID */
+    .profile-posts {
+      min-height: 200px;
+      padding: 20px 0;
+    }
 
     .profile-post-grid {
       display: grid;
-
       grid-template-columns: repeat(3, 1fr);
-
       gap: 3px;
-
-      margin-top: 3px;
     }
 
-    .profile-grid-post {
-      aspect-ratio: 1 / 1;
-
-      overflow: hidden;
-
-      background: #1e293b;
-    }
-
-    .profile-grid-post img,
-    .profile-grid-post video {
+    .profile-post-grid img,
+    .profile-post-grid video {
       width: 100%;
-      height: 100%;
-
+      aspect-ratio: 1;
       object-fit: cover;
     }
 
-    .empty-profile {
-      grid-column: 1 / -1;
+    /* =========================
+       MODALS
+    ========================== */
 
-      padding: 80px 20px;
-
-      text-align: center;
-    }
-
-    .empty-profile h2 {
-      margin-bottom: 8px;
-
-      font-size: 24px;
-    }
-
-    .empty-profile p {
-      color: #cbd5e1;
-    }
-
-    .empty-profile button {
-      margin-top: 25px;
-
-      padding: 13px 35px;
-
-      border: none;
-      border-radius: 15px;
-
-      background: #10b981;
-
-      color: white;
-
-      font-size: 16px;
-      font-weight: bold;
-    }
-
-
-    /* LOGOUT */
-
-    .profile-logout {
-      display: block;
-
-      margin: 30px auto;
-
-      padding: 12px 35px;
-
-      border: none;
-      border-radius: 10px;
-
-      background: #334155;
-
-      color: white;
-
-      font-weight: bold;
-    }
-
-
-    /* ==================================================
-       STORY VIEWER
-    ================================================== */
-
-    .story-viewer {
-      position: fixed;
-
-      inset: 0;
-
-      z-index: 500;
-
+    .modal {
       display: none;
-
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.85);
+      z-index: 500;
       align-items: center;
       justify-content: center;
-
       padding: 20px;
-
-      background: rgba(0, 0, 0, .95);
     }
 
-    .story-viewer-content {
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
       width: 100%;
-      max-width: 500px;
-
+      max-width: 600px;
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
       max-height: 90vh;
+      overflow-y: auto;
+    }
 
-      text-align: center;
+    .close-modal {
+      position: absolute;
+      right: 14px;
+      top: 10px;
+      border: none;
+      background: transparent;
+      color: white;
+      font-size: 28px;
+    }
+
+    .story-viewer {
+      background: black;
+      max-width: 500px;
+      width: 100%;
+      height: 80vh;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .story-viewer img,
     .story-viewer video {
       max-width: 100%;
-      max-height: 80vh;
-
-      border-radius: 12px;
+      max-height: 100%;
+      object-fit: contain;
     }
 
-    .close-story {
-      position: fixed;
-
+    .story-viewer-name {
+      position: absolute;
       top: 15px;
-      right: 22px;
-
-      border: none;
-
-      background: transparent;
-
-      color: white;
-
-      font-size: 35px;
+      left: 15px;
+      z-index: 2;
+      font-weight: bold;
     }
 
-
-    /* ==================================================
-       BOTTOM NAV
-    ================================================== */
+    /* =========================
+       BOTTOM NAVIGATION
+    ========================== */
 
     .bottom-nav {
       position: fixed;
-
-      right: 0;
       bottom: 0;
       left: 0;
-
-      z-index: 200;
-
-      height: 65px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-
-      border-top: 1px solid #263241;
-
+      right: 0;
+      height: 68px;
       background: #111827;
+      border-top: 1px solid #334155;
+      z-index: 200;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
     }
 
     .nav-btn {
-      border: none;
-
       background: transparent;
-
+      border: none;
       color: #94a3b8;
-
-      font-size: 12px;
-
-      text-align: center;
+      font-size: 24px;
+      min-width: 60px;
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
     }
 
     .nav-btn span {
-      display: block;
-
-      margin-bottom: 2px;
-
-      font-size: 21px;
+      font-size: 10px;
     }
 
     .nav-btn.active {
       color: #10b981;
     }
 
+    /* =========================
+       RESPONSIVE
+    ========================== */
 
-    /* ==================================================
-       MOBILE
-    ================================================== */
-
-    @media (max-width: 560px) {
-
+    @media (max-width: 600px) {
       .page {
-        padding: 15px;
-      }
-
-      .profile-heading {
-        gap: 14px;
-      }
-
-      .profile-avatar-large {
-        width: 92px;
-        height: 92px;
-
-        font-size: 40px;
-      }
-
-      .profile-details h2 {
-        font-size: 18px;
-      }
-
-      .profile-stats {
-        gap: 18px;
-      }
-
-      .profile-stats strong {
-        font-size: 16px;
-      }
-
-      .profile-actions {
-        margin-top: 20px;
-      }
-
-      .profile-action-btn {
-        font-size: 13px;
-      }
-
-      .profile-add-btn {
-        width: 48px;
-      }
-
-      .discover-card {
-        width: 175px;
-        min-width: 175px;
+        padding: 14px;
       }
 
       .friend-card {
-        padding: 10px;
+        align-items: flex-start;
       }
 
-      .friend-action,
-      .accept-btn,
-      .decline-btn {
-        padding: 8px;
-
-        font-size: 11px;
+      .friend-card,
+      .friend-info {
+        flex-wrap: wrap;
       }
 
-      .request-actions {
-        gap: 4px;
+      .friend-actions {
+        width: 100%;
       }
 
+      .friend-actions button {
+        flex: 1;
+      }
+
+      .profile-stats {
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .profile-actions .btn {
+        flex: 1;
+      }
     }
-
   </style>
 </head>
 
-
 <body>
 
-
-  <!-- ==================================================
+  <!-- =========================
        TOP BAR
-  ================================================== -->
+  ========================== -->
 
   <header class="topbar">
-
     <div class="logo">
       <span class="tex">Tex</span><span class="us">Us</span>
     </div>
 
-    <button
-      class="profile-top"
-      onclick="showPage('profile')">
-      👤
+    <button class="header-profile" onclick="showPage('profile')">
+      <span id="headerAvatar">👤</span>
     </button>
-
   </header>
 
 
-  <!-- ==================================================
+  <!-- =========================
        HOME
-  ================================================== -->
+  ========================== -->
 
-  <section
-    id="homePage"
-    class="page active">
+  <main id="homePage" class="page active">
 
-    <h2>Home Feed</h2>
-
+    <h1 class="page-title">Home Feed</h1>
 
     <!-- STORIES -->
 
-    <div class="stories-title">
-      <h3>Stories</h3>
-    </div>
+    <section class="stories-section">
 
-    <div
-      id="uploadStatus"
-      class="upload-status">
-    </div>
+      <h2 class="section-title">Stories</h2>
 
+      <div class="stories" id="storyContainer">
 
-    <div
-      id="storyContainer"
-      class="stories-container">
+        <div class="story-card your-story">
 
+          <div class="your-story-avatar" id="yourStoryAvatar">
+            👤
+          </div>
 
-      <!-- YOUR STORY -->
+          <button
+            class="plus-button"
+            onclick="openStoryUpload()">
+            +
+          </button>
 
-      <div
-        class="story-card your-story"
-        onclick="openStoryUpload()">
+          <div class="your-story-name">Your Story</div>
 
-        <div class="story-plus">
-          +
         </div>
 
-        <div class="story-name">
-          Your Story
-        </div>
+        <div id="otherStories" style="display:flex;gap:12px;"></div>
 
       </div>
 
+      <input
+        type="file"
+        id="storyFile"
+        accept="image/*,video/*"
+        onchange="uploadStory()">
 
-      <div id="otherStories"></div>
+      <div id="uploadStatus"></div>
 
-    </div>
-
-
-    <input
-      id="storyFile"
-      type="file"
-      accept="image/*,video/*"
-      style="display:none"
-      onchange="uploadStory(this.files[0])"
-    >
+    </section>
 
 
     <!-- CREATE POST -->
@@ -1278,968 +908,1356 @@
       <textarea
         id="postText"
         class="post-input"
-        placeholder="Tell us something fun about yourself! 🚀">
-      </textarea>
+        placeholder="Tell us something fun about yourself! 🚀"></textarea>
 
+      <div class="post-actions">
 
-      <div class="post-buttons">
+        <label class="btn secondary">
+          📷 Photo / Video
+          <input
+            type="file"
+            id="postFile"
+            accept="image/*,video/*"
+            style="display:none;">
+        </label>
 
-        <button
-          class="main-btn"
-          onclick="createPost()">
+        <button class="btn" onclick="createPost()">
           Post
         </button>
 
-
-        <label class="main-btn pink-btn">
-
-          📷 Photo
-
-          <input
-            id="postFile"
-            type="file"
-            accept="image/*,video/*"
-            style="display:none">
-
-        </label>
-
       </div>
 
     </div>
 
+
+    <!-- FEED -->
 
     <div id="feed">
-
-      <div class="friends-loading">
+      <div class="empty-message">
         Loading live feed...
       </div>
+    </div>
+
+  </main>
+
+
+  <!-- =========================
+       FRIENDS & REQUESTS
+  ========================== -->
+
+  <main id="friendsPage" class="page">
+
+    <h1 class="page-title">Friends & Requests</h1>
+
+    <div class="tabs">
+
+      <button
+        id="friendsTab"
+        class="tab active"
+        onclick="switchFriendTab('friends')">
+        👥 Friends
+      </button>
+
+      <button
+        id="requestsTab"
+        class="tab"
+        onclick="switchFriendTab('requests')">
+        🔔 Requests
+      </button>
 
     </div>
 
-  </section>
+
+    <!-- FRIENDS TAB -->
+
+    <section id="friendsTabContent">
+
+      <div class="empty-message" id="friendsLoading">
+        Loading users...
+      </div>
+
+      <div id="availableUsers"></div>
+
+    </section>
 
 
-  <!-- ==================================================
-       FRIENDS & REQUESTS
-  ================================================== -->
+    <!-- REQUESTS TAB -->
 
-  <section
-    id="friendsPage"
-    class="page">
+    <section
+      id="requestsTabContent"
+      style="display:none;">
+
+      <div id="friendRequests"></div>
+
+    </section>
+
+  </main>
 
 
-    <div class="friends-header">
+  <!-- =========================
+       CHAT
+  ========================== -->
 
-      <h2>
-        Friends & Requests
-      </h2>
+  <main id="chatPage" class="page">
+
+    <h1 class="page-title">Messages</h1>
+
+    <div id="chatUsers" class="chat-users">
+      <div class="empty-message">
+        Loading connections...
+      </div>
+    </div>
+
+    <div id="messages" class="messages">
+      <div class="empty-message">
+        Select someone to start chatting.
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+
+      <input
+        id="messageInput"
+        class="chat-input"
+        placeholder="Aa"
+        onkeydown="if(event.key === 'Enter') sendMessage()">
+
+      <button
+        class="btn"
+        onclick="sendMessage()">
+        Send
+      </button>
+
+    </div>
+
+  </main>
+
+
+  <!-- =========================
+       MUSIC
+  ========================== -->
+
+  <main id="musicPage" class="page">
+
+    <div class="music-banner">
+
+      <h2>TexUs Global Music Streaming</h2>
 
       <p>
-        Connect with people on TexUs
+        Discover trending music from around the world.
       </p>
 
     </div>
 
+    <h2 class="section-title">Global Trending Hits</h2>
 
-    <!-- TWO TABS -->
 
-    <div class="friends-tabs">
+    <div class="track">
+
+      <div class="track-info">
+
+        <div class="track-cover">
+          🎵
+        </div>
+
+        <div>
+          <strong>Water</strong>
+          <br>
+          <small>Tyla</small>
+        </div>
+
+      </div>
 
       <button
-        id="friendsTabBtn"
-        class="friends-tab active"
-        onclick="showFriendsTab('friends')">
-
-        👥 Friends
-
-      </button>
-
-
-      <button
-        id="requestsTabBtn"
-        class="friends-tab"
-        onclick="showFriendsTab('requests')">
-
-        📨 Requests
-
-        <span
-          id="requestCount"
-          class="request-count">
-          0
-        </span>
-
+        class="play-btn"
+        onclick="playTrack('Water - Tyla')">
+        ▶
       </button>
 
     </div>
 
 
-    <!-- FRIENDS -->
+    <div class="track">
 
-    <div
-      id="friendsTab"
-      class="friends-tab-content">
+      <div class="track-info">
 
-      <h3>
-        People on TexUs
-      </h3>
+        <div class="track-cover">
+          🎵
+        </div>
 
-
-      <div id="availableUsers">
-
-        <div class="friends-loading">
-          Loading people...
+        <div>
+          <strong>Umbrella</strong>
+          <br>
+          <small>Rihanna ft. Jay-Z</small>
         </div>
 
       </div>
 
+      <button
+        class="play-btn"
+        onclick="playTrack('Umbrella - Rihanna')">
+        ▶
+      </button>
+
     </div>
 
 
-    <!-- REQUESTS -->
+    <div class="track">
 
-    <div
-      id="requestsTab"
-      class="friends-tab-content"
-      style="display:none">
+      <div class="track-info">
 
-      <h3>
-        Friend Requests
-      </h3>
+        <div class="track-cover">
+          🎵
+        </div>
 
-
-      <div id="incomingRequests">
-
-        <div class="friends-loading">
-          Loading requests...
+        <div>
+          <strong>Rush</strong>
+          <br>
+          <small>Ayra Starr</small>
         </div>
 
       </div>
 
+      <button
+        class="play-btn"
+        onclick="playTrack('Rush - Ayra Starr')">
+        ▶
+      </button>
+
     </div>
 
-  </section>
 
+    <div class="track">
 
-  <!-- ==================================================
-       CHAT
-  ================================================== -->
+      <div class="track-info">
 
-  <section
-    id="chatPage"
-    class="page">
+        <div class="track-cover">
+          🎵
+        </div>
 
-    <h2>
-      Messages
-    </h2>
-
-
-    <div class="chat-box">
-
-      <div
-        id="messages"
-        class="messages">
-
-        <div class="friends-loading">
-          Select a friend to start chatting.
+        <div>
+          <strong>Neon Nights</strong>
+          <br>
+          <small>CyberPulse</small>
         </div>
 
       </div>
 
-
-      <div class="chat-input">
-
-        <input
-          id="messageInput"
-          type="text"
-          placeholder="Aa"
-          onkeydown="if(event.key === 'Enter') sendMessage()"
-        >
-
-
-        <button
-          class="main-btn"
-          onclick="sendMessage()">
-
-          Send
-
-        </button>
-
-      </div>
+      <button
+        class="play-btn"
+        onclick="playTrack('Neon Nights - CyberPulse')">
+        ▶
+      </button>
 
     </div>
 
-  </section>
+  </main>
 
 
-  <!-- ==================================================
-       MUSIC
-  ================================================== -->
-
-  <section
-    id="musicPage"
-    class="page">
-
-    <h2>
-      TexUs Global Music Streaming
-    </h2>
-
-    <h3>
-      Global Trending Hits
-    </h3>
-
-
-    <div class="music-card">
-
-      <div class="music-title">
-        Water
-      </div>
-
-      <div class="music-artist">
-        Tyla
-      </div>
-
-    </div>
-
-
-    <div class="music-card">
-
-      <div class="music-title">
-        Umbrella
-      </div>
-
-      <div class="music-artist">
-        Rihanna ft. Jay-Z
-      </div>
-
-    </div>
-
-
-    <div class="music-card">
-
-      <div class="music-title">
-        Rush
-      </div>
-
-      <div class="music-artist">
-        Ayra Starr
-      </div>
-
-    </div>
-
-
-    <div class="music-card">
-
-      <div class="music-title">
-        Neon Nights
-      </div>
-
-      <div class="music-artist">
-        CyberPulse
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
+  <!-- =========================
        PROFILE
-  ================================================== -->
+  ========================== -->
 
-  <section
-    id="profilePage"
-    class="page profile-page">
+  <main id="profilePage" class="page">
+
+    <div class="profile-card">
+
+      <div class="profile-cover"></div>
+
+      <div class="profile-content">
+
+        <div
+          class="profile-avatar"
+          id="profileAvatar">
+          👤
+        </div>
+
+        <div
+          class="profile-name"
+          id="profileName">
+          Loading...
+        </div>
+
+        <div
+          class="profile-email"
+          id="profileEmail">
+          Loading...
+        </div>
 
 
-    <!-- PROFILE HEADER -->
+        <div class="profile-stats">
 
-    <div class="profile-top-area">
-
-
-      <div class="profile-heading">
-
-
-        <!-- PROFILE PHOTO -->
-
-        <div class="profile-avatar-wrap">
-
-          <div
-            id="profileAvatar"
-            class="profile-avatar-large">
-
-            👤
-
+          <div class="stat">
+            <div
+              class="stat-number"
+              id="postCount">
+              0
+            </div>
+            <div class="stat-label">
+              posts
+            </div>
           </div>
 
+          <div class="stat">
+            <div
+              class="stat-number"
+              id="friendCount">
+              0
+            </div>
+            <div class="stat-label">
+              friends
+            </div>
+          </div>
+
+          <div class="stat">
+            <div
+              class="stat-number"
+              id="followingCount">
+              0
+            </div>
+            <div class="stat-label">
+              following
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="profile-actions">
 
           <button
-            class="avatar-plus"
-            onclick="document.getElementById('avatarFileInput').click()">
-
-            +
-
+            class="btn"
+            onclick="openEditProfile()">
+            Edit profile
           </button>
 
+          <button
+            class="btn secondary"
+            onclick="shareProfile()">
+            Share profile
+          </button>
 
-          <input
-            id="avatarFileInput"
-            type="file"
-            accept="image/*"
-            style="display:none"
-            onchange="changeProfilePhoto(this.files[0])">
+          <button
+            class="btn danger"
+            onclick="logout()">
+            Logout
+          </button>
 
         </div>
 
 
-        <!-- DETAILS -->
+        <div class="profile-tabs">
 
-        <div class="profile-details">
+          <button
+            class="profile-tab active">
+            ▦
+          </button>
 
-          <h2 id="profileUsername">
-            Loading...
-          </h2>
+          <button
+            class="profile-tab">
+            ♙
+          </button>
 
-
-          <p id="profileEmail">
-            Loading...
-          </p>
-
-
-          <div class="profile-stats">
+        </div>
 
 
-            <div>
+        <div
+          id="profilePosts"
+          class="profile-posts">
 
-              <strong id="postCount">
-                0
-              </strong>
-
-              <span>
-                posts
-              </span>
-
-            </div>
-
-
-            <div>
-
-              <strong id="followerCount">
-                0
-              </strong>
-
-              <span>
-                followers
-              </span>
-
-            </div>
-
-
-            <div>
-
-              <strong id="followingCount">
-                0
-              </strong>
-
-              <span>
-                following
-              </span>
-
-            </div>
-
-
+          <div class="empty-message">
+            No posts yet.
           </div>
 
         </div>
 
       </div>
 
-
-      <!-- PROFILE BUTTONS -->
-
-      <div class="profile-actions">
-
-
-        <button
-          class="profile-action-btn"
-          onclick="editProfile()">
-
-          Edit profile
-
-        </button>
-
-
-        <button
-          class="profile-action-btn"
-          onclick="shareProfile()">
-
-          Share profile
-
-        </button>
-
-
-        <button
-          class="profile-add-btn"
-          onclick="showPage('friends')">
-
-          👥
-
-        </button>
-
-      </div>
-
     </div>
 
-
-    <!-- DISCOVER PEOPLE -->
-
-    <div class="discover-section">
+  </main>
 
 
-      <div class="discover-heading">
-
-        <h3>
-          Discover people
-        </h3>
-
-
-        <button
-          onclick="showPage('friends')">
-
-          See all
-
-        </button>
-
-      </div>
-
-
-      <div
-        id="discoverPeople"
-        class="discover-scroll">
-
-        <div class="friends-loading">
-          Loading people...
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- PROFILE CONTENT TABS -->
-
-    <div class="profile-content-tabs">
-
-
-      <button
-        class="profile-content-tab active"
-        onclick="showProfileContent('posts')">
-
-        ▦
-
-      </button>
-
-
-      <button
-        class="profile-content-tab"
-        onclick="showProfileContent('tagged')">
-
-        ♙
-
-      </button>
-
-
-    </div>
-
-
-    <!-- POSTS -->
-
-    <div
-      id="profilePosts"
-      class="profile-post-grid">
-
-      <div class="empty-profile">
-
-        <h2>
-          Create your first post
-        </h2>
-
-        <p>
-          Give this space some love.
-        </p>
-
-
-        <button
-          onclick="showPage('home')">
-
-          Create
-
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- TAGGED -->
-
-    <div
-      id="profileTagged"
-      class="profile-post-grid"
-      style="display:none">
-
-      <div class="empty-profile">
-
-        <h2>
-          No tagged posts
-        </h2>
-
-        <p>
-          Posts you're tagged in will appear here.
-        </p>
-
-      </div>
-
-    </div>
-
-
-    <!-- LOGOUT -->
-
-    <button
-      class="profile-logout"
-      onclick="logout()">
-
-      Logout
-
-    </button>
-
-  </section>
-
-
-  <!-- ==================================================
+  <!-- =========================
        STORY VIEWER
-  ================================================== -->
+  ========================== -->
 
   <div
-    id="storyViewer"
-    class="story-viewer">
+    id="storyModal"
+    class="modal">
 
+    <div class="story-viewer">
 
-    <button
-      class="close-story"
-      onclick="closeStoryViewer()">
+      <button
+        class="close-modal"
+        onclick="closeStoryViewer()">
+        ×
+      </button>
 
-      ×
+      <div
+        id="storyViewerName"
+        class="story-viewer-name">
+      </div>
 
-    </button>
+      <div id="storyViewerMedia"></div>
 
-
-    <div
-      id="storyViewerContent"
-      class="story-viewer-content">
     </div>
 
   </div>
 
 
-  <!-- ==================================================
+  <!-- =========================
+       EDIT PROFILE MODAL
+  ========================== -->
+
+  <div
+    id="editProfileModal"
+    class="modal">
+
+    <div class="modal-box">
+
+      <button
+        class="close-modal"
+        onclick="closeEditProfile()">
+        ×
+      </button>
+
+      <h2>Edit Profile</h2>
+
+      <br>
+
+      <label>Username</label>
+
+      <input
+        id="editUsername"
+        class="chat-input"
+        style="width:100%;margin-top:8px;"
+        placeholder="Username">
+
+      <br><br>
+
+      <label>Profile picture</label>
+
+      <br><br>
+
+      <input
+        type="file"
+        id="avatarFileInput"
+        accept="image/*">
+
+      <br><br>
+
+      <button
+        class="btn"
+        onclick="saveProfile()">
+        Save Profile
+      </button>
+
+      <div id="profileSaveStatus"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
        BOTTOM NAVIGATION
-  ================================================== -->
+  ========================== -->
 
   <nav class="bottom-nav">
 
-
     <button
-      id="navHome"
       class="nav-btn active"
+      data-page="home"
       onclick="showPage('home')">
-
-      <span>
-        🏠
-      </span>
-
-      Home
-
+      🏠
+      <span>Home</span>
     </button>
 
-
     <button
-      id="navFriends"
       class="nav-btn"
+      data-page="friends"
       onclick="showPage('friends')">
-
-      <span>
-        👥
-      </span>
-
-      Friends
-
+      👥
+      <span>Friends</span>
     </button>
 
-
     <button
-      id="navChat"
       class="nav-btn"
+      data-page="chat"
       onclick="showPage('chat')">
-
-      <span>
-        💬
-      </span>
-
-      Chat
-
+      💬
+      <span>Chat</span>
     </button>
 
-
     <button
-      id="navMusic"
       class="nav-btn"
+      data-page="music"
       onclick="showPage('music')">
-
-      <span>
-        🎵
-      </span>
-
-      Music
-
+      🎵
+      <span>Music</span>
     </button>
-
 
     <button
-      id="navProfile"
       class="nav-btn"
+      data-page="profile"
       onclick="showPage('profile')">
-
-      <span>
-        👤
-      </span>
-
-      Profile
-
+      👤
+      <span>Profile</span>
     </button>
-
 
   </nav>
 
 
-  <!-- ==================================================
+  <!-- =========================
        JAVASCRIPT
-  ================================================== -->
+  ========================== -->
 
   <script>
 
-
-    /* ==================================================
+    /* =========================
        FIREBASE CONFIG
-    ================================================== */
+    ========================== */
 
     const firebaseConfig = {
-
-      apiKey:
-        "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
-
-      authDomain:
-        "texus-5c99e.firebaseapp.com",
-
-      projectId:
-        "texus-5c99e",
-
-      storageBucket:
-        "texus-5c99e.firebasestorage.app",
-
-      messagingSenderId:
-        "1040040305137",
-
-      appId:
-        "1:1040040305137:web:86f4f717204378a22da450",
-
-      measurementId:
-        "G-KCF9J53BGH"
-
+      apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
+      authDomain: "texus-5c99e.firebaseapp.com",
+      projectId: "texus-5c99e",
+      storageBucket: "texus-5c99e.firebasestorage.app",
+      messagingSenderId: "1040040305137",
+      appId: "1:1040040305137:web:86f4f717204378a22da450",
+      measurementId: "G-KCF9J53BGH"
     };
 
 
-    firebase.initializeApp(
-      firebaseConfig
-    );
+    firebase.initializeApp(firebaseConfig);
 
-
-    const auth =
-      firebase.auth();
-
-    const db =
-      firebase.firestore();
-
-    const storage =
-      firebase.storage();
-
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
     let currentUser = null;
+    let currentChatUser = null;
 
-    let currentUsername = "";
+
+    /* =========================
+       AUTH
+    ========================== */
+
+    auth.onAuthStateChanged(async user => {
+
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+
+      await loadCurrentUser();
+
+      loadFeed();
+      loadStories();
+      loadUsers();
+      loadFriendRequests();
+      loadChatUsers();
+      loadProfile();
+
+    });
 
 
-    /* ==================================================
-       LOGIN CHECK
-    ================================================== */
+    /* =========================
+       PAGE NAVIGATION
+    ========================== */
 
-    auth.onAuthStateChanged(
-      async function(user) {
+    function showPage(page) {
 
-        if (!user) {
+      document.querySelectorAll(".page").forEach(p => {
+        p.classList.remove("active");
+      });
 
-          window.location.href =
-            "login.html";
+      document
+        .getElementById(page + "Page")
+        .classList.add("active");
+
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      const activeButton =
+        document.querySelector(
+          `.nav-btn[data-page="${page}"]`
+        );
+
+      if (activeButton) {
+        activeButton.classList.add("active");
+      }
+
+
+      if (page === "friends") {
+        loadUsers();
+        loadFriendRequests();
+      }
+
+      if (page === "chat") {
+        loadChatUsers();
+      }
+
+      if (page === "profile") {
+        loadProfile();
+      }
+
+      window.scrollTo(0, 0);
+    }
+
+
+    /* =========================
+       CURRENT USER
+    ========================== */
+
+    async function loadCurrentUser() {
+
+      try {
+
+        const doc =
+          await db
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
+
+        const data = doc.exists
+          ? doc.data()
+          : {};
+
+        const username =
+          data.username ||
+          currentUser.email.split("@")[0];
+
+        const avatar =
+          data.avatarUrl || "";
+
+        document.getElementById("profileName").textContent =
+          username;
+
+        document.getElementById("profileEmail").textContent =
+          currentUser.email;
+
+        updateAvatar(
+          "headerAvatar",
+          avatar
+        );
+
+        updateAvatar(
+          "yourStoryAvatar",
+          avatar
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Could not load user:",
+          error
+        );
+
+      }
+    }
+
+
+    function updateAvatar(elementId, url) {
+
+      const element =
+        document.getElementById(elementId);
+
+      if (!element) return;
+
+      if (url) {
+
+        element.innerHTML =
+          `<img src="${escapeHtml(url)}" alt="Profile">`;
+
+      } else {
+
+        element.innerHTML = "👤";
+
+      }
+    }
+
+
+    /* =========================
+       STORIES
+    ========================== */
+
+    function openStoryUpload() {
+
+      document
+        .getElementById("storyFile")
+        .click();
+
+    }
+
+
+    async function uploadStory() {
+
+      const input =
+        document.getElementById("storyFile");
+
+      const file = input.files[0];
+
+      if (!file) return;
+
+      const status =
+        document.getElementById("uploadStatus");
+
+      status.style.display = "block";
+      status.textContent =
+        "Uploading your story... 0%";
+
+
+      try {
+
+        const filename =
+          Date.now() + "_" +
+          file.name.replace(
+            /[^a-zA-Z0-9._-]/g,
+            "_"
+          );
+
+        const path =
+          "stories/" +
+          currentUser.uid +
+          "/" +
+          filename;
+
+        const storageRef =
+          storage.ref(path);
+
+
+        const uploadTask =
+          storageRef.put(file, {
+            contentType: file.type
+          });
+
+
+        uploadTask.on(
+
+          firebase.storage.TaskEvent.STATE_CHANGED,
+
+          snapshot => {
+
+            const percent =
+              Math.round(
+                snapshot.bytesTransferred /
+                snapshot.totalBytes *
+                100
+              );
+
+            status.textContent =
+              "Uploading your story... " +
+              percent +
+              "%";
+
+          },
+
+          error => {
+
+            console.error(
+              "Story upload error:",
+              error
+            );
+
+            status.textContent =
+              "Story upload failed: " +
+              (error.code || error.message);
+
+          },
+
+          async () => {
+
+            const mediaUrl =
+              await uploadTask.snapshot.ref
+                .getDownloadURL();
+
+
+            const now =
+              firebase.firestore.Timestamp.now();
+
+            const expiresAt =
+              new firebase.firestore.Timestamp(
+                now.seconds + 86400,
+                now.nanoseconds
+              );
+
+
+            const userDoc =
+              await db
+                .collection("users")
+                .doc(currentUser.uid)
+                .get();
+
+            const userData =
+              userDoc.exists
+                ? userDoc.data()
+                : {};
+
+
+            await db
+              .collection("stories")
+              .add({
+
+                uid: currentUser.uid,
+
+                username:
+                  userData.username ||
+                  currentUser.email.split("@")[0],
+
+                mediaUrl: mediaUrl,
+
+                mediaType:
+                  file.type.startsWith("video/")
+                    ? "video"
+                    : "image",
+
+                createdAt: now,
+
+                expiresAt: expiresAt
+
+              });
+
+
+            status.textContent =
+              "Your story was uploaded successfully!";
+
+
+            input.value = "";
+
+            loadStories();
+
+
+            setTimeout(() => {
+              status.style.display = "none";
+            }, 2500);
+
+          }
+
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Story error:",
+          error
+        );
+
+        status.textContent =
+          "Upload failed: " +
+          (error.code || error.message);
+
+      }
+
+    }
+
+
+    async function loadStories() {
+
+      const container =
+        document.getElementById("otherStories");
+
+      container.innerHTML = "";
+
+      try {
+
+        const now =
+          firebase.firestore.Timestamp.now();
+
+
+        const snapshot =
+          await db
+            .collection("stories")
+            .where(
+              "expiresAt",
+              ">",
+              now
+            )
+            .orderBy(
+              "expiresAt",
+              "asc"
+            )
+            .get();
+
+
+        snapshot.forEach(doc => {
+
+          const story =
+            doc.data();
+
+          if (story.uid === currentUser.uid) {
+            return;
+          }
+
+
+          const card =
+            document.createElement("div");
+
+          card.className =
+            "story-card";
+
+          card.onclick = () =>
+            openStoryViewer(story);
+
+
+          if (story.mediaType === "video") {
+
+            card.innerHTML = `
+              <video
+                src="${escapeHtml(story.mediaUrl)}"
+                muted
+                playsinline>
+              </video>
+
+              <div class="story-name">
+                ${escapeHtml(story.username || "User")}
+              </div>
+            `;
+
+          } else {
+
+            card.innerHTML = `
+              <img
+                src="${escapeHtml(story.mediaUrl)}"
+                alt="Story">
+
+              <div class="story-name">
+                ${escapeHtml(story.username || "User")}
+              </div>
+            `;
+
+          }
+
+
+          container.appendChild(card);
+
+        });
+
+
+      } catch (error) {
+
+        console.error(
+          "Stories error:",
+          error
+        );
+
+        if (
+          error.code ===
+          "failed-precondition"
+        ) {
+
+          container.innerHTML = `
+            <div class="empty-message">
+              Stories are ready, but Firestore
+              may need an index.
+            </div>
+          `;
+
+        }
+
+      }
+
+    }
+
+
+    function openStoryViewer(story) {
+
+      const modal =
+        document.getElementById("storyModal");
+
+      const media =
+        document.getElementById(
+          "storyViewerMedia"
+        );
+
+      const name =
+        document.getElementById(
+          "storyViewerName"
+        );
+
+
+      name.textContent =
+        story.username || "Story";
+
+
+      if (story.mediaType === "video") {
+
+        media.innerHTML = `
+          <video
+            src="${escapeHtml(story.mediaUrl)}"
+            controls
+            autoplay
+            playsinline
+            style="max-width:100%;max-height:100%;">
+          </video>
+        `;
+
+      } else {
+
+        media.innerHTML = `
+          <img
+            src="${escapeHtml(story.mediaUrl)}"
+            alt="Story">
+        `;
+
+      }
+
+
+      modal.classList.add("show");
+
+    }
+
+
+    function closeStoryViewer() {
+
+      const modal =
+        document.getElementById("storyModal");
+
+      modal.classList.remove("show");
+
+      document.getElementById(
+        "storyViewerMedia"
+      ).innerHTML = "";
+
+    }
+
+
+    /* =========================
+       CREATE POST
+    ========================== */
+
+    async function createPost() {
+
+      const text =
+        document.getElementById("postText")
+          .value.trim();
+
+      const file =
+        document.getElementById("postFile")
+          .files[0];
+
+
+      if (!text && !file) {
+
+        alert(
+          "Please write something or choose a photo/video."
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        let mediaUrl = "";
+        let mediaType = "";
+
+
+        if (file) {
+
+          const filename =
+            Date.now() + "_" +
+            file.name.replace(
+              /[^a-zA-Z0-9._-]/g,
+              "_"
+            );
+
+
+          const ref =
+            storage.ref(
+              "posts/" +
+              currentUser.uid +
+              "/" +
+              filename
+            );
+
+
+          const snapshot =
+            await ref.put(file, {
+              contentType: file.type
+            });
+
+
+          mediaUrl =
+            await snapshot.ref
+              .getDownloadURL();
+
+
+          mediaType =
+            file.type.startsWith("video/")
+              ? "video"
+              : "image";
+
+        }
+
+
+        const userDoc =
+          await db
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
+
+
+        const userData =
+          userDoc.exists
+            ? userDoc.data()
+            : {};
+
+
+        await db
+          .collection("posts")
+          .add({
+
+            uid: currentUser.uid,
+
+            username:
+              userData.username ||
+              currentUser.email.split("@")[0],
+
+            text: text,
+
+            mediaUrl: mediaUrl,
+
+            mediaType: mediaType,
+
+            createdAt:
+              firebase.firestore.FieldValue.serverTimestamp()
+
+          });
+
+
+        document.getElementById(
+          "postText"
+        ).value = "";
+
+        document.getElementById(
+          "postFile"
+        ).value = "";
+
+
+        loadFeed();
+
+        alert("Post created!");
+
+      } catch (error) {
+
+        console.error(
+          "Post error:",
+          error
+        );
+
+        alert(
+          "Could not create post: " +
+          (error.code || error.message)
+        );
+
+      }
+
+    }
+
+
+    /* =========================
+       FEED
+    ========================== */
+
+    async function loadFeed() {
+
+      const feed =
+        document.getElementById("feed");
+
+      try {
+
+        const snapshot =
+          await db
+            .collection("posts")
+            .orderBy(
+              "createdAt",
+              "desc"
+            )
+            .limit(50)
+            .get();
+
+
+        feed.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+          feed.innerHTML = `
+            <div class="empty-message">
+              No posts yet. Be the first to share something!
+            </div>
+          `;
 
           return;
 
         }
 
 
-        currentUser =
-          user;
+        snapshot.forEach(doc => {
+
+          const post =
+            doc.data();
+
+          const article =
+            document.createElement("article");
+
+          article.className =
+            "feed-post";
 
 
-        await loadCurrentUser();
+          const time =
+            post.createdAt
+              ? formatDate(
+                  post.createdAt.toDate()
+                )
+              : "Just now";
 
 
-        loadFeed();
+          let media = "";
 
-        loadStories();
+          if (post.mediaUrl) {
 
-        loadAvailableFriends();
+            if (
+              post.mediaType === "video"
+            ) {
 
-        loadFriendRequests();
+              media = `
+                <video
+                  class="post-media"
+                  src="${escapeHtml(post.mediaUrl)}"
+                  controls>
+                </video>
+              `;
 
-        loadDiscoverPeople();
+            } else {
 
-        loadProfilePosts();
+              media = `
+                <img
+                  class="post-media"
+                  src="${escapeHtml(post.mediaUrl)}"
+                  alt="Post">
+              `;
 
-      }
-    );
-
-
-    /* ==================================================
-       CURRENT USER
-    ================================================== */
-
-    async function loadCurrentUser() {
-
-      try {
-
-        const userDoc =
-          await db
-          .collection("users")
-          .doc(currentUser.uid)
-          .get();
-
-
-        if (userDoc.exists) {
-
-          const data =
-            userDoc.data();
-
-
-          currentUsername =
-            data.username ||
-            currentUser.email.split("@")[0];
-
-
-          if (data.avatarUrl) {
-
-            setProfileAvatar(
-              data.avatarUrl
-            );
+            }
 
           }
 
-        } else {
 
-          currentUsername =
-            currentUser.email.split("@")[0];
+          article.innerHTML = `
 
-        }
+            <div class="post-header">
+
+              <div class="avatar">
+                👤
+              </div>
+
+              <div>
+
+                <div class="post-user">
+                  ${escapeHtml(
+                    post.username || "TexUs User"
+                  )}
+                </div>
+
+                <div class="post-time">
+                  ${time}
+                </div>
+
+              </div>
+
+            </div>
 
 
-        document.getElementById(
-          "profileUsername"
-        ).textContent =
-          currentUsername;
+            ${
+              post.text
+                ? `<div class="post-text">
+                    ${escapeHtml(post.text)}
+                   </div>`
+                : ""
+            }
+
+            ${media}
 
 
-        document.getElementById(
-          "profileEmail"
-        ).textContent =
-          currentUser.email;
+            <div class="post-buttons">
+
+              <button onclick="likePost('${doc.id}')">
+                ❤️ Like
+              </button>
+
+              <button>
+                💬 Comment
+              </button>
+
+              <button>
+                ↗ Share
+              </button>
+
+            </div>
+
+          `;
+
+
+          feed.appendChild(article);
+
+        });
 
 
       } catch (error) {
 
         console.error(
-          "Current user error:",
+          "Feed error:",
           error
         );
 
-      }
-
-    }
-
-
-    /* ==================================================
-       PAGE NAVIGATION
-    ================================================== */
-
-    function showPage(page) {
-
-
-      const pages = [
-
-        "homePage",
-        "friendsPage",
-        "chatPage",
-        "musicPage",
-        "profilePage"
-
-      ];
-
-
-      pages.forEach(
-        function(id) {
-
-          document
-            .getElementById(id)
-            .classList
-            .remove("active");
-
-        }
-      );
-
-
-      const navButtons = [
-
-        "navHome",
-        "navFriends",
-        "navChat",
-        "navMusic",
-        "navProfile"
-
-      ];
-
-
-      navButtons.forEach(
-        function(id) {
-
-          document
-            .getElementById(id)
-            .classList
-            .remove("active");
-
-        }
-      );
-
-
-      if (page === "home") {
-
-        document
-          .getElementById("homePage")
-          .classList
-          .add("active");
-
-
-        document
-          .getElementById("navHome")
-          .classList
-          .add("active");
-
-      }
-
-
-      if (page === "friends") {
-
-        document
-          .getElementById("friendsPage")
-          .classList
-          .add("active");
-
-
-        document
-          .getElementById("navFriends")
-          .classList
-          .add("active");
-
-
-        loadAvailableFriends();
-
-        loadFriendRequests();
-
-      }
-
-
-      if (page === "chat") {
-
-        document
-          .getElementById("chatPage")
-          .classList
-          .add("active");
-
-
-        document
-          .getElementById("navChat")
-          .classList
-          .add("active");
-
-      }
-
-
-      if (page === "music") {
-
-        document
-          .getElementById("musicPage")
-          .classList
-          .add("active");
-
-
-        document
-          .getElementById("navMusic")
-          .classList
-          .add("active");
-
-      }
-
-
-      if (page === "profile") {
-
-        document
-          .getElementById("profilePage")
-          .classList
-          .add("active");
-
-
-        document
-          .getElementById("navProfile")
-          .classList
-          .add("active");
-
-
-        loadDiscoverPeople();
-
-        loadProfilePosts();
+        feed.innerHTML = `
+          <div class="empty-message">
+            Could not load the feed.
+          </div>
+        `;
 
       }
 
     }
 
 
-    /* ==================================================
-       FRIENDS TABS
-    ================================================== */
+    function likePost(postId) {
 
-    function showFriendsTab(tab) {
+      alert(
+        "Like feature coming next!"
+      );
+
+    }
+
+
+    /* =========================
+       FRIEND TABS
+    ========================== */
+
+    function switchFriendTab(tab) {
+
+      const friendsContent =
+        document.getElementById(
+          "friendsTabContent"
+        );
+
+      const requestsContent =
+        document.getElementById(
+          "requestsTabContent"
+        );
+
 
       const friendsTab =
         document.getElementById(
           "friendsTab"
         );
-
 
       const requestsTab =
         document.getElementById(
@@ -2247,304 +2265,170 @@
         );
 
 
-      const friendsButton =
-        document.getElementById(
-          "friendsTabBtn"
-        );
-
-
-      const requestsButton =
-        document.getElementById(
-          "requestsTabBtn"
-        );
-
-
       if (tab === "friends") {
 
-        friendsTab.style.display =
+        friendsContent.style.display =
           "block";
 
-        requestsTab.style.display =
+        requestsContent.style.display =
           "none";
 
-
-        friendsButton.classList.add(
+        friendsTab.classList.add(
           "active"
         );
 
-        requestsButton.classList.remove(
+        requestsTab.classList.remove(
           "active"
         );
+
+        loadUsers();
 
       } else {
 
-        friendsTab.style.display =
+        friendsContent.style.display =
           "none";
 
-        requestsTab.style.display =
+        requestsContent.style.display =
           "block";
 
-
-        friendsButton.classList.remove(
+        friendsTab.classList.remove(
           "active"
         );
 
-        requestsButton.classList.add(
+        requestsTab.classList.add(
           "active"
         );
+
+        loadFriendRequests();
 
       }
 
     }
 
 
-    /* ==================================================
-       LOAD AVAILABLE USERS
-    ================================================== */
+    /* =========================
+       AVAILABLE USERS
+    ========================== */
 
-    async function loadAvailableFriends() {
-
-      if (!currentUser) return;
-
+    async function loadUsers() {
 
       const container =
         document.getElementById(
           "availableUsers"
         );
 
+      const loading =
+        document.getElementById(
+          "friendsLoading"
+        );
 
-      container.innerHTML =
-        '<div class="friends-loading">Loading people...</div>';
+
+      loading.style.display =
+        "block";
+
+      container.innerHTML = "";
 
 
       try {
 
-        const usersSnapshot =
+        const snapshot =
           await db
-          .collection("users")
-          .get();
+            .collection("users")
+            .limit(100)
+            .get();
 
 
-        const sentSnapshot =
-          await db
-          .collection("friendRequests")
-          .where(
-            "from",
-            "==",
-            currentUser.uid
-          )
-          .get();
+        loading.style.display =
+          "none";
 
 
-        const receivedSnapshot =
-          await db
-          .collection("friendRequests")
-          .where(
-            "to",
-            "==",
-            currentUser.uid
-          )
-          .get();
+        let foundUsers = false;
 
 
-        const sentRequests = {};
+        snapshot.forEach(doc => {
 
-        const receivedRequests = {};
-
-
-        sentSnapshot.forEach(
-          function(doc) {
-
-            const data =
-              doc.data();
-
-
-            sentRequests[data.to] =
-              data.status;
-
+          if (
+            doc.id === currentUser.uid
+          ) {
+            return;
           }
-        );
 
 
-        receivedSnapshot.forEach(
-          function(doc) {
+          foundUsers = true;
 
-            const data =
-              doc.data();
-
-
-            receivedRequests[data.from] =
-              data.status;
-
-          }
-        );
+          const user =
+            doc.data();
 
 
-        container.innerHTML = "";
+          const card =
+            document.createElement("div");
+
+          card.className =
+            "friend-card";
 
 
-        let usersFound = 0;
+          card.innerHTML = `
 
+            <div class="friend-info">
 
-        usersSnapshot.forEach(
-          function(doc) {
-
-            const uid =
-              doc.id;
-
-
-            const data =
-              doc.data();
-
-
-            if (
-              uid ===
-              currentUser.uid
-            ) {
-
-              return;
-
-            }
-
-
-            if (
-              receivedRequests[uid] ===
-              "pending"
-            ) {
-
-              return;
-
-            }
-
-
-            usersFound++;
-
-
-            const username =
-              data.username ||
-              data.email ||
-              "TexUs User";
-
-
-            const firstLetter =
-              username
-              .charAt(0)
-              .toUpperCase();
-
-
-            let buttonHTML = "";
-
-
-            if (
-              sentRequests[uid] ===
-              "pending"
-            ) {
-
-              buttonHTML = `
-
-                <button
-                  class="friend-action pending"
-                  onclick="cancelFriendRequest('${uid}')">
-
-                  Pending
-
-                </button>
-
-              `;
-
-            } else if (
-              sentRequests[uid] ===
-              "accepted"
-            ) {
-
-              buttonHTML = `
-
-                <button
-                  class="friend-action pending"
-                  disabled>
-
-                  Friends ✓
-
-                </button>
-
-              `;
-
-            } else {
-
-              buttonHTML = `
-
-                <button
-                  class="friend-action"
-                  onclick="sendFriendRequest('${uid}')">
-
-                  Add Friend
-
-                </button>
-
-              `;
-
-            }
-
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-
-            card.className =
-              "friend-card";
-
-
-            card.innerHTML = `
-
-              <div class="friend-avatar">
-
-                ${escapeHTML(firstLetter)}
-
+              <div class="avatar">
+                ${
+                  user.avatarUrl
+                    ? `<img
+                        src="${escapeHtml(
+                          user.avatarUrl
+                        )}"
+                        alt="Profile">`
+                    : "👤"
+                }
               </div>
 
+              <div>
 
-              <div class="friend-info">
+                <div class="friend-name">
+                  ${escapeHtml(
+                    user.username ||
+                    "TexUs User"
+                  )}
+                </div>
 
-                <strong>
-                  ${escapeHTML(username)}
-                </strong>
-
-                <span>
-                  TexUs user
-                </span>
+                <div class="friend-email">
+                  ${escapeHtml(
+                    user.email || ""
+                  )}
+                </div>
 
               </div>
-
-
-              ${buttonHTML}
-
-            `;
-
-
-            container.appendChild(
-              card
-            );
-
-          }
-        );
-
-
-        if (usersFound === 0) {
-
-          container.innerHTML = `
-
-            <div class="friends-empty">
-
-              👥
-
-              <p>
-                No other users available yet.
-              </p>
 
             </div>
 
+
+            <div class="friend-actions">
+
+              <button
+                class="small-btn"
+                onclick="sendFriendRequest(
+                  '${doc.id}'
+                )">
+                Add Friend
+              </button>
+
+            </div>
+
+          `;
+
+
+          container.appendChild(card);
+
+        });
+
+
+        if (!foundUsers) {
+
+          container.innerHTML = `
+            <div class="empty-message">
+              No other users are available yet.
+            </div>
           `;
 
         }
@@ -2553,19 +2437,17 @@
       } catch (error) {
 
         console.error(
-          "Load users error:",
+          "Users error:",
           error
         );
 
+        loading.style.display =
+          "none";
 
         container.innerHTML = `
-
-          <div class="friends-empty">
-
-            Unable to load people right now.
-
+          <div class="empty-message">
+            Could not load users.
           </div>
-
         `;
 
       }
@@ -2573,62 +2455,42 @@
     }
 
 
-    /* ==================================================
-       SEND FRIEND REQUEST
-    ================================================== */
+    /* =========================
+       FRIEND REQUESTS
+    ========================== */
 
-    async function sendFriendRequest(
-      toUserId
-    ) {
+    async function sendFriendRequest(receiverId) {
 
-      if (!currentUser) return;
+      if (
+        !currentUser ||
+        receiverId === currentUser.uid
+      ) {
+        return;
+      }
 
 
       try {
 
         const existing =
           await db
-          .collection("friendRequests")
-          .where(
-            "from",
-            "==",
-            currentUser.uid
-          )
-          .get();
+            .collection("friendRequests")
+            .where(
+              "senderId",
+              "==",
+              currentUser.uid
+            )
+            .where(
+              "receiverId",
+              "==",
+              receiverId
+            )
+            .get();
 
 
-        let alreadyExists =
-          false;
-
-
-        existing.forEach(
-          function(doc) {
-
-            const data =
-              doc.data();
-
-
-            if (
-              data.to === toUserId &&
-              (
-                data.status === "pending" ||
-                data.status === "accepted"
-              )
-            ) {
-
-              alreadyExists =
-                true;
-
-            }
-
-          }
-        );
-
-
-        if (alreadyExists) {
+        if (!existing.empty) {
 
           alert(
-            "You already sent a request to this user."
+            "Friend request already sent."
           );
 
           return;
@@ -2638,9 +2500,9 @@
 
         const userDoc =
           await db
-          .collection("users")
-          .doc(toUserId)
-          .get();
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
 
 
         const userData =
@@ -2649,58 +2511,43 @@
             : {};
 
 
-        const username =
-          userData.username ||
-          userData.email ||
-          "TexUs User";
-
-
         await db
           .collection("friendRequests")
           .add({
 
-            from:
+            senderId:
               currentUser.uid,
 
-            fromUsername:
-              currentUsername,
+            senderName:
+              userData.username ||
+              currentUser.email.split("@")[0],
 
-            to:
-              toUserId,
+            senderEmail:
+              currentUser.email,
 
-            toUsername:
-              username,
+            receiverId:
+              receiverId,
 
             status:
               "pending",
 
             createdAt:
-              firebase.firestore
-              .FieldValue
-              .serverTimestamp()
+              firebase.firestore.FieldValue.serverTimestamp()
 
           });
 
 
         alert(
-          "Friend request sent! 🎉"
+          "Friend request sent!"
         );
-
-
-        loadAvailableFriends();
-
-        loadFriendRequests();
-
-        loadDiscoverPeople();
 
 
       } catch (error) {
 
         console.error(
-          "Send request error:",
+          "Friend request error:",
           error
         );
-
 
         alert(
           "Could not send friend request."
@@ -2711,252 +2558,136 @@
     }
 
 
-    /* ==================================================
-       CANCEL FRIEND REQUEST
-    ================================================== */
-
-    async function cancelFriendRequest(
-      toUserId
-    ) {
-
-      try {
-
-        const snapshot =
-          await db
-          .collection("friendRequests")
-          .where(
-            "from",
-            "==",
-            currentUser.uid
-          )
-          .get();
-
-
-        const batch =
-          db.batch();
-
-
-        snapshot.forEach(
-          function(doc) {
-
-            const data =
-              doc.data();
-
-
-            if (
-              data.to === toUserId &&
-              data.status === "pending"
-            ) {
-
-              batch.delete(
-                doc.ref
-              );
-
-            }
-
-          }
-        );
-
-
-        await batch.commit();
-
-
-        loadAvailableFriends();
-
-
-      } catch (error) {
-
-        console.error(
-          "Cancel request error:",
-          error
-        );
-
-      }
-
-    }
-
-
-    /* ==================================================
-       LOAD REQUESTS
-    ================================================== */
-
     async function loadFriendRequests() {
-
-      if (!currentUser) return;
-
 
       const container =
         document.getElementById(
-          "incomingRequests"
+          "friendRequests"
         );
 
-
-      const count =
-        document.getElementById(
-          "requestCount"
-        );
-
-
-      container.innerHTML =
-        '<div class="friends-loading">Loading requests...</div>';
+      container.innerHTML = `
+        <div class="empty-message">
+          Loading requests...
+        </div>
+      `;
 
 
       try {
 
         const snapshot =
           await db
-          .collection("friendRequests")
-          .where(
-            "to",
-            "==",
-            currentUser.uid
-          )
-          .get();
+            .collection("friendRequests")
+            .where(
+              "receiverId",
+              "==",
+              currentUser.uid
+            )
+            .where(
+              "status",
+              "==",
+              "pending"
+            )
+            .get();
 
 
         container.innerHTML = "";
 
 
-        let pendingCount =
-          0;
-
-
-        snapshot.forEach(
-          function(doc) {
-
-            const data =
-              doc.data();
-
-
-            if (
-              data.status !==
-              "pending"
-            ) {
-
-              return;
-
-            }
-
-
-            pendingCount++;
-
-
-            const username =
-              data.fromUsername ||
-              "TexUs User";
-
-
-            const firstLetter =
-              username
-              .charAt(0)
-              .toUpperCase();
-
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-
-            card.className =
-              "friend-card";
-
-
-            card.innerHTML = `
-
-              <div class="friend-avatar">
-
-                ${escapeHTML(firstLetter)}
-
-              </div>
-
-
-              <div class="friend-info">
-
-                <strong>
-                  ${escapeHTML(username)}
-                </strong>
-
-                <span>
-                  Wants to be your friend
-                </span>
-
-              </div>
-
-
-              <div class="request-actions">
-
-                <button
-                  class="accept-btn"
-                  onclick="acceptFriendRequest('${doc.id}', '${data.from}')">
-
-                  Accept
-
-                </button>
-
-
-                <button
-                  class="decline-btn"
-                  onclick="declineFriendRequest('${doc.id}')">
-
-                  Decline
-
-                </button>
-
-              </div>
-
-            `;
-
-
-            container.appendChild(
-              card
-            );
-
-          }
-        );
-
-
-        count.textContent =
-          pendingCount;
-
-
-        if (
-          pendingCount === 0
-        ) {
+        if (snapshot.empty) {
 
           container.innerHTML = `
+            <div class="empty-message">
+              You don't have any friend requests.
+            </div>
+          `;
 
-            <div class="friends-empty">
+          return;
 
-              📨
+        }
 
-              <p>
-                You don't have any friend requests.
-              </p>
+
+        snapshot.forEach(doc => {
+
+          const request =
+            doc.data();
+
+
+          const card =
+            document.createElement("div");
+
+          card.className =
+            "friend-card";
+
+
+          card.innerHTML = `
+
+            <div class="friend-info">
+
+              <div class="avatar">
+                👤
+              </div>
+
+              <div>
+
+                <div class="friend-name">
+                  ${escapeHtml(
+                    request.senderName ||
+                    "TexUs User"
+                  )}
+                </div>
+
+                <div class="friend-email">
+                  ${escapeHtml(
+                    request.senderEmail ||
+                    ""
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="friend-actions">
+
+              <button
+                class="small-btn"
+                onclick="acceptFriendRequest(
+                  '${doc.id}',
+                  '${request.senderId}'
+                )">
+                Accept
+              </button>
+
+              <button
+                class="small-btn decline"
+                onclick="declineFriendRequest(
+                  '${doc.id}'
+                )">
+                Decline
+              </button>
 
             </div>
 
           `;
 
-        }
+
+          container.appendChild(card);
+
+        });
 
 
       } catch (error) {
 
         console.error(
-          "Request error:",
+          "Requests error:",
           error
         );
 
-
         container.innerHTML = `
-
-          <div class="friends-empty">
-
-            Unable to load friend requests.
-
+          <div class="empty-message">
+            Could not load friend requests.
           </div>
-
         `;
 
       }
@@ -2964,13 +2695,9 @@
     }
 
 
-    /* ==================================================
-       ACCEPT FRIEND REQUEST
-    ================================================== */
-
     async function acceptFriendRequest(
       requestId,
-      otherUserId
+      senderId
     ) {
 
       try {
@@ -2981,70 +2708,50 @@
 
         const requestRef =
           db
-          .collection("friendRequests")
-          .doc(requestId);
+            .collection("friendRequests")
+            .doc(requestId);
+
+
+        const myFriendRef =
+          db
+            .collection("users")
+            .doc(currentUser.uid)
+            .collection("friends")
+            .doc(senderId);
+
+
+        const theirFriendRef =
+          db
+            .collection("users")
+            .doc(senderId)
+            .collection("friends")
+            .doc(currentUser.uid);
 
 
         batch.update(
           requestRef,
           {
-
-            status:
-              "accepted",
-
-            acceptedAt:
-              firebase.firestore
-              .FieldValue
-              .serverTimestamp()
-
+            status: "accepted"
           }
         );
-
-
-        const myFriendRef =
-          db
-          .collection("users")
-          .doc(currentUser.uid)
-          .collection("friends")
-          .doc(otherUserId);
 
 
         batch.set(
           myFriendRef,
           {
-
-            uid:
-              otherUserId,
-
-            addedAt:
-              firebase.firestore
-              .FieldValue
-              .serverTimestamp()
-
+            friendId: senderId,
+            createdAt:
+              firebase.firestore.FieldValue.serverTimestamp()
           }
         );
-
-
-        const theirFriendRef =
-          db
-          .collection("users")
-          .doc(otherUserId)
-          .collection("friends")
-          .doc(currentUser.uid);
 
 
         batch.set(
           theirFriendRef,
           {
-
-            uid:
-              currentUser.uid,
-
-            addedAt:
-              firebase.firestore
-              .FieldValue
-              .serverTimestamp()
-
+            friendId: currentUser.uid,
+            createdAt:
+              firebase.firestore.FieldValue.serverTimestamp()
           }
         );
 
@@ -3053,36 +2760,30 @@
 
 
         alert(
-          "Friend request accepted! 🎉"
+          "Friend request accepted!"
         );
 
 
         loadFriendRequests();
+        loadUsers();
+        loadChatUsers();
 
-        loadAvailableFriends();
-
-        updateProfileStats();
 
       } catch (error) {
 
         console.error(
-          "Accept error:",
+          "Accept request error:",
           error
         );
 
-
         alert(
-          "Could not accept friend request."
+          "Could not accept request."
         );
 
       }
 
     }
 
-
-    /* ==================================================
-       DECLINE FRIEND REQUEST
-    ================================================== */
 
     async function declineFriendRequest(
       requestId
@@ -3094,21 +2795,11 @@
           .collection("friendRequests")
           .doc(requestId)
           .update({
-
-            status:
-              "declined",
-
-            declinedAt:
-              firebase.firestore
-              .FieldValue
-              .serverTimestamp()
-
+            status: "declined"
           });
 
 
         loadFriendRequests();
-
-        loadAvailableFriends();
 
 
       } catch (error) {
@@ -3117,7 +2808,6 @@
           "Decline error:",
           error
         );
-
 
         alert(
           "Could not decline request."
@@ -3128,436 +2818,162 @@
     }
 
 
-    /* ==================================================
-       CREATE POST
-    ================================================== */
+    /* =========================
+       CHAT USERS
+    ========================== */
 
-    async function createPost() {
+    async function loadChatUsers() {
 
-      const text =
+      const container =
         document.getElementById(
-          "postText"
-        )
-        .value
-        .trim();
+          "chatUsers"
+        );
 
 
-      if (!text) {
+      try {
+
+        const snapshot =
+          await db
+            .collection("users")
+            .limit(50)
+            .get();
+
+
+        container.innerHTML = "";
+
+
+        let found = false;
+
+
+        snapshot.forEach(doc => {
+
+          if (
+            doc.id === currentUser.uid
+          ) {
+            return;
+          }
+
+
+          found = true;
+
+          const user =
+            doc.data();
+
+
+          const button =
+            document.createElement("button");
+
+          button.className =
+            "chat-user";
+
+
+          button.onclick = () =>
+            selectChatUser(
+              doc.id,
+              user
+            );
+
+
+          button.innerHTML = `
+
+            <div class="avatar">
+              ${
+                user.avatarUrl
+                  ? `<img
+                      src="${escapeHtml(
+                        user.avatarUrl
+                      )}"
+                      alt="Profile">`
+                  : "👤"
+              }
+            </div>
+
+            <div>
+              ${escapeHtml(
+                user.username ||
+                "User"
+              )}
+            </div>
+
+          `;
+
+
+          container.appendChild(button);
+
+        });
+
+
+        if (!found) {
+
+          container.innerHTML = `
+            <div class="empty-message">
+              No users available.
+            </div>
+          `;
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Chat users error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    function selectChatUser(
+      uid,
+      user
+    ) {
+
+      currentChatUser = {
+        uid: uid,
+        ...user
+      };
+
+
+      document
+        .querySelectorAll(".chat-user")
+        .forEach(btn => {
+          btn.classList.remove(
+            "selected"
+          );
+        });
+
+
+      event.currentTarget.classList.add(
+        "selected"
+      );
+
+
+      loadMessages();
+
+    }
+
+
+    /* =========================
+       MESSAGES
+    ========================== */
+
+    async function sendMessage() {
+
+      if (
+        !currentChatUser
+      ) {
 
         alert(
-          "Please write something first."
+          "Please select someone to chat with."
         );
 
         return;
 
       }
 
-
-      try {
-
-        await db
-          .collection("posts")
-          .add({
-
-            uid:
-              currentUser.uid,
-
-            username:
-              currentUsername,
-
-            text:
-              text,
-
-            createdAt:
-              firebase.firestore
-              .FieldValue
-              .serverTimestamp()
-
-          });
-
-
-        document.getElementById(
-          "postText"
-        ).value = "";
-
-
-        loadFeed();
-
-        loadProfilePosts();
-
-
-      } catch (error) {
-
-        console.error(
-          "Post error:",
-          error
-        );
-
-
-        alert(
-          "Could not create post."
-        );
-
-      }
-
-    }
-
-
-    /* ==================================================
-       LOAD FEED
-    ================================================== */
-
-    async function loadFeed() {
-
-      const feed =
-        document.getElementById(
-          "feed"
-        );
-
-
-      try {
-
-        const snapshot =
-          await db
-          .collection("posts")
-          .orderBy(
-            "createdAt",
-            "desc"
-          )
-          .limit(30)
-          .get();
-
-
-        feed.innerHTML = "";
-
-
-        if (
-          snapshot.empty
-        ) {
-
-          feed.innerHTML = `
-
-            <div class="friends-empty">
-
-              <p>
-                No posts yet.
-              </p>
-
-              <p>
-                Be the first person to post! 🚀
-              </p>
-
-            </div>
-
-          `;
-
-          return;
-
-        }
-
-
-        snapshot.forEach(
-          function(doc) {
-
-            const data =
-              doc.data();
-
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-
-            card.className =
-              "post-card";
-
-
-            card.innerHTML = `
-
-              <div class="post-author">
-
-                ${escapeHTML(
-                  data.username ||
-                  "TexUs User"
-                )}
-
-              </div>
-
-
-              <div class="post-time">
-                TexUs
-              </div>
-
-
-              <div class="post-content">
-
-                ${escapeHTML(
-                  data.text || ""
-                )}
-
-              </div>
-
-            `;
-
-
-            feed.appendChild(
-              card
-            );
-
-          }
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Feed error:",
-          error
-        );
-
-
-        feed.innerHTML = `
-
-          <div class="friends-empty">
-
-            Feed could not be loaded.
-
-          </div>
-
-        `;
-
-      }
-
-    }
-
-
-    /* ==================================================
-       STORIES
-    ================================================== */
-
-    function openStoryUpload() {
-
-      const status =
-        document.getElementById(
-          "uploadStatus"
-        );
-
-
-      status.style.display =
-        "block";
-
-
-      status.textContent =
-        "Story uploads are paused because Firebase Storage needs the project to be upgraded.";
-
-    }
-
-
-    async function uploadStory(file) {
-
-      if (!file) return;
-
-
-      const status =
-        document.getElementById(
-          "uploadStatus"
-        );
-
-
-      status.style.display =
-        "block";
-
-
-      status.textContent =
-        "Story uploads are paused because Firebase Storage needs the project to be upgraded.";
-
-    }
-
-
-    /* ==================================================
-       LOAD STORIES
-    ================================================== */
-
-    async function loadStories() {
-
-      const container =
-        document.getElementById(
-          "otherStories"
-        );
-
-
-      container.innerHTML = "";
-
-
-      try {
-
-        const now =
-          firebase.firestore
-          .Timestamp
-          .now();
-
-
-        const snapshot =
-          await db
-          .collection("stories")
-          .where(
-            "expiresAt",
-            ">",
-            now
-          )
-          .orderBy(
-            "expiresAt",
-            "asc"
-          )
-          .get();
-
-
-        snapshot.forEach(
-          function(doc) {
-
-            const data =
-              doc.data();
-
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-
-            card.className =
-              "story-card";
-
-
-            card.innerHTML = `
-
-              <div class="story-placeholder">
-
-                Story
-
-              </div>
-
-
-              <div class="story-name">
-
-                ${escapeHTML(
-                  data.username ||
-                  "TexUs User"
-                )}
-
-              </div>
-
-            `;
-
-
-            card.onclick =
-              function() {
-
-                openStoryViewer(
-                  data
-                );
-
-              };
-
-
-            container.appendChild(
-              card
-            );
-
-          }
-        );
-
-
-      } catch (error) {
-
-        console.log(
-          "Stories unavailable:",
-          error
-        );
-
-      }
-
-    }
-
-
-    /* ==================================================
-       STORY VIEWER
-    ================================================== */
-
-    function openStoryViewer(
-      data
-    ) {
-
-      const viewer =
-        document.getElementById(
-          "storyViewer"
-        );
-
-
-      const content =
-        document.getElementById(
-          "storyViewerContent"
-        );
-
-
-      if (
-        data.mediaType &&
-        data.mediaType
-          .startsWith("video")
-      ) {
-
-        content.innerHTML = `
-
-          <video
-            src="${escapeHTML(data.mediaUrl)}"
-            controls
-            autoplay>
-          </video>
-
-        `;
-
-      } else {
-
-        content.innerHTML = `
-
-          <img
-            src="${escapeHTML(data.mediaUrl)}"
-            alt="Story">
-
-        `;
-
-      }
-
-
-      viewer.style.display =
-        "flex";
-
-    }
-
-
-    function closeStoryViewer() {
-
-      document.getElementById(
-        "storyViewer"
-      ).style.display =
-        "none";
-
-
-      document.getElementById(
-        "storyViewerContent"
-      ).innerHTML =
-        "";
-
-    }
-
-
-    /* ==================================================
-       CHAT
-       ONLY ONE sendMessage() FUNCTION
-    ================================================== */
-
-    async function sendMessage() {
 
       const input =
         document.getElementById(
@@ -3569,11 +2985,7 @@
         input.value.trim();
 
 
-      if (!text) {
-
-        return;
-
-      }
+      if (!text) return;
 
 
       try {
@@ -3582,46 +2994,23 @@
           .collection("messages")
           .add({
 
-            sender:
+            senderId:
               currentUser.uid,
 
-            senderUsername:
-              currentUsername,
+            receiverId:
+              currentChatUser.uid,
 
-            text:
-              text,
+            text: text,
 
             createdAt:
-              firebase.firestore
-              .FieldValue
-              .serverTimestamp()
+              firebase.firestore.FieldValue.serverTimestamp()
 
           });
 
 
-        input.value =
-          "";
+        input.value = "";
 
-
-        const messages =
-          document.getElementById(
-            "messages"
-          );
-
-
-        messages.innerHTML += `
-
-          <div class="message mine">
-
-            ${escapeHTML(text)}
-
-          </div>
-
-        `;
-
-
-        messages.scrollTop =
-          messages.scrollHeight;
+        loadMessages();
 
 
       } catch (error) {
@@ -3631,386 +3020,153 @@
           error
         );
 
-
-        alert(
-          "Message could not be sent."
-        );
-
       }
 
     }
 
 
-    /* ==================================================
-       PROFILE
-    ================================================== */
+    async function loadMessages() {
 
-
-    function setProfileAvatar(
-      url
-    ) {
-
-      const avatar =
+      const messages =
         document.getElementById(
-          "profileAvatar"
+          "messages"
         );
 
 
-      avatar.innerHTML = `
+      if (!currentChatUser) {
 
-        <img
-          src="${escapeHTML(url)}"
-          alt="Profile">
-
-      `;
-
-    }
-
-
-    /* ==================================================
-       PROFILE PHOTO
-       STORAGE WILL BE ENABLED LATER
-    ================================================== */
-
-    async function changeProfilePhoto(
-      file
-    ) {
-
-      if (!file) return;
-
-
-      alert(
-        "Profile photo uploading will be connected when we enable Firebase Storage."
-      );
-
-    }
-
-
-    /* ==================================================
-       EDIT PROFILE
-    ================================================== */
-
-    function editProfile() {
-
-      const newUsername =
-        prompt(
-          "Enter your new TexUs username:",
-          currentUsername
-        );
-
-
-      if (
-        !newUsername ||
-        !newUsername.trim()
-      ) {
+        messages.innerHTML = `
+          <div class="empty-message">
+            Select someone to start chatting.
+          </div>
+        `;
 
         return;
 
       }
 
 
-      updateUsername(
-        newUsername.trim()
-      );
-
-    }
-
-
-    async function updateUsername(
-      username
-    ) {
-
-      try {
-
-        await db
-          .collection("users")
-          .doc(currentUser.uid)
-          .set(
-
-            {
-
-              username:
-                username
-
-            },
-
-            {
-              merge: true
-            }
-
-          );
-
-
-        currentUsername =
-          username;
-
-
-        document.getElementById(
-          "profileUsername"
-        ).textContent =
-          username;
-
-
-        alert(
-          "Profile updated! 🎉"
-        );
-
-
-        loadDiscoverPeople();
-
-
-      } catch (error) {
-
-        console.error(
-          "Username update error:",
-          error
-        );
-
-
-        alert(
-          "Could not update your profile."
-        );
-
-      }
-
-    }
-
-
-    /* ==================================================
-       SHARE PROFILE
-    ================================================== */
-
-    async function shareProfile() {
-
-      const profileUrl =
-        window.location.href;
-
-
-      try {
-
-        if (
-          navigator.share
-        ) {
-
-          await navigator.share({
-
-            title:
-              currentUsername +
-              " on TexUs",
-
-            text:
-              "Check out my TexUs profile!",
-
-            url:
-              profileUrl
-
-          });
-
-        } else {
-
-          await navigator.clipboard
-            .writeText(
-              profileUrl
-            );
-
-
-          alert(
-            "Profile link copied! 🔗"
-          );
-
-        }
-
-      } catch (error) {
-
-        console.log(
-          "Share cancelled."
-        );
-
-      }
-
-    }
-
-
-    /* ==================================================
-       DISCOVER PEOPLE
-    ================================================== */
-
-    async function loadDiscoverPeople() {
-
-      if (!currentUser) return;
-
-
-      const container =
-        document.getElementById(
-          "discoverPeople"
-        );
-
-
-      container.innerHTML =
-        '<div class="friends-loading">Loading people...</div>';
-
-
       try {
 
         const snapshot =
           await db
-          .collection("users")
-          .limit(10)
-          .get();
+            .collection("messages")
+            .where(
+              "senderId",
+              "in",
+              [
+                currentUser.uid,
+                currentChatUser.uid
+              ]
+            )
+            .get();
 
 
-        container.innerHTML = "";
+        messages.innerHTML = "";
 
 
-        let found =
-          false;
+        const list = [];
 
 
-        snapshot.forEach(
-          function(doc) {
+        snapshot.forEach(doc => {
 
-            const uid =
-              doc.id;
+          const message =
+            doc.data();
 
 
-            if (
-              uid ===
+          if (
+            (
+              message.senderId ===
+              currentUser.uid &&
+              message.receiverId ===
+              currentChatUser.uid
+            )
+            ||
+            (
+              message.senderId ===
+              currentChatUser.uid &&
+              message.receiverId ===
               currentUser.uid
-            ) {
+            )
+          ) {
 
-              return;
-
-            }
-
-
-            found =
-              true;
-
-
-            const data =
-              doc.data();
-
-
-            const username =
-              data.username ||
-              data.email ||
-              "TexUs User";
-
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-
-            card.className =
-              "discover-card";
-
-
-            const avatarHTML =
-              data.avatarUrl
-
-                ? `
-
-                  <img
-                    src="${escapeHTML(data.avatarUrl)}"
-                    alt="Profile">
-
-                `
-
-                : `
-
-                  ${escapeHTML(
-                    username
-                      .charAt(0)
-                      .toUpperCase()
-                  )}
-
-                `;
-
-
-            card.innerHTML = `
-
-              <button
-                class="discover-close"
-                onclick="this.parentElement.remove()">
-
-                ×
-
-              </button>
-
-
-              <div class="discover-avatar">
-
-                ${avatarHTML}
-
-              </div>
-
-
-              <div class="discover-name">
-
-                ${escapeHTML(username)}
-
-              </div>
-
-
-              <div class="discover-mutual">
-
-                TexUs user
-
-              </div>
-
-
-              <button
-                class="discover-follow"
-                onclick="sendFriendRequestFromProfile('${uid}')">
-
-                Add Friend
-
-              </button>
-
-            `;
-
-
-            container.appendChild(
-              card
-            );
+            list.push(message);
 
           }
-        );
+
+        });
 
 
-        if (!found) {
+        list.sort((a, b) => {
 
-          container.innerHTML = `
+          const aTime =
+            a.createdAt
+              ? a.createdAt.toMillis()
+              : 0;
 
-            <div class="friends-empty">
+          const bTime =
+            b.createdAt
+              ? b.createdAt.toMillis()
+              : 0;
 
-              No people to discover yet.
+          return aTime - bTime;
 
+        });
+
+
+        if (!list.length) {
+
+          messages.innerHTML = `
+            <div class="empty-message">
+              No messages yet. Say hello! 👋
             </div>
-
           `;
 
+          return;
+
         }
+
+
+        list.forEach(message => {
+
+          const div =
+            document.createElement("div");
+
+
+          div.className =
+            "message " +
+            (
+              message.senderId ===
+              currentUser.uid
+                ? "me"
+                : "them"
+            );
+
+
+          div.textContent =
+            message.text;
+
+
+          messages.appendChild(div);
+
+        });
+
+
+        messages.scrollTop =
+          messages.scrollHeight;
 
 
       } catch (error) {
 
         console.error(
-          "Discover people error:",
+          "Load messages error:",
           error
         );
 
-
-        container.innerHTML = `
-
-          <div class="friends-empty">
-
-            People could not be loaded.
-
+        messages.innerHTML = `
+          <div class="empty-message">
+            Could not load messages.
           </div>
-
         `;
 
       }
@@ -4018,87 +3174,128 @@
     }
 
 
-    /* ==================================================
-       ADD FRIEND FROM PROFILE
-    ================================================== */
+    /* =========================
+       PROFILE
+    ========================== */
 
-    async function sendFriendRequestFromProfile(
-      uid
-    ) {
+    async function loadProfile() {
 
-      await sendFriendRequest(
-        uid
-      );
+      if (!currentUser) return;
 
 
-      loadDiscoverPeople();
+      try {
 
-    }
+        const userDoc =
+          await db
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
 
 
-    /* ==================================================
-       PROFILE CONTENT TABS
-    ================================================== */
+        const user =
+          userDoc.exists
+            ? userDoc.data()
+            : {};
 
-    function showProfileContent(
-      tab
-    ) {
 
-      const posts =
+        const username =
+          user.username ||
+          currentUser.email.split("@")[0];
+
+
         document.getElementById(
-          "profilePosts"
-        );
+          "profileName"
+        ).textContent =
+          username;
 
 
-      const tagged =
         document.getElementById(
-          "profileTagged"
-        );
+          "profileEmail"
+        ).textContent =
+          currentUser.email;
 
 
-      const buttons =
-        document.querySelectorAll(
-          ".profile-content-tab"
-        );
+        const avatar =
+          user.avatarUrl || "";
 
 
-      buttons.forEach(
-        function(button) {
-
-          button.classList.remove(
-            "active"
+        const profileAvatar =
+          document.getElementById(
+            "profileAvatar"
           );
 
+
+        if (avatar) {
+
+          profileAvatar.innerHTML =
+            `<img
+              src="${escapeHtml(avatar)}"
+              alt="Profile">`;
+
+        } else {
+
+          profileAvatar.innerHTML =
+            "👤";
+
         }
-      );
 
 
-      if (
-        tab === "posts"
-      ) {
-
-        posts.style.display =
-          "grid";
-
-        tagged.style.display =
-          "none";
-
-
-        buttons[0].classList.add(
-          "active"
+        updateAvatar(
+          "headerAvatar",
+          avatar
         );
 
-      } else {
 
-        posts.style.display =
-          "none";
-
-        tagged.style.display =
-          "grid";
+        updateAvatar(
+          "yourStoryAvatar",
+          avatar
+        );
 
 
-        buttons[1].classList.add(
-          "active"
+        const posts =
+          await db
+            .collection("posts")
+            .where(
+              "uid",
+              "==",
+              currentUser.uid
+            )
+            .get();
+
+
+        document.getElementById(
+          "postCount"
+        ).textContent =
+          posts.size;
+
+
+        const friends =
+          await db
+            .collection("users")
+            .doc(currentUser.uid)
+            .collection("friends")
+            .get();
+
+
+        document.getElementById(
+          "friendCount"
+        ).textContent =
+          friends.size;
+
+
+        document.getElementById(
+          "followingCount"
+        ).textContent =
+          friends.size;
+
+
+        loadProfilePosts();
+
+      } catch (error) {
+
+        console.error(
+          "Profile error:",
+          error
         );
 
       }
@@ -4106,14 +3303,7 @@
     }
 
 
-    /* ==================================================
-       LOAD PROFILE POSTS
-    ================================================== */
-
     async function loadProfilePosts() {
-
-      if (!currentUser) return;
-
 
       const container =
         document.getElementById(
@@ -4125,110 +3315,77 @@
 
         const snapshot =
           await db
-          .collection("posts")
-          .where(
-            "uid",
-            "==",
-            currentUser.uid
-          )
-          .get();
+            .collection("posts")
+            .where(
+              "uid",
+              "==",
+              currentUser.uid
+            )
+            .get();
 
 
-        document.getElementById(
-          "postCount"
-        ).textContent =
-          snapshot.size;
-
-
-        container.innerHTML = "";
-
-
-        if (
-          snapshot.empty
-        ) {
+        if (snapshot.empty) {
 
           container.innerHTML = `
-
-            <div class="empty-profile">
-
-              <h2>
-                Create your first post
-              </h2>
-
-              <p>
-                Give this space some love.
-              </p>
-
-
-              <button
-                onclick="showPage('home')">
-
-                Create
-
-              </button>
-
+            <div class="empty-message">
+              No posts yet.
             </div>
-
           `;
-
-          updateProfileStats();
 
           return;
 
         }
 
 
-        snapshot.forEach(
-          function(doc) {
+        const grid =
+          document.createElement("div");
 
-            const data =
-              doc.data();
-
-
-            const grid =
-              document.createElement(
-                "div"
-              );
+        grid.className =
+          "profile-post-grid";
 
 
-            grid.className =
-              "profile-grid-post";
+        snapshot.forEach(doc => {
+
+          const post =
+            doc.data();
 
 
-            grid.innerHTML = `
+          if (!post.mediaUrl) {
+            return;
+          }
 
-              <div
-                style="
-                  width:100%;
-                  height:100%;
-                  padding:15px;
-                  display:flex;
-                  align-items:center;
-                  justify-content:center;
-                  text-align:center;
-                  background:#1e293b;
-                  overflow:auto;
-                ">
 
-                ${escapeHTML(
-                  data.text || ""
-                )}
+          if (
+            post.mediaType === "video"
+          ) {
 
-              </div>
-
+            grid.innerHTML += `
+              <video
+                src="${escapeHtml(
+                  post.mediaUrl
+                )}"
+                controls>
+              </video>
             `;
 
+          } else {
 
-            container.appendChild(
-              grid
-            );
+            grid.innerHTML += `
+              <img
+                src="${escapeHtml(
+                  post.mediaUrl
+                )}"
+                alt="Post">
+            `;
 
           }
-        );
+
+        });
 
 
-        updateProfileStats();
+        container.innerHTML = "";
 
+        container.appendChild(grid);
 
       } catch (error) {
 
@@ -4242,45 +3399,216 @@
     }
 
 
-    /* ==================================================
-       PROFILE FOLLOW STATS
-    ================================================== */
+    /* =========================
+       EDIT PROFILE
+    ========================== */
 
-    async function updateProfileStats() {
+    async function openEditProfile() {
 
-      if (!currentUser) return;
+      const modal =
+        document.getElementById(
+          "editProfileModal"
+        );
+
+
+      const doc =
+        await db
+          .collection("users")
+          .doc(currentUser.uid)
+          .get();
+
+
+      if (doc.exists) {
+
+        document.getElementById(
+          "editUsername"
+        ).value =
+          doc.data().username || "";
+
+      }
+
+
+      modal.classList.add("show");
+
+    }
+
+
+    function closeEditProfile() {
+
+      document
+        .getElementById(
+          "editProfileModal"
+        )
+        .classList.remove("show");
+
+    }
+
+
+    async function saveProfile() {
+
+      const username =
+        document.getElementById(
+          "editUsername"
+        ).value.trim();
+
+
+      const file =
+        document.getElementById(
+          "avatarFileInput"
+        ).files[0];
+
+
+      const status =
+        document.getElementById(
+          "profileSaveStatus"
+        );
+
+
+      if (!username) {
+
+        alert(
+          "Please enter a username."
+        );
+
+        return;
+
+      }
+
+
+      status.textContent =
+        "Saving...";
 
 
       try {
 
-        const friendsSnapshot =
-          await db
+        let avatarUrl = null;
+
+
+        if (file) {
+
+          const filename =
+            Date.now() + "_" +
+            file.name.replace(
+              /[^a-zA-Z0-9._-]/g,
+              "_"
+            );
+
+
+          const ref =
+            storage.ref(
+              "avatars/" +
+              currentUser.uid +
+              "/" +
+              filename
+            );
+
+
+          const snapshot =
+            await ref.put(file);
+
+
+          avatarUrl =
+            await snapshot.ref
+              .getDownloadURL();
+
+        }
+
+
+        const updateData = {
+          username: username,
+          email: currentUser.email
+        };
+
+
+        if (avatarUrl) {
+
+          updateData.avatarUrl =
+            avatarUrl;
+
+        }
+
+
+        await db
           .collection("users")
           .doc(currentUser.uid)
-          .collection("friends")
-          .get();
+          .set(
+            updateData,
+            { merge: true }
+          );
 
 
-        const following =
-          friendsSnapshot.size;
+        status.textContent =
+          "Profile saved!";
 
 
-        document.getElementById(
-          "followingCount"
-        ).textContent =
-          following;
+        await loadCurrentUser();
+        await loadProfile();
 
 
-        document.getElementById(
-          "followerCount"
-        ).textContent =
-          following;
+        setTimeout(() => {
+
+          closeEditProfile();
+
+        }, 800);
 
 
       } catch (error) {
 
-        console.log(
-          "Profile stats unavailable."
+        console.error(
+          "Profile save error:",
+          error
+        );
+
+        status.textContent =
+          "Could not save profile: " +
+          (error.code || error.message);
+
+      }
+
+    }
+
+
+    /* =========================
+       MUSIC
+    ========================== */
+
+    function playTrack(name) {
+
+      alert(
+        name +
+        " selected. Music player will be added next."
+      );
+
+    }
+
+
+    /* =========================
+       SHARE PROFILE
+    ========================== */
+
+    async function shareProfile() {
+
+      const profileUrl =
+        window.location.origin +
+        window.location.pathname +
+        "?profile=" +
+        currentUser.uid;
+
+
+      try {
+
+        await navigator.clipboard.writeText(
+          profileUrl
+        );
+
+        alert(
+          "Profile link copied!"
+        );
+
+      } catch {
+
+        alert(
+          profileUrl
         );
 
       }
@@ -4288,9 +3616,9 @@
     }
 
 
-    /* ==================================================
+    /* =========================
        LOGOUT
-    ================================================== */
+    ========================== */
 
     async function logout() {
 
@@ -4298,10 +3626,8 @@
 
         await auth.signOut();
 
-
         window.location.href =
           "login.html";
-
 
       } catch (error) {
 
@@ -4315,43 +3641,126 @@
     }
 
 
-    /* ==================================================
-       ESCAPE HTML
-    ================================================== */
+    /* =========================
+       HELPERS
+    ========================== */
 
-    function escapeHTML(
-      value
-    ) {
+    function escapeHtml(value) {
+
+      if (value === null ||
+          value === undefined) {
+        return "";
+      }
+
 
       return String(value)
-
-        .replace(
-          /&/g,
-          "&amp;"
-        )
-
-        .replace(
-          /</g,
-          "&lt;"
-        )
-
-        .replace(
-          />/g,
-          "&gt;"
-        )
-
-        .replace(
-          /"/g,
-          "&quot;"
-        )
-
-        .replace(
-          /'/g,
-          "&#039;"
-        );
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
     }
 
+
+    function formatDate(date) {
+
+      if (!date) {
+        return "Just now";
+      }
+
+
+      const now =
+        new Date();
+
+
+      const diff =
+        now - date;
+
+
+      const minutes =
+        Math.floor(
+          diff / 60000
+        );
+
+
+      if (minutes < 1) {
+        return "Just now";
+      }
+
+
+      if (minutes < 60) {
+        return minutes + "m";
+      }
+
+
+      const hours =
+        Math.floor(
+          minutes / 60
+        );
+
+
+      if (hours < 24) {
+        return hours + "h";
+      }
+
+
+      const days =
+        Math.floor(
+          hours / 24
+        );
+
+
+      if (days < 7) {
+        return days + "d";
+      }
+
+
+      return date.toLocaleDateString();
+
+    }
+
+
+    /* =========================
+       CLOSE MODALS
+    ========================== */
+
+    document
+      .getElementById("storyModal")
+      .addEventListener(
+        "click",
+        event => {
+
+          if (
+            event.target.id ===
+            "storyModal"
+          ) {
+
+            closeStoryViewer();
+
+          }
+
+        }
+      );
+
+
+    document
+      .getElementById("editProfileModal")
+      .addEventListener(
+        "click",
+        event => {
+
+          if (
+            event.target.id ===
+            "editProfileModal"
+          ) {
+
+            closeEditProfile();
+
+          }
+
+        }
+      );
 
   </script>
 
