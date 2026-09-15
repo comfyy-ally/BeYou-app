@@ -1,1307 +1,1205 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>TexUs - Dashboard</title>
-
-
-    <!-- TEXUS HANDWRITTEN FONT -->
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
-        rel="stylesheet"
-    >
-
-
-    <!-- FIREBASE -->
-
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
-
-<style>
-
-/* =========================================
-   BASIC
-========================================= */
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-
-    background: #0f172a;
-
-    color: white;
-
-    font-family: Arial, sans-serif;
-
-    padding-bottom: 80px;
-}
-
-
-/* =========================================
-   TEXUS LOGO
-========================================= */
-
-.logo {
-    font-family: "Pacifico", cursive;
-
-    font-size: 36px;
-
-    line-height: 1;
-}
-
-.tex {
-    color: #ec4899;
-}
-
-.us {
-    color: #10b981;
-}
-
-
-/* =========================================
-   HEADER
-========================================= */
-
-header {
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 100;
-
-    height: 65px;
-
-    background: #1e293b;
-
-    border-bottom: 1px solid #334155;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 0 16px;
-}
-
-
-.logout {
-
-    background: #334155;
-
-    color: white;
-
-    border: none;
-
-    border-radius: 8px;
-
-    padding: 9px 14px;
-
-    cursor: pointer;
-
-    font-weight: bold;
-}
-
-
-/* =========================================
-   MAIN
-========================================= */
-
-main {
-
-    max-width: 760px;
-
-    margin: auto;
-
-    padding: 16px;
-}
-
-
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
-
-/* =========================================
-   CARDS
-========================================= */
-
-.card {
-
-    background: #1e293b;
-
-    border-radius: 14px;
-
-    padding: 16px;
-
-    margin-bottom: 16px;
-}
-
-
-/* =========================================
-   STORIES
-========================================= */
-
-.story-section {
-
-    margin-bottom: 20px;
-}
-
-
-.story-title {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom: 12px;
-}
-
-
-.story-title h3 {
-
-    margin: 0;
-
-    font-size: 19px;
-}
-
-
-.story-container {
-
-    display: flex;
-
-    gap: 12px;
-
-    overflow-x: auto;
-
-    padding: 3px 2px 10px;
-
-    scrollbar-width: none;
-}
-
-
-.story-container::-webkit-scrollbar {
-    display: none;
-}
-
-
-/* STORY CARD */
-
-.story-card {
-
-    position: relative;
-
-    flex: 0 0 145px;
-
-    height: 220px;
-
-    border-radius: 18px;
-
-    overflow: hidden;
-
-    background: #334155;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 3px 10px rgba(0,0,0,0.35);
-}
-
-
-.story-card img,
-.story-card video {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-
-    display: block;
-}
-
-
-/* DARK GRADIENT */
-
-.story-card::after {
-
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-
-    right: 0;
-
-    bottom: 0;
-
-    height: 90px;
-
-    background:
-        linear-gradient(
-            transparent,
-            rgba(0,0,0,0.75)
-        );
-
-    pointer-events: none;
-}
-
-
-/* STORY NAME */
-
-.story-name {
-
-    position: absolute;
-
-    left: 10px;
-
-    right: 7px;
-
-    bottom: 10px;
-
-    z-index: 3;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    color: white;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-}
-
-
-/* =========================================
-   YOUR STORY
-========================================= */
-
-.my-story {
-
-    background: white;
-
-    border: 1px solid #d1d5db;
-}
-
-
-.my-story-placeholder {
-
-    width: 100%;
-
-    height: 150px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #e2e8f0,
-            #f8fafc
-        );
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    color: #64748b;
-
-    font-size: 13px;
-
-    font-weight: bold;
-}
-
-
-/* PLUS BUTTON */
-
-.plus-button {
-
-    position: absolute;
-
-    left: 50%;
-
-    top: 150px;
-
-    transform:
-        translate(-50%, -50%);
-
-    width: 58px;
-
-    height: 58px;
-
-    border-radius: 50%;
-
-    background: #1877f2;
-
-    border: 5px solid white;
-
-    color: white;
-
-    font-size: 39px;
-
-    line-height: 42px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    z-index: 5;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 2px 8px rgba(0,0,0,0.3);
-}
-
-
-.plus-button:hover {
-
-    transform:
-        translate(-50%, -50%)
-        scale(1.05);
-}
-
-
-.my-story .story-name {
-
-    color: #111827;
-
-    bottom: 10px;
-
-    text-align: center;
-}
-
-
-/* =========================================
-   UPLOAD MESSAGE
-========================================= */
-
-.upload-status {
-
-    display: none;
-
-    background: #334155;
-
-    padding: 10px;
-
-    border-radius: 8px;
-
-    margin-top: 10px;
-
-    font-size: 13px;
-
-    text-align: center;
-}
-
-
-/* =========================================
-   FEED
-========================================= */
-
-textarea,
-input {
-
-    width: 100%;
-
-    background: #0f172a;
-
-    color: white;
-
-    border: 1px solid #475569;
-
-    border-radius: 9px;
-
-    padding: 12px;
-
-    margin: 6px 0;
-
-    font-family: Arial, sans-serif;
-}
-
-
-textarea {
-
-    min-height: 90px;
-
-    resize: vertical;
-}
-
-
-textarea:focus,
-input:focus {
-
-    outline: none;
-
-    border-color: #10b981;
-}
-
-
-.primary {
-
-    background: #ec4899;
-
-    color: white;
-
-    border: none;
-
-    border-radius: 9px;
-
-    padding: 11px 17px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    margin-top: 5px;
-}
-
-
-.secondary {
-
-    background: #10b981;
-
-    color: white;
-
-    border: none;
-
-    border-radius: 8px;
-
-    padding: 10px 14px;
-
-    cursor: pointer;
-}
-
-
-.post {
-
-    border-top: 1px solid #334155;
-
-    padding-top: 14px;
-
-    margin-top: 14px;
-}
-
-
-.post img,
-.post video {
-
-    width: 100%;
-
-    max-height: 450px;
-
-    object-fit: cover;
-
-    border-radius: 10px;
-
-    margin-top: 10px;
-}
-
-
-.meta {
-
-    color: #94a3b8;
-
-    font-size: 13px;
-}
-
-
-.empty {
-
-    color: #94a3b8;
-
-    text-align: center;
-
-    padding: 25px;
-}
-
-
-/* =========================================
-   STORY VIEWER
-========================================= */
-
-.story-viewer {
-
-    position: fixed;
-
-    inset: 0;
-
-    background: rgba(0,0,0,0.94);
-
-    z-index: 1000;
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-}
-
-
-.story-viewer.active {
-
-    display: flex;
-}
-
-
-.story-viewer-content {
-
-    position: relative;
-
-    width: min(420px, 95vw);
-
-    height: min(750px, 90vh);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    background: black;
-
-    border-radius: 15px;
-
-    overflow: hidden;
-}
-
-
-.story-viewer-content img,
-.story-viewer-content video {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: contain;
-}
-
-
-.close-story {
-
-    position: absolute;
-
-    top: 12px;
-
-    right: 12px;
-
-    z-index: 20;
-
-    width: 40px;
-
-    height: 40px;
-
-    border-radius: 50%;
-
-    border: none;
-
-    background: rgba(0,0,0,0.7);
-
-    color: white;
-
-    font-size: 25px;
-
-    cursor: pointer;
-}
-
-
-.viewer-name {
-
-    position: absolute;
-
-    top: 15px;
-
-    left: 15px;
-
-    z-index: 20;
-
-    background: rgba(0,0,0,0.55);
-
-    padding: 7px 10px;
-
-    border-radius: 8px;
-
-    font-weight: bold;
-}
-
-
-/* =========================================
-   USERS
-========================================= */
-
-.user-row {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 12px 0;
-
-    border-bottom: 1px solid #334155;
-}
-
-
-/* =========================================
-   BOTTOM NAVIGATION
-========================================= */
-
-nav {
-
-    position: fixed;
-
-    left: 0;
-
-    right: 0;
-
-    bottom: 0;
-
-    height: 70px;
-
-    background: #1e293b;
-
-    border-top: 1px solid #334155;
-
-    display: flex;
-
-    justify-content: space-around;
-
-    z-index: 100;
-}
-
-
-nav button {
-
-    flex: 1;
-
-    background: none;
-
-    border: none;
-
-    color: #94a3b8;
-
-    cursor: pointer;
-
-    font-size: 12px;
-}
-
-
-nav button.active {
-
-    color: #10b981;
-
-    font-weight: bold;
-}
-
-
-nav span {
-
-    display: block;
-
-    font-size: 22px;
-
-    margin-bottom: 2px;
-}
-
-
-/* =========================================
-   MOBILE
-========================================= */
-
-@media (max-width: 500px) {
-
-    main {
-        padding: 10px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>TexUs</title>
+
+  <!-- TexUs handwritten logo font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding-bottom: 75px;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    /* =========================
+       LOGO
+    ========================= */
+
+    .logo {
+      font-family: "Pacifico", cursive;
+      font-size: 30px;
+      letter-spacing: 1px;
+    }
+
+    .tex {
+      color: #ec4899;
+    }
+
+    .us {
+      color: #10b981;
+    }
+
+    /* =========================
+       TOP BAR
+    ========================= */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 68px;
+      padding: 10px 18px;
+      background: #111827;
+      border-bottom: 1px solid #334155;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .profile-top {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 50%;
+      background: #334155;
+      color: white;
+      font-size: 19px;
+      cursor: pointer;
+    }
+
+    /* =========================
+       PAGES
+    ========================= */
+
+    .page {
+      display: none;
+      max-width: 720px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    /* =========================
+       HOME
+    ========================= */
+
+    .post-box {
+      background: #1e293b;
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 18px;
+    }
+
+    .post-input {
+      width: 100%;
+      min-height: 80px;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: #334155;
+      color: white;
+      outline: none;
+      resize: vertical;
+      font-family: Arial, sans-serif;
+    }
+
+    .post-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .main-btn {
+      border: none;
+      border-radius: 9px;
+      padding: 10px 15px;
+      background: #10b981;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .pink-btn {
+      background: #ec4899;
+    }
+
+    /* =========================
+       STORIES
+    ========================= */
+
+    .stories-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stories-container {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 5px 0 15px;
+      scrollbar-width: none;
+    }
+
+    .stories-container::-webkit-scrollbar {
+      display: none;
     }
 
     .story-card {
-        flex-basis: 135px;
-        height: 210px;
+      position: relative;
+      width: 110px;
+      min-width: 110px;
+      height: 170px;
+      overflow: hidden;
+      border-radius: 15px;
+      background: #334155;
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
-    .my-story-placeholder {
-        height: 140px;
+    .your-story {
+      border: 2px solid #10b981;
+      background: #1e293b;
     }
 
-    .plus-button {
-        top: 140px;
+    .story-plus {
+      position: absolute;
+      top: 47px;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: #2563eb;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 29px;
+      color: white;
     }
 
-}
+    .story-name {
+      position: absolute;
+      right: 6px;
+      bottom: 9px;
+      left: 6px;
 
-</style>
+      text-align: center;
+      font-size: 13px;
+      font-weight: bold;
 
+      text-shadow: 0 1px 5px black;
+    }
+
+    .story-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .story-placeholder {
+      height: 100%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .upload-status {
+      display: none;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: #1e293b;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    /* =========================
+       POSTS
+    ========================= */
+
+    .post-card {
+      background: #1e293b;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 15px;
+    }
+
+    .post-author {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .post-time {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .post-content {
+      margin-top: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    /* =========================
+       FRIENDS PAGE
+    ========================= */
+
+    .friends-header {
+      margin-bottom: 20px;
+    }
+
+    .friends-header h2 {
+      margin-bottom: 5px;
+    }
+
+    .friends-header p {
+      margin: 0;
+      color: #94a3b8;
+    }
+
+    /* TWO TABS */
+
+    .friends-tabs {
+      display: flex;
+      gap: 7px;
+      padding: 6px;
+      margin-bottom: 20px;
+      border-radius: 14px;
+      background: #1e293b;
+    }
+
+    .friends-tab {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 8px;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .friends-tab.active {
+      background: #10b981;
+      color: white;
+    }
+
+    .request-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      min-width: 21px;
+      height: 21px;
+      padding: 0 5px;
+
+      margin-left: 4px;
+
+      border-radius: 50%;
+      background: #ec4899;
+      color: white;
+
+      font-size: 12px;
+    }
+
+    .friends-tab-content h3 {
+      margin-bottom: 15px;
+    }
+
+    /* FRIEND CARD */
+
+    .friend-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      margin-bottom: 10px;
+      padding: 13px;
+
+      border-radius: 14px;
+      background: #1e293b;
+    }
+
+    .friend-avatar {
+      width: 50px;
+      height: 50px;
+      min-width: 50px;
+
+      border-radius: 50%;
+      background: #334155;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .friend-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .friend-info strong {
+      display: block;
+      color: white;
+      font-size: 16px;
+    }
+
+    .friend-info span {
+      display: block;
+      margin-top: 3px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .friend-action,
+    .accept-btn,
+    .decline-btn {
+      border: none;
+      border-radius: 9px;
+      padding: 9px 12px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .friend-action {
+      background: #10b981;
+    }
+
+    .friend-action.pending {
+      background: #475569;
+    }
+
+    .accept-btn {
+      background: #10b981;
+    }
+
+    .decline-btn {
+      background: #475569;
+    }
+
+    .request-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .friends-empty {
+      padding: 35px 15px;
+      border-radius: 14px;
+      background: #1e293b;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .friends-loading {
+      padding: 25px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    /* =========================
+       CHAT
+    ========================= */
+
+    .chat-box {
+      padding: 15px;
+      border-radius: 15px;
+      background: #1e293b;
+    }
+
+    .messages {
+      height: 350px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      background: #0f172a;
+    }
+
+    .message {
+      width: fit-content;
+      max-width: 80%;
+      padding: 9px 12px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      background: #334155;
+      white-space: pre-wrap;
+    }
+
+    .message.mine {
+      margin-left: auto;
+      background: #10b981;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      min-width: 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #334155;
+      color: white;
+      outline: none;
+    }
+
+    /* =========================
+       MUSIC
+    ========================= */
+
+    .music-card {
+      padding: 18px;
+      margin-bottom: 12px;
+      border-radius: 15px;
+      background: #1e293b;
+    }
+
+    .music-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .music-artist {
+      margin-top: 4px;
+      color: #94a3b8;
+    }
+
+    /* =========================
+       PROFILE
+    ========================= */
+
+    .profile-card {
+      padding: 25px;
+      border-radius: 15px;
+      background: #1e293b;
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      margin: auto;
+      border-radius: 50%;
+      background: #334155;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 35px;
+    }
+
+    /* =========================
+       BOTTOM NAV
+    ========================= */
+
+    .bottom-nav {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+
+      z-index: 200;
+
+      height: 65px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+
+      border-top: 1px solid #334155;
+      background: #111827;
+    }
+
+    .nav-btn {
+      border: none;
+      background: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .nav-btn span {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 21px;
+    }
+
+    .nav-btn.active {
+      color: #10b981;
+    }
+
+    /* =========================
+       STORY VIEWER
+    ========================= */
+
+    .story-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+
+      display: none;
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+
+      background: rgba(0, 0, 0, .95);
+    }
+
+    .story-viewer-content {
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      text-align: center;
+    }
+
+    .story-viewer img,
+    .story-viewer video {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 12px;
+    }
+
+    .close-story {
+      position: fixed;
+      top: 18px;
+      right: 22px;
+
+      border: none;
+      background: none;
+
+      color: white;
+      font-size: 34px;
+      cursor: pointer;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 500px) {
+
+      .page {
+        padding: 15px;
+      }
+
+      .friend-card {
+        padding: 10px;
+      }
+
+      .friend-action,
+      .accept-btn,
+      .decline-btn {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .request-actions {
+        gap: 4px;
+      }
+
+    }
+  </style>
 </head>
-
 
 <body>
 
+  <!-- =========================
+       TOP BAR
+  ========================= -->
 
-<!-- =========================================
-     HEADER
-========================================= -->
-
-<header>
+  <header class="topbar">
 
     <div class="logo">
-
-        <span class="tex">Tex</span><span class="us">Us</span>
-
+      <span class="tex">Tex</span><span class="us">Us</span>
     </div>
 
-
     <button
-        class="logout"
-        onclick="logout()"
-    >
-        Log out
+      class="profile-top"
+      onclick="showPage('profile')">
+      👤
     </button>
 
-</header>
+  </header>
 
 
+  <!-- =========================
+       HOME
+  ========================= -->
 
-<main>
+  <section
+    id="homePage"
+    class="page active">
 
-
-<!-- =========================================
-     HOME
-========================================= -->
-
-<section
-    id="home"
-    class="page active"
->
+    <h2>Home Feed</h2>
 
 
     <!-- STORIES -->
 
-    <div class="story-section">
+    <div class="stories-title">
+      <h3>Stories</h3>
+    </div>
+
+    <div
+      id="uploadStatus"
+      class="upload-status">
+    </div>
 
 
-        <div class="story-title">
+    <div
+      id="storyContainer"
+      class="stories-container">
 
-            <h3>
-                Stories
-            </h3>
+      <!-- YOUR STORY -->
 
-            <span
-                class="meta"
-                id="storyCount"
-            ></span>
+      <div
+        class="story-card your-story"
+        onclick="openStoryUpload()">
 
+        <div class="story-plus">
+          +
         </div>
 
-
-        <div
-            class="story-container"
-            id="storyContainer"
-        >
-
-
-            <!-- YOUR STORY -->
-
-            <div
-                class="story-card my-story"
-                onclick="openStoryUpload()"
-            >
-
-                <div
-                    class="my-story-placeholder"
-                    id="myStoryImage"
-                >
-
-                    Your Story
-
-                </div>
-
-
-                <!-- PLUS -->
-
-                <div class="plus-button">
-
-                    +
-
-                </div>
-
-
-                <div class="story-name">
-
-                    Add to Story
-
-                </div>
-
-            </div>
-
-
-            <!-- STORIES FROM USERS -->
-
-            <div
-                id="otherStories"
-                style="display:flex; gap:12px;"
-            >
-
-            </div>
-
-
+        <div class="story-name">
+          Your Story
         </div>
 
-
-        <!-- HIDDEN FILE INPUT -->
-
-        <input
-            type="file"
-            id="storyFile"
-            accept="image/*,video/*"
-            style="display:none"
-            onchange="uploadStory()"
-        >
+      </div>
 
 
-        <div
-            id="uploadStatus"
-            class="upload-status"
-        >
+      <!-- OTHER STORIES -->
 
-            Uploading story...
-
-        </div>
+      <div id="otherStories"></div>
 
     </div>
 
+
+    <input
+      id="storyFile"
+      type="file"
+      accept="image/*,video/*"
+      style="display:none"
+      onchange="uploadStory(this.files[0])"
+    >
 
 
     <!-- CREATE POST -->
 
-    <div class="card">
+    <div class="post-box">
 
-        <strong id="welcome">
-            Welcome!
-        </strong>
-
-
-        <textarea
-            id="postText"
-            placeholder="Tell us something fun about yourself! 🚀"
-        ></textarea>
+      <textarea
+        id="postText"
+        class="post-input"
+        placeholder="Tell us something fun about yourself! 🚀">
+      </textarea>
 
 
-        <input
-            id="mediaFile"
-            type="file"
-            accept="image/*,video/*"
-        >
-
+      <div class="post-buttons">
 
         <button
-            class="primary"
-            onclick="createPost()"
-        >
-            Post
+          class="main-btn"
+          onclick="createPost()">
+          Post
         </button>
 
 
-        <div
-            id="postMessage"
-            class="meta"
-        ></div>
+        <label class="main-btn pink-btn">
+
+          📷 Photo
+
+          <input
+            id="postFile"
+            type="file"
+            accept="image/*,video/*"
+            style="display:none">
+
+        </label>
+
+      </div>
 
     </div>
-
 
 
     <!-- FEED -->
 
     <div id="feed">
 
-        <div class="empty">
-
-            Loading live feed...
-
-        </div>
+      <div class="friends-loading">
+        Loading live feed...
+      </div>
 
     </div>
 
-
-</section>
-
+  </section>
 
 
-<!-- =========================================
-     FRIENDS
-========================================= -->
+  <!-- =========================
+       FRIENDS & REQUESTS
+  ========================= -->
 
-<section
-    id="friends"
-    class="page"
->
+  <section
+    id="friendsPage"
+    class="page">
 
-    <h2>
+    <div class="friends-header">
+
+      <h2>
         Friends & Requests
-    </h2>
+      </h2>
 
-
-    <div class="card">
-
-        <p class="meta">
-            People on TexUs
-        </p>
-
-
-        <div id="usersList">
-
-            <div class="empty">
-                Loading users...
-            </div>
-
-        </div>
+      <p>
+        Connect with people on TexUs
+      </p>
 
     </div>
 
-</section>
+
+    <!-- TWO TABS -->
+
+    <div class="friends-tabs">
+
+      <button
+        id="friendsTabBtn"
+        class="friends-tab active"
+        onclick="showFriendsTab('friends')">
+
+        👥 Friends
+
+      </button>
 
 
+      <button
+        id="requestsTabBtn"
+        class="friends-tab"
+        onclick="showFriendsTab('requests')">
 
-<!-- =========================================
-     CHAT
-========================================= -->
+        📨 Requests
 
-<section
-    id="chat"
-    class="page"
->
+        <span
+          id="requestCount"
+          class="request-count">
+          0
+        </span>
+
+      </button>
+
+    </div>
+
+
+    <!-- =========================
+         FRIENDS TAB
+    ========================= -->
+
+    <div
+      id="friendsTab"
+      class="friends-tab-content">
+
+      <h3>
+        People on TexUs
+      </h3>
+
+
+      <div id="availableUsers">
+
+        <div class="friends-loading">
+          Loading people...
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         REQUESTS TAB
+    ========================= -->
+
+    <div
+      id="requestsTab"
+      class="friends-tab-content"
+      style="display:none">
+
+      <h3>
+        Friend Requests
+      </h3>
+
+
+      <div id="incomingRequests">
+
+        <div class="friends-loading">
+          Loading requests...
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       CHAT
+  ========================= -->
+
+  <section
+    id="chatPage"
+    class="page">
 
     <h2>
-        Messages
+      Messages
     </h2>
 
 
-    <div class="card">
+    <div class="chat-box">
 
-        <p class="meta">
-            TexUs messaging
-        </p>
+      <div
+        id="messages"
+        class="messages">
 
+        <div class="friends-loading">
+          Select a friend to start chatting.
+        </div>
+
+      </div>
+
+
+      <div class="chat-input">
 
         <input
-            id="messageText"
-            placeholder="Aa"
+          id="messageInput"
+          type="text"
+          placeholder="Aa"
+          onkeydown="if(event.key === 'Enter') sendMessage()"
         >
 
 
         <button
-            class="secondary"
-            onclick="sendMessage()"
-        >
-            Send
+          class="main-btn"
+          onclick="sendMessage()">
+
+          Send
+
         </button>
 
-
-        <div id="messages">
-
-            <div class="empty">
-                No messages yet.
-            </div>
-
-        </div>
+      </div>
 
     </div>
 
-</section>
+  </section>
 
 
+  <!-- =========================
+       MUSIC
+  ========================= -->
 
-<!-- =========================================
-     MUSIC
-========================================= -->
-
-<section
-    id="music"
-    class="page"
->
+  <section
+    id="musicPage"
+    class="page">
 
     <h2>
-        TexUs Global Music Streaming
+      TexUs Global Music Streaming
     </h2>
 
 
-    <div class="card">
-
-        <h3>
-            🌍 Global Trending Hits
-        </h3>
+    <h3>
+      Global Trending Hits
+    </h3>
 
 
-        <p>
-            🎵 Water — Tyla
-        </p>
+    <div class="music-card">
 
+      <div class="music-title">
+        Water
+      </div>
 
-        <p>
-            🎵 Umbrella — Rihanna ft. Jay-Z
-        </p>
-
-
-        <p>
-            🎵 Rush — Ayra Starr
-        </p>
-
-
-        <p class="meta">
-
-            More music features can be
-            connected later.
-
-        </p>
+      <div class="music-artist">
+        Tyla
+      </div>
 
     </div>
 
-</section>
+
+    <div class="music-card">
+
+      <div class="music-title">
+        Umbrella
+      </div>
+
+      <div class="music-artist">
+        Rihanna ft. Jay-Z
+      </div>
+
+    </div>
 
 
+    <div class="music-card">
 
-<!-- =========================================
-     PROFILE
-========================================= -->
+      <div class="music-title">
+        Rush
+      </div>
 
-<section
-    id="profile"
-    class="page"
->
+      <div class="music-artist">
+        Ayra Starr
+      </div>
+
+    </div>
+
+
+    <div class="music-card">
+
+      <div class="music-title">
+        Neon Nights
+      </div>
+
+      <div class="music-artist">
+        CyberPulse
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       PROFILE
+  ========================= -->
+
+  <section
+    id="profilePage"
+    class="page">
 
     <h2>
-        My Profile
+      My Profile
     </h2>
 
 
-    <div class="card">
+    <div class="profile-card">
 
-        <h3 id="profileName">
-            Loading...
-        </h3>
+      <div
+        id="profileAvatar"
+        class="profile-avatar">
 
+        👤
 
-        <p
-            id="profileEmail"
-            class="meta"
-        ></p>
+      </div>
 
 
-        <p class="meta">
-            TexUs member
-        </p>
+      <h3 id="profileUsername">
+        Loading...
+      </h3>
+
+
+      <p id="profileEmail">
+        Loading...
+      </p>
+
+
+      <button
+        class="main-btn"
+        onclick="logout()">
+
+        Logout
+
+      </button>
 
     </div>
 
-</section>
+  </section>
 
 
-</main>
+  <!-- =========================
+       STORY VIEWER
+  ========================= -->
 
-
-
-<!-- =========================================
-     STORY VIEWER
-========================================= -->
-
-<div
+  <div
     id="storyViewer"
-    class="story-viewer"
->
+    class="story-viewer">
+
+    <button
+      class="close-story"
+      onclick="closeStoryViewer()">
+
+      ×
+
+    </button>
 
 
-    <div class="story-viewer-content">
-
-
-        <button
-            class="close-story"
-            onclick="closeStory()"
-        >
-            ×
-        </button>
-
-
-        <div
-            id="viewerName"
-            class="viewer-name"
-        ></div>
-
-
-        <div
-            id="viewerMedia"
-            style="width:100%;height:100%;"
-        ></div>
-
-
+    <div
+      id="storyViewerContent"
+      class="story-viewer-content">
     </div>
 
-</div>
+  </div>
 
 
+  <!-- =========================
+       BOTTOM NAVIGATION
+  ========================= -->
 
-<!-- =========================================
-     BOTTOM NAV
-========================================= -->
-
-<nav>
-
+  <nav class="bottom-nav">
 
     <button
-        class="active"
-        onclick="showPage('home', this)"
-    >
+      id="navHome"
+      class="nav-btn active"
+      onclick="showPage('home')">
 
-        <span>🏠</span>
-
-        Home
+      <span>🏠</span>
+      Home
 
     </button>
 
 
     <button
-        onclick="showPage('friends', this)"
-    >
+      id="navFriends"
+      class="nav-btn"
+      onclick="showPage('friends')">
 
-        <span>👥</span>
-
-        Friends
-
-    </button>
-
-
-    <button
-        onclick="showPage('chat', this)"
-    >
-
-        <span>💬</span>
-
-        Chat
+      <span>👥</span>
+      Friends
 
     </button>
 
 
     <button
-        onclick="showPage('music', this)"
-    >
+      id="navChat"
+      class="nav-btn"
+      onclick="showPage('chat')">
 
-        <span>🎵</span>
-
-        Music
+      <span>💬</span>
+      Chat
 
     </button>
 
 
     <button
-        onclick="showPage('profile', this)"
-    >
+      id="navMusic"
+      class="nav-btn"
+      onclick="showPage('music')">
 
-        <span>👤</span>
-
-        Profile
+      <span>🎵</span>
+      Music
 
     </button>
 
 
-</nav>
+    <button
+      id="navProfile"
+      class="nav-btn"
+      onclick="showPage('profile')">
+
+      <span>👤</span>
+      Profile
+
+    </button>
+
+  </nav>
 
 
+  <!-- =========================
+       JAVASCRIPT
+  ========================= -->
 
-<script>
+  <script>
 
-/* =========================================
-   FIREBASE CONFIG
-========================================= */
+    /* ==========================================
+       FIREBASE
+    ========================================== */
 
-const firebaseConfig = {
+    const firebaseConfig = {
 
-    apiKey:
+      apiKey:
         "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
 
-    authDomain:
+      authDomain:
         "texus-5c99e.firebaseapp.com",
 
-    projectId:
+      projectId:
         "texus-5c99e",
 
-    storageBucket:
+      storageBucket:
         "texus-5c99e.firebasestorage.app",
 
-    messagingSenderId:
+      messagingSenderId:
         "1040040305137",
 
-    appId:
+      appId:
         "1:1040040305137:web:86f4f717204378a22da450",
 
-    measurementId:
+      measurementId:
         "G-KCF9J53BGH"
 
-};
+    };
 
 
-/* INITIALIZE */
-
-firebase.initializeApp(
-    firebaseConfig
-);
+    firebase.initializeApp(
+      firebaseConfig
+    );
 
 
-const db =
-    firebase.firestore();
+    const auth =
+      firebase.auth();
+
+    const db =
+      firebase.firestore();
+
+    const storage =
+      firebase.storage();
 
 
-const storage =
-    firebase.storage();
+    let currentUser = null;
+
+    let currentUsername = "";
 
 
-let currentUser = null;
+    /* ==========================================
+       AUTH
+    ========================================== */
 
-
-
-/* =========================================
-   AUTH
-========================================= */
-
-firebase.auth()
-.onAuthStateChanged(
-    async function(user) {
+    auth.onAuthStateChanged(
+      async function(user) {
 
         if (!user) {
 
-            window.location.href =
-                "login.html";
+          window.location.href =
+            "login.html";
 
-            return;
+          return;
 
         }
 
@@ -1309,1309 +1207,1672 @@ firebase.auth()
         currentUser = user;
 
 
-        document.getElementById(
-            "profileEmail"
-        ).textContent =
-            user.email || "";
+        await loadCurrentUser();
 
-
-        await loadProfile(user.uid);
 
         loadFeed();
 
-        loadUsers();
-
-        loadMessages();
-
         loadStories();
 
-    }
-);
+        loadAvailableFriends();
+
+        loadFriendRequests();
+
+      }
+    );
 
 
+    /* ==========================================
+       CURRENT USER
+    ========================================== */
 
-/* =========================================
-   PROFILE
-========================================= */
+    async function loadCurrentUser() {
 
-async function loadProfile(uid) {
-
-    try {
-
-        const doc =
-            await db
-            .collection("users")
-            .doc(uid)
-            .get();
-
-
-        const data =
-            doc.exists
-                ? doc.data()
-                : {};
-
-
-        const name =
-            data.username ||
-            localStorage.getItem(
-                "texus_username"
-            ) ||
-            "TexUs User";
-
-
-        document.getElementById(
-            "welcome"
-        ).textContent =
-            "Welcome, " + name + "!";
-
-
-        document.getElementById(
-            "profileName"
-        ).textContent =
-            name;
-
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-    }
-
-}
-
-
-
-/* =========================================
-   OPEN STORY UPLOAD
-========================================= */
-
-function openStoryUpload() {
-
-    if (!currentUser) {
-
-        alert(
-            "Please log in first."
-        );
-
-        return;
-
-    }
-
-
-    document
-        .getElementById("storyFile")
-        .click();
-
-}
-
-
-
-/* =========================================
-   UPLOAD STORY
-========================================= */
-
-async function uploadStory() {
-
-    const file =
-        document
-        .getElementById("storyFile")
-        .files[0];
-
-
-    if (!file || !currentUser) {
-
-        return;
-
-    }
-
-
-    /* FILE SIZE LIMIT */
-
-    if (
-        file.size >
-        100 * 1024 * 1024
-    ) {
-
-        alert(
-            "Please choose a file smaller than 100 MB."
-        );
-
-        return;
-
-    }
-
-
-    const status =
-        document.getElementById(
-            "uploadStatus"
-        );
-
-
-    status.style.display =
-        "block";
-
-
-    status.textContent =
-        "Uploading your story...";
-
-
-    try {
-
-
-        /* USERNAME */
+      try {
 
         const userDoc =
-            await db
-            .collection("users")
-            .doc(currentUser.uid)
-            .get();
+          await db.collection("users")
+          .doc(currentUser.uid)
+          .get();
+
+
+        if (userDoc.exists) {
+
+          const data =
+            userDoc.data();
+
+
+          currentUsername =
+            data.username ||
+            currentUser.email.split("@")[0];
+
+        } else {
+
+          currentUsername =
+            currentUser.email.split("@")[0];
+
+        }
+
+
+        document.getElementById(
+          "profileUsername"
+        ).textContent =
+          currentUsername;
+
+
+        document.getElementById(
+          "profileEmail"
+        ).textContent =
+          currentUser.email;
+
+
+      } catch (error) {
+
+        console.error(
+          "Current user error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       PAGE NAVIGATION
+    ========================================== */
+
+    function showPage(page) {
+
+      const pages = [
+
+        "homePage",
+        "friendsPage",
+        "chatPage",
+        "musicPage",
+        "profilePage"
+
+      ];
+
+
+      pages.forEach(function(id) {
+
+        document.getElementById(id)
+          .classList.remove("active");
+
+      });
+
+
+      const navButtons = [
+
+        "navHome",
+        "navFriends",
+        "navChat",
+        "navMusic",
+        "navProfile"
+
+      ];
+
+
+      navButtons.forEach(function(id) {
+
+        document.getElementById(id)
+          .classList.remove("active");
+
+      });
+
+
+      if (page === "home") {
+
+        document.getElementById(
+          "homePage"
+        ).classList.add("active");
+
+
+        document.getElementById(
+          "navHome"
+        ).classList.add("active");
+
+      }
+
+
+      if (page === "friends") {
+
+        document.getElementById(
+          "friendsPage"
+        ).classList.add("active");
+
+
+        document.getElementById(
+          "navFriends"
+        ).classList.add("active");
+
+
+        loadAvailableFriends();
+
+        loadFriendRequests();
+
+      }
+
+
+      if (page === "chat") {
+
+        document.getElementById(
+          "chatPage"
+        ).classList.add("active");
+
+
+        document.getElementById(
+          "navChat"
+        ).classList.add("active");
+
+      }
+
+
+      if (page === "music") {
+
+        document.getElementById(
+          "musicPage"
+        ).classList.add("active");
+
+
+        document.getElementById(
+          "navMusic"
+        ).classList.add("active");
+
+      }
+
+
+      if (page === "profile") {
+
+        document.getElementById(
+          "profilePage"
+        ).classList.add("active");
+
+
+        document.getElementById(
+          "navProfile"
+        ).classList.add("active");
+
+      }
+
+    }
+
+
+    /* ==========================================
+       FRIENDS / REQUESTS TABS
+    ========================================== */
+
+    function showFriendsTab(tab) {
+
+      const friendsTab =
+        document.getElementById(
+          "friendsTab"
+        );
+
+
+      const requestsTab =
+        document.getElementById(
+          "requestsTab"
+        );
+
+
+      const friendsButton =
+        document.getElementById(
+          "friendsTabBtn"
+        );
+
+
+      const requestsButton =
+        document.getElementById(
+          "requestsTabBtn"
+        );
+
+
+      if (tab === "friends") {
+
+        friendsTab.style.display =
+          "block";
+
+        requestsTab.style.display =
+          "none";
+
+
+        friendsButton.classList.add(
+          "active"
+        );
+
+        requestsButton.classList.remove(
+          "active"
+        );
+
+      } else {
+
+        friendsTab.style.display =
+          "none";
+
+        requestsTab.style.display =
+          "block";
+
+
+        friendsButton.classList.remove(
+          "active"
+        );
+
+        requestsButton.classList.add(
+          "active"
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       LOAD PEOPLE
+    ========================================== */
+
+    async function loadAvailableFriends() {
+
+      if (!currentUser) return;
+
+
+      const container =
+        document.getElementById(
+          "availableUsers"
+        );
+
+
+      container.innerHTML =
+        '<div class="friends-loading">Loading people...</div>';
+
+
+      try {
+
+        const usersSnapshot =
+          await db.collection("users")
+          .get();
+
+
+        const sentSnapshot =
+          await db.collection("friendRequests")
+          .where(
+            "from",
+            "==",
+            currentUser.uid
+          )
+          .get();
+
+
+        const receivedSnapshot =
+          await db.collection("friendRequests")
+          .where(
+            "to",
+            "==",
+            currentUser.uid
+          )
+          .get();
+
+
+        const sentRequests = {};
+
+        const receivedRequests = {};
+
+
+        sentSnapshot.forEach(
+          function(doc) {
+
+            const data =
+              doc.data();
+
+
+            sentRequests[data.to] =
+              data.status;
+
+          }
+        );
+
+
+        receivedSnapshot.forEach(
+          function(doc) {
+
+            const data =
+              doc.data();
+
+
+            receivedRequests[data.from] =
+              data.status;
+
+          }
+        );
+
+
+        container.innerHTML = "";
+
+
+        let usersFound = 0;
+
+
+        usersSnapshot.forEach(
+          function(doc) {
+
+            const uid =
+              doc.id;
+
+
+            const data =
+              doc.data();
+
+
+            /* Don't show yourself */
+
+            if (
+              uid === currentUser.uid
+            ) {
+
+              return;
+
+            }
+
+
+            /* Don't show pending incoming request */
+
+            if (
+              receivedRequests[uid] ===
+              "pending"
+            ) {
+
+              return;
+
+            }
+
+
+            usersFound++;
+
+
+            const username =
+              data.username ||
+              data.email ||
+              "TexUs User";
+
+
+            const firstLetter =
+              username.charAt(0)
+              .toUpperCase();
+
+
+            let buttonHTML = "";
+
+
+            if (
+              sentRequests[uid] ===
+              "pending"
+            ) {
+
+              buttonHTML = `
+
+                <button
+                  class="friend-action pending"
+                  onclick="cancelFriendRequest('${uid}')">
+
+                  Pending
+
+                </button>
+
+              `;
+
+            } else if (
+              sentRequests[uid] ===
+              "accepted"
+            ) {
+
+              buttonHTML = `
+
+                <button
+                  class="friend-action pending"
+                  disabled>
+
+                  Friends ✓
+
+                </button>
+
+              `;
+
+            } else {
+
+              buttonHTML = `
+
+                <button
+                  class="friend-action"
+                  onclick="sendFriendRequest('${uid}')">
+
+                  Add Friend
+
+                </button>
+
+              `;
+
+            }
+
+
+            const card =
+              document.createElement(
+                "div"
+              );
+
+
+            card.className =
+              "friend-card";
+
+
+            card.innerHTML = `
+
+              <div class="friend-avatar">
+
+                ${escapeHTML(firstLetter)}
+
+              </div>
+
+
+              <div class="friend-info">
+
+                <strong>
+                  ${escapeHTML(username)}
+                </strong>
+
+                <span>
+                  TexUs user
+                </span>
+
+              </div>
+
+
+              ${buttonHTML}
+
+            `;
+
+
+            container.appendChild(card);
+
+          }
+        );
+
+
+        if (usersFound === 0) {
+
+          container.innerHTML = `
+
+            <div class="friends-empty">
+
+              <div style="font-size:35px;">
+                👥
+              </div>
+
+              <p>
+                No other users available yet.
+              </p>
+
+            </div>
+
+          `;
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Load users error:",
+          error
+        );
+
+
+        container.innerHTML = `
+
+          <div class="friends-empty">
+
+            Unable to load people right now.
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* ==========================================
+       SEND FRIEND REQUEST
+    ========================================== */
+
+    async function sendFriendRequest(
+      toUserId
+    ) {
+
+      if (!currentUser) return;
+
+
+      try {
+
+        const existing =
+          await db.collection(
+            "friendRequests"
+          )
+          .where(
+            "from",
+            "==",
+            currentUser.uid
+          )
+          .get();
+
+
+        let alreadyExists =
+          false;
+
+
+        existing.forEach(
+          function(doc) {
+
+            const data =
+              doc.data();
+
+
+            if (
+              data.to === toUserId &&
+              (
+                data.status ===
+                "pending" ||
+
+                data.status ===
+                "accepted"
+              )
+            ) {
+
+              alreadyExists =
+                true;
+
+            }
+
+          }
+        );
+
+
+        if (alreadyExists) {
+
+          alert(
+            "You already sent a request to this user."
+          );
+
+          return;
+
+        }
+
+
+        const userDoc =
+          await db.collection("users")
+          .doc(toUserId)
+          .get();
+
+
+        const userData =
+          userDoc.exists
+            ? userDoc.data()
+            : {};
 
 
         const username =
-            userDoc.exists &&
-            userDoc.data().username
-                ? userDoc.data().username
-                : "TexUs User";
+          userData.username ||
+          userData.email ||
+          "TexUs User";
 
 
-        /* FILE TYPE */
+        await db.collection(
+          "friendRequests"
+        ).add({
 
-        const mediaType =
-            file.type.startsWith("video/")
-                ? "video"
-                : "image";
+          from:
+            currentUser.uid,
 
+          fromUsername:
+            currentUsername,
 
-        /* STORAGE LOCATION */
+          to:
+            toUserId,
 
-        const fileName =
-            Date.now() +
-            "_" +
-            file.name;
+          toUsername:
+            username,
 
+          status:
+            "pending",
 
-        const storageRef =
-            storage.ref(
-                "stories/" +
-                currentUser.uid +
-                "/" +
-                fileName
-            );
+          createdAt:
+            firebase.firestore.FieldValue
+            .serverTimestamp()
 
-
-        /* UPLOAD */
-
-        const snapshot =
-            await storageRef.put(file);
+        });
 
 
-        /* GET URL */
-
-        const mediaUrl =
-            await snapshot.ref
-                .getDownloadURL();
-
-
-        /* EXPIRY = 24 HOURS */
-
-        const expiresAt =
-            new Date(
-                Date.now() +
-                24 * 60 * 60 * 1000
-            );
-
-
-        /* SAVE TO FIRESTORE */
-
-        await db
-            .collection("stories")
-            .add({
-
-                uid:
-                    currentUser.uid,
-
-                username:
-                    username,
-
-                mediaUrl:
-                    mediaUrl,
-
-                mediaType:
-                    mediaType,
-
-                createdAt:
-                    firebase.firestore
-                    .FieldValue
-                    .serverTimestamp(),
-
-                expiresAt:
-                    firebase.firestore
-                    .Timestamp
-                    .fromDate(
-                        expiresAt
-                    )
-
-            });
-
-
-        status.textContent =
-            "Story uploaded successfully! 🎉";
-
-
-        /* RESET */
-
-        document
-            .getElementById("storyFile")
-            .value = "";
-
-
-        /* REFRESH STORIES */
-
-        setTimeout(
-            function() {
-
-                status.style.display =
-                    "none";
-
-            },
-            2500
+        alert(
+          "Friend request sent! 🎉"
         );
 
 
-        loadStories();
+        loadAvailableFriends();
+
+        loadFriendRequests();
 
 
-    }
-
-    catch (error) {
+      } catch (error) {
 
         console.error(
-            "Story upload error:",
-            error
+          "Send friend request error:",
+          error
         );
 
 
-        status.textContent =
-            "Upload failed: " +
-            error.message;
+        alert(
+          "Could not send friend request."
+        );
 
-    }
-
-}
-
-
-
-/* =========================================
-   LOAD STORIES
-========================================= */
-
-async function loadStories() {
-
-    if (!currentUser) {
-
-        return;
+      }
 
     }
 
 
-    const container =
-        document.getElementById(
-            "otherStories"
-        );
+    /* ==========================================
+       CANCEL FRIEND REQUEST
+    ========================================== */
 
+    async function cancelFriendRequest(
+      toUserId
+    ) {
 
-    container.innerHTML = "";
-
-
-    try {
-
-
-        const now =
-            firebase.firestore
-            .Timestamp.now();
-
+      try {
 
         const snapshot =
-            await db
-            .collection("stories")
-            .where(
-                "expiresAt",
-                ">",
-                now
-            )
-            .orderBy(
-                "expiresAt",
-                "asc"
-            )
-            .limit(30)
-            .get();
+          await db.collection(
+            "friendRequests"
+          )
+          .where(
+            "from",
+            "==",
+            currentUser.uid
+          )
+          .get();
 
 
-        let count = 0;
+        const batch =
+          db.batch();
 
 
         snapshot.forEach(
-            function(doc) {
+          function(doc) {
 
-                const story =
-                    doc.data();
-
-
-                /* DON'T DUPLICATE
-                   YOUR OWN STORY CARD */
-
-                if (
-                    story.uid ===
-                    currentUser.uid
-                ) {
-
-                    count++;
-
-                    return;
-
-                }
+            const data =
+              doc.data();
 
 
-                count++;
+            if (
+              data.to === toUserId &&
+              data.status === "pending"
+            ) {
 
-
-                const card =
-                    document
-                    .createElement("div");
-
-
-                card.className =
-                    "story-card";
-
-
-                let media;
-
-
-                if (
-                    story.mediaType ===
-                    "video"
-                ) {
-
-                    media =
-                        document
-                        .createElement(
-                            "video"
-                        );
-
-                    media.src =
-                        story.mediaUrl;
-
-                    media.muted =
-                        true;
-
-                }
-
-                else {
-
-                    media =
-                        document
-                        .createElement(
-                            "img"
-                        );
-
-                    media.src =
-                        story.mediaUrl;
-
-                }
-
-
-                card.appendChild(
-                    media
-                );
-
-
-                const name =
-                    document
-                    .createElement(
-                        "div"
-                    );
-
-
-                name.className =
-                    "story-name";
-
-
-                name.textContent =
-                    story.username ||
-                    "TexUs User";
-
-
-                card.appendChild(
-                    name
-                );
-
-
-                card.onclick =
-                    function() {
-
-                        openStory(
-                            story.mediaUrl,
-                            story.mediaType,
-                            story.username
-                        );
-
-                    };
-
-
-                container.appendChild(
-                    card
-                );
+              batch.delete(
+                doc.ref
+              );
 
             }
+
+          }
         );
 
 
-        document.getElementById(
-            "storyCount"
-        ).textContent =
-            count > 0
-                ? count + " active"
-                : "";
+        await batch.commit();
 
 
-    }
+        loadAvailableFriends();
 
-    catch (error) {
+
+      } catch (error) {
 
         console.error(
-            "Story loading error:",
-            error
-        );
-
-        /* If Firestore needs
-           an index, show message */
-
-        container.innerHTML =
-            '<div class="meta" style="padding:20px;">' +
-            'Stories are ready, but Firestore may need an index.' +
-            '</div>';
-
-    }
-
-}
-
-
-
-/* =========================================
-   OPEN STORY
-========================================= */
-
-function openStory(
-    url,
-    type,
-    username
-) {
-
-    const viewer =
-        document.getElementById(
-            "storyViewer"
+          "Cancel request error:",
+          error
         );
 
 
-    const mediaBox =
-        document.getElementById(
-            "viewerMedia"
+        alert(
+          "Could not cancel request."
         );
 
-
-    const nameBox =
-        document.getElementById(
-            "viewerName"
-        );
-
-
-    mediaBox.innerHTML = "";
-
-
-    nameBox.textContent =
-        username ||
-        "TexUs User";
-
-
-    if (type === "video") {
-
-        const video =
-            document
-            .createElement("video");
-
-
-        video.src = url;
-
-        video.controls = true;
-
-        video.autoplay = true;
-
-
-        mediaBox.appendChild(
-            video
-        );
-
-    }
-
-    else {
-
-        const image =
-            document
-            .createElement("img");
-
-
-        image.src = url;
-
-
-        mediaBox.appendChild(
-            image
-        );
+      }
 
     }
 
 
-    viewer.classList.add(
-        "active"
-    );
+    /* ==========================================
+       LOAD INCOMING REQUESTS
+    ========================================== */
 
-}
+    async function loadFriendRequests() {
+
+      if (!currentUser) return;
 
 
-
-/* =========================================
-   CLOSE STORY
-========================================= */
-
-function closeStory() {
-
-    const viewer =
+      const container =
         document.getElementById(
-            "storyViewer"
+          "incomingRequests"
         );
 
 
-    const media =
+      const count =
         document.getElementById(
-            "viewerMedia"
+          "requestCount"
         );
 
 
-    viewer.classList.remove(
-        "active"
-    );
+      container.innerHTML =
+        '<div class="friends-loading">Loading requests...</div>';
 
 
-    media.innerHTML = "";
+      try {
 
-}
-
-
-
-/* =========================================
-   CREATE POST
-========================================= */
-
-async function createPost() {
-
-    if (!currentUser) {
-
-        return;
-
-    }
+        const snapshot =
+          await db.collection(
+            "friendRequests"
+          )
+          .where(
+            "to",
+            "==",
+            currentUser.uid
+          )
+          .get();
 
 
-    const text =
-        document
-        .getElementById("postText")
-        .value
-        .trim();
+        container.innerHTML = "";
 
 
-    const file =
-        document
-        .getElementById("mediaFile")
-        .files[0];
+        let pendingCount =
+          0;
 
 
-    const status =
-        document.getElementById(
-            "postMessage"
+        snapshot.forEach(
+          function(doc) {
+
+            const data =
+              doc.data();
+
+
+            if (
+              data.status !==
+              "pending"
+            ) {
+
+              return;
+
+            }
+
+
+            pendingCount++;
+
+
+            const username =
+              data.fromUsername ||
+              "TexUs User";
+
+
+            const firstLetter =
+              username.charAt(0)
+              .toUpperCase();
+
+
+            const card =
+              document.createElement(
+                "div"
+              );
+
+
+            card.className =
+              "friend-card";
+
+
+            card.innerHTML = `
+
+              <div class="friend-avatar">
+
+                ${escapeHTML(firstLetter)}
+
+              </div>
+
+
+              <div class="friend-info">
+
+                <strong>
+                  ${escapeHTML(username)}
+                </strong>
+
+                <span>
+                  Wants to be your friend
+                </span>
+
+              </div>
+
+
+              <div class="request-actions">
+
+                <button
+                  class="accept-btn"
+                  onclick="acceptFriendRequest('${doc.id}', '${data.from}')">
+
+                  Accept
+
+                </button>
+
+
+                <button
+                  class="decline-btn"
+                  onclick="declineFriendRequest('${doc.id}')">
+
+                  Decline
+
+                </button>
+
+              </div>
+
+            `;
+
+
+            container.appendChild(
+              card
+            );
+
+          }
         );
 
 
-    if (!text && !file) {
-
-        status.textContent =
-            "Write something or choose a photo/video.";
-
-        return;
-
-    }
+        count.textContent =
+          pendingCount;
 
 
-    status.textContent =
-        "Posting...";
+        if (
+          pendingCount === 0
+        ) {
 
+          container.innerHTML = `
 
-    try {
+            <div class="friends-empty">
 
+              <div style="font-size:35px;">
+                📨
+              </div>
 
-        let mediaUrl = "";
+              <p>
+                You don't have any friend requests.
+              </p>
 
-        let mediaType = "";
+            </div>
 
-
-        if (file) {
-
-            const ref =
-                storage.ref(
-                    "posts/" +
-                    currentUser.uid +
-                    "/" +
-                    Date.now() +
-                    "_" +
-                    file.name
-                );
-
-
-            const snapshot =
-                await ref.put(file);
-
-
-            mediaUrl =
-                await snapshot.ref
-                .getDownloadURL();
-
-
-            mediaType =
-                file.type.startsWith(
-                    "video/"
-                )
-                ? "video"
-                : "image";
+          `;
 
         }
 
 
-        const userDoc =
-            await db
-            .collection("users")
-            .doc(currentUser.uid)
-            .get();
+      } catch (error) {
+
+        console.error(
+          "Load requests error:",
+          error
+        );
 
 
-        const username =
-            userDoc.exists &&
-            userDoc.data().username
-                ? userDoc.data().username
-                : "TexUs User";
+        container.innerHTML = `
+
+          <div class="friends-empty">
+
+            Unable to load friend requests.
+
+          </div>
+
+        `;
+
+      }
+
+    }
 
 
-        await db
-            .collection("posts")
-            .add({
+    /* ==========================================
+       ACCEPT FRIEND REQUEST
+    ========================================== */
 
-                uid:
-                    currentUser.uid,
+    async function acceptFriendRequest(
+      requestId,
+      otherUserId
+    ) {
 
-                username:
-                    username,
+      try {
 
-                text:
-                    text,
+        const batch =
+          db.batch();
 
-                mediaUrl:
-                    mediaUrl,
 
-                mediaType:
-                    mediaType,
+        /* Update request */
 
-                createdAt:
-                    firebase.firestore
-                    .FieldValue
-                    .serverTimestamp()
+        const requestRef =
+          db.collection(
+            "friendRequests"
+          )
+          .doc(requestId);
 
-            });
+
+        batch.update(
+          requestRef,
+          {
+
+            status:
+              "accepted",
+
+            acceptedAt:
+              firebase.firestore.FieldValue
+              .serverTimestamp()
+
+          }
+        );
+
+
+        /* Add other person to my friends */
+
+        const myFriendRef =
+          db.collection("users")
+          .doc(currentUser.uid)
+          .collection("friends")
+          .doc(otherUserId);
+
+
+        batch.set(
+          myFriendRef,
+          {
+
+            uid:
+              otherUserId,
+
+            addedAt:
+              firebase.firestore.FieldValue
+              .serverTimestamp()
+
+          }
+        );
+
+
+        /* Add me to their friends */
+
+        const theirFriendRef =
+          db.collection("users")
+          .doc(otherUserId)
+          .collection("friends")
+          .doc(currentUser.uid);
+
+
+        batch.set(
+          theirFriendRef,
+          {
+
+            uid:
+              currentUser.uid,
+
+            addedAt:
+              firebase.firestore.FieldValue
+              .serverTimestamp()
+
+          }
+        );
+
+
+        await batch.commit();
+
+
+        alert(
+          "Friend request accepted! 🎉"
+        );
+
+
+        loadFriendRequests();
+
+        loadAvailableFriends();
+
+
+      } catch (error) {
+
+        console.error(
+          "Accept request error:",
+          error
+        );
+
+
+        alert(
+          "Could not accept friend request."
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       DECLINE FRIEND REQUEST
+    ========================================== */
+
+    async function declineFriendRequest(
+      requestId
+    ) {
+
+      try {
+
+        await db.collection(
+          "friendRequests"
+        )
+        .doc(requestId)
+        .update({
+
+          status:
+            "declined",
+
+          declinedAt:
+            firebase.firestore.FieldValue
+            .serverTimestamp()
+
+        });
+
+
+        loadFriendRequests();
+
+        loadAvailableFriends();
+
+
+      } catch (error) {
+
+        console.error(
+          "Decline request error:",
+          error
+        );
+
+
+        alert(
+          "Could not decline friend request."
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       CREATE POST
+    ========================================== */
+
+    async function createPost() {
+
+      const text =
+        document.getElementById(
+          "postText"
+        ).value.trim();
+
+
+      if (!text) {
+
+        alert(
+          "Please write something first."
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        await db.collection(
+          "posts"
+        ).add({
+
+          uid:
+            currentUser.uid,
+
+          username:
+            currentUsername,
+
+          text:
+            text,
+
+          createdAt:
+            firebase.firestore.FieldValue
+            .serverTimestamp()
+
+        });
 
 
         document.getElementById(
-            "postText"
+          "postText"
         ).value = "";
-
-
-        document.getElementById(
-            "mediaFile"
-        ).value = "";
-
-
-        status.textContent =
-            "Posted!";
 
 
         loadFeed();
 
-    }
 
-    catch (error) {
+      } catch (error) {
 
-        console.error(error);
-
-
-        status.textContent =
-            "Could not post: " +
-            error.message;
-
-    }
-
-}
-
-
-
-/* =========================================
-   LOAD FEED
-========================================= */
-
-async function loadFeed() {
-
-    const feed =
-        document.getElementById(
-            "feed"
+        console.error(
+          "Create post error:",
+          error
         );
 
 
-    try {
+        alert(
+          "Could not create post."
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       LOAD FEED
+    ========================================== */
+
+    async function loadFeed() {
+
+      const feed =
+        document.getElementById(
+          "feed"
+        );
+
+
+      try {
 
         const snapshot =
-            await db
-            .collection("posts")
-            .orderBy(
-                "createdAt",
-                "desc"
-            )
-            .limit(30)
-            .get();
-
-
-        if (snapshot.empty) {
-
-            feed.innerHTML =
-                '<div class="empty">' +
-                'No posts yet. Be the first to post! 🚀' +
-                '</div>';
-
-            return;
-
-        }
+          await db.collection(
+            "posts"
+          )
+          .orderBy(
+            "createdAt",
+            "desc"
+          )
+          .limit(30)
+          .get();
 
 
         feed.innerHTML = "";
 
 
+        if (snapshot.empty) {
+
+          feed.innerHTML = `
+
+            <div class="friends-empty">
+
+              <p>
+                No posts yet.
+              </p>
+
+              <p>
+                Be the first person to post! 🚀
+              </p>
+
+            </div>
+
+          `;
+
+          return;
+
+        }
+
+
         snapshot.forEach(
-            function(doc) {
+          function(doc) {
 
-                const p =
-                    doc.data();
-
-
-                const div =
-                    document
-                    .createElement("div");
+            const data =
+              doc.data();
 
 
-                div.className =
-                    "card post";
+            const card =
+              document.createElement(
+                "div"
+              );
 
 
-                const date =
-                    p.createdAt
-                        ? p.createdAt
-                            .toDate()
-                            .toLocaleString()
-                        : "Just now";
+            card.className =
+              "post-card";
 
 
-                let media = "";
+            card.innerHTML = `
+
+              <div class="post-author">
+
+                ${escapeHTML(
+                  data.username ||
+                  "TexUs User"
+                )}
+
+              </div>
 
 
-                if (
-                    p.mediaUrl &&
-                    p.mediaType ===
-                    "image"
-                ) {
-
-                    media =
-                        '<img src="' +
-                        escapeAttr(
-                            p.mediaUrl
-                        ) +
-                        '" alt="Post image">';
-
-                }
+              <div class="post-time">
+                TexUs
+              </div>
 
 
-                if (
-                    p.mediaUrl &&
-                    p.mediaType ===
-                    "video"
-                ) {
+              <div class="post-content">
 
-                    media =
-                        '<video src="' +
-                        escapeAttr(
-                            p.mediaUrl
-                        ) +
-                        '" controls></video>';
+                ${escapeHTML(
+                  data.text || ""
+                )}
 
-                }
+              </div>
+
+            `;
 
 
-                div.innerHTML =
+            feed.appendChild(
+              card
+            );
 
-                    "<strong>" +
-
-                    escapeHtml(
-                        p.username ||
-                        "TexUs User"
-                    ) +
-
-                    "</strong>" +
-
-                    '<div class="meta">' +
-
-                    escapeHtml(date) +
-
-                    "</div>" +
-
-                    (
-                        p.text
-                            ? "<p>" +
-                              escapeHtml(
-                                  p.text
-                              ) +
-                              "</p>"
-                            : ""
-                    ) +
-
-                    media;
-
-
-                feed.appendChild(
-                    div
-                );
-
-            }
+          }
         );
 
+
+      } catch (error) {
+
+        console.error(
+          "Feed error:",
+          error
+        );
+
+
+        feed.innerHTML = `
+
+          <div class="friends-empty">
+
+            Feed could not be loaded.
+
+          </div>
+
+        `;
+
+      }
+
     }
 
-    catch (error) {
 
-        console.error(error);
+    /* ==========================================
+       STORIES
+       STORAGE TEMPORARILY PAUSED
+    ========================================== */
 
+    function openStoryUpload() {
 
-        feed.innerHTML =
-            '<div class="empty">' +
-            'Feed could not load.' +
-            '</div>';
-
-    }
-
-}
-
-
-
-/* =========================================
-   USERS
-========================================= */
-
-async function loadUsers() {
-
-    const list =
+      const status =
         document.getElementById(
-            "usersList"
+          "uploadStatus"
         );
 
 
-    try {
+      status.style.display =
+        "block";
+
+
+      status.textContent =
+        "Story uploads are temporarily unavailable because Firebase Storage needs the project to be upgraded. We can come back to this later.";
+
+    }
+
+
+    async function uploadStory(file) {
+
+      if (!file) return;
+
+
+      const status =
+        document.getElementById(
+          "uploadStatus"
+        );
+
+
+      status.style.display =
+        "block";
+
+
+      status.textContent =
+        "Story uploads are temporarily unavailable because Firebase Storage is not enabled on the current plan.";
+
+    }
+
+
+    /* ==========================================
+       LOAD STORIES
+    ========================================== */
+
+    async function loadStories() {
+
+      const container =
+        document.getElementById(
+          "otherStories"
+        );
+
+
+      container.innerHTML = "";
+
+
+      try {
+
+        const now =
+          firebase.firestore
+          .Timestamp.now();
+
 
         const snapshot =
-            await db
-            .collection("users")
-            .limit(30)
-            .get();
-
-
-        list.innerHTML = "";
+          await db.collection(
+            "stories"
+          )
+          .where(
+            "expiresAt",
+            ">",
+            now
+          )
+          .orderBy(
+            "expiresAt",
+            "asc"
+          )
+          .get();
 
 
         snapshot.forEach(
-            function(doc) {
+          function(doc) {
 
-                const u =
-                    doc.data();
-
-
-                if (
-                    doc.id ===
-                    currentUser.uid
-                ) {
-
-                    return;
-
-                }
+            const data =
+              doc.data();
 
 
-                const row =
-                    document
-                    .createElement("div");
+            const card =
+              document.createElement(
+                "div"
+              );
 
 
-                row.className =
-                    "user-row";
+            card.className =
+              "story-card";
 
 
-                row.innerHTML =
+            card.innerHTML = `
 
-                    "<span>👤 " +
-
-                    escapeHtml(
-                        u.username ||
-                        "TexUs User"
-                    ) +
-
-                    "</span>" +
-
-                    '<button class="secondary" ' +
-
-                    'onclick="alert(\'Friend requests will be added next.\')">' +
-
-                    "Add Friend" +
-
-                    "</button>";
+              <div class="story-placeholder">
+                Story
+              </div>
 
 
-                list.appendChild(
-                    row
+              <div class="story-name">
+
+                ${escapeHTML(
+                  data.username ||
+                  "TexUs User"
+                )}
+
+              </div>
+
+            `;
+
+
+            card.onclick =
+              function() {
+
+                openStoryViewer(
+                  data
                 );
 
-            }
+              };
+
+
+            container.appendChild(
+              card
+            );
+
+          }
         );
 
 
-    }
+      } catch (error) {
 
-    catch (error) {
+        console.log(
+          "Stories unavailable:",
+          error
+        );
 
-        console.error(error);
-
-
-        list.innerHTML =
-            '<div class="empty">' +
-            "Users could not load." +
-            '</div>';
-
-    }
-
-}
-
-
-
-/* =========================================
-   SEND MESSAGE
-========================================= */
-
-async function sendMessage() {
-
-    if (!currentUser) {
-
-        return;
+      }
 
     }
 
 
-    const input =
+    /* ==========================================
+       STORY VIEWER
+    ========================================== */
+
+    function openStoryViewer(data) {
+
+      const viewer =
         document.getElementById(
-            "messageText"
+          "storyViewer"
         );
 
 
-    const text =
+      const content =
+        document.getElementById(
+          "storyViewerContent"
+        );
+
+
+      if (
+        data.mediaType &&
+        data.mediaType
+        .startsWith("video")
+      ) {
+
+        content.innerHTML = `
+
+          <video
+            src="${escapeHTML(data.mediaUrl)}"
+            controls
+            autoplay>
+          </video>
+
+        `;
+
+      } else {
+
+        content.innerHTML = `
+
+          <img
+            src="${escapeHTML(data.mediaUrl)}"
+            alt="Story">
+
+        `;
+
+      }
+
+
+      viewer.style.display =
+        "flex";
+
+    }
+
+
+    function closeStoryViewer() {
+
+      document.getElementById(
+        "storyViewer"
+      ).style.display =
+        "none";
+
+
+      document.getElementById(
+        "storyViewerContent"
+      ).innerHTML =
+        "";
+
+    }
+
+
+    /* ==========================================
+       CHAT
+       THIS IS THE ONLY sendMessage()
+       FUNCTION IN THIS FILE.
+    ========================================== */
+
+    async function sendMessage() {
+
+      const input =
+        document.getElementById(
+          "messageInput"
+        );
+
+
+      const text =
         input.value.trim();
 
 
-    if (!text) {
+      if (!text) {
 
         return;
 
-    }
+      }
 
 
-    try {
+      try {
 
-        await db
-            .collection("messages")
-            .add({
+        await db.collection(
+          "messages"
+        ).add({
 
-                senderId:
-                    currentUser.uid,
+          sender:
+            currentUser.uid,
 
-                senderEmail:
-                    currentUser.email,
+          senderUsername:
+            currentUsername,
 
-                text:
-                    text,
+          text:
+            text,
 
-                createdAt:
-                    firebase.firestore
-                    .FieldValue
-                    .serverTimestamp()
+          createdAt:
+            firebase.firestore.FieldValue
+            .serverTimestamp()
 
-            });
-
-
-        input.value = "";
+        });
 
 
-        loadMessages();
+        input.value =
+          "";
 
-    }
 
-    catch (error) {
+        const messages =
+          document.getElementById(
+            "messages"
+          );
+
+
+        messages.innerHTML += `
+
+          <div class="message mine">
+
+            ${escapeHTML(text)}
+
+          </div>
+
+        `;
+
+
+        messages.scrollTop =
+          messages.scrollHeight;
+
+
+      } catch (error) {
+
+        console.error(
+          "Send message error:",
+          error
+        );
+
 
         alert(
-            "Message could not be sent: " +
-            error.message
+          "Message could not be sent."
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       LOGOUT
+    ========================================== */
+
+    async function logout() {
+
+      try {
+
+        await auth.signOut();
+
+
+        window.location.href =
+          "login.html";
+
+
+      } catch (error) {
+
+        console.error(
+          "Logout error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       SECURITY / HTML ESCAPING
+    ========================================== */
+
+    function escapeHTML(value) {
+
+      return String(value)
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
         );
 
     }
 
-}
-
-
-
-/* =========================================
-   LOAD MESSAGES
-========================================= */
-
-async function loadMessages() {
-
-    const box =
-        document.getElementById(
-            "messages"
-        );
-
-
-    try {
-
-        const snapshot =
-            await db
-            .collection("messages")
-            .orderBy(
-                "createdAt",
-                "asc"
-            )
-            .limit(30)
-            .get();
-
-
-        if (snapshot.empty) {
-
-            box.innerHTML =
-                '<div class="empty">' +
-                "No messages yet." +
-                "</div>";
-
-            return;
-
-        }
-
-
-        box.innerHTML = "";
-
-
-        snapshot.forEach(
-            function(doc) {
-
-                const m =
-                    doc.data();
-
-
-                const row =
-                    document
-                    .createElement("p");
-
-
-                row.innerHTML =
-                    "<strong>" +
-
-                    escapeHtml(
-                        m.senderEmail ||
-                        "User"
-                    ) +
-
-                    ":</strong> " +
-
-                    escapeHtml(
-                        m.text || ""
-                    );
-
-
-                box.appendChild(
-                    row
-                );
-
-            }
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-    }
-
-}
-
-
-
-/* =========================================
-   NAVIGATION
-========================================= */
-
-function showPage(
-    id,
-    button
-) {
-
-    document
-        .querySelectorAll(".page")
-        .forEach(
-            function(page) {
-
-                page.classList.remove(
-                    "active"
-                );
-
-            }
-        );
-
-
-    document
-        .getElementById(id)
-        .classList.add(
-            "active"
-        );
-
-
-    document
-        .querySelectorAll("nav button")
-        .forEach(
-            function(btn) {
-
-                btn.classList.remove(
-                    "active"
-                );
-
-            }
-        );
-
-
-    button.classList.add(
-        "active"
-    );
-
-}
-
-
-
-/* =========================================
-   LOGOUT
-========================================= */
-
-function logout() {
-
-    firebase.auth()
-        .signOut()
-        .then(
-            function() {
-
-                window.location.href =
-                    "login.html";
-
-            }
-        );
-
-}
-
-
-
-/* =========================================
-   ESCAPE HTML
-========================================= */
-
-function escapeHtml(value) {
-
-    return String(value).replace(
-        /[&<>"']/g,
-        function(character) {
-
-            return {
-
-                "&": "&amp;",
-
-                "<": "&lt;",
-
-                ">": "&gt;",
-
-                '"': "&quot;",
-
-                "'": "&#039;"
-
-            }[character];
-
-        }
-    );
-
-}
-
-
-function escapeAttr(value) {
-
-    return escapeHtml(value);
-
-}
-
-
-
-/* =========================================
-   CLOSE STORY WHEN CLICKING OUTSIDE
-========================================= */
-
-document
-    .getElementById("storyViewer")
-    .addEventListener(
-        "click",
-        function(event) {
-
-            if (
-                event.target ===
-                this
-            ) {
-
-                closeStory();
-
-            }
-
-        }
-    );
-
-</script>
-
+  </script>
 
 </body>
-
 </html>
