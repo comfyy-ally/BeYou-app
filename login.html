@@ -60,6 +60,11 @@
             font-size: 15px;
         }
 
+        input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
         button {
             width: 100%;
             padding: 13px;
@@ -73,8 +78,13 @@
             cursor: pointer;
         }
 
+        button:hover {
+            opacity: 0.9;
+        }
+
         button:disabled {
             opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .message {
@@ -82,6 +92,10 @@
             margin-top: 14px;
             color: #fda4af;
             font-size: 14px;
+        }
+
+        .success {
+            color: #10b981;
         }
 
         p {
@@ -94,8 +108,13 @@
             text-decoration: none;
             font-weight: bold;
         }
+
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
@@ -139,8 +158,12 @@
 
 <script>
 
+/* =========================================
+   FIREBASE CONFIG
+========================================= */
+
 const firebaseConfig = {
-    apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
+    apiKey: "AIzaSyAwGvF8YZ6wH6QVPTHLe0QzmTPewWQvrO0o",
     authDomain: "texus-5c99e.firebaseapp.com",
     projectId: "texus-5c99e",
     storageBucket: "texus-5c99e.firebasestorage.app",
@@ -151,15 +174,64 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-firebase.auth().onAuthStateChanged(function(user) {
+const auth = firebase.auth();
 
-    if (user) {
-        window.location.href = "dashboard.html";
-    }
+
+/* =========================================
+   AUTHENTICATION PERSISTENCE
+========================================= */
+
+let checkingLogin = true;
+
+auth.setPersistence(
+    firebase.auth.Auth.Persistence.LOCAL
+)
+.then(function() {
+
+    /*
+     * Firebase will now restore the saved
+     * login session from this browser.
+     */
+
+    auth.onAuthStateChanged(function(user) {
+
+        checkingLogin = false;
+
+        /*
+         * Only redirect when Firebase has
+         * confirmed that a real user is logged in.
+         */
+
+        if (user) {
+
+            console.log(
+                "TexUs: Existing login session found."
+            );
+
+            window.location.replace("dashboard.html");
+
+        }
+
+    });
+
+})
+.catch(function(error) {
+
+    checkingLogin = false;
+
+    console.error(
+        "Authentication persistence error:",
+        error
+    );
 
 });
 
-function loginUser() {
+
+/* =========================================
+   LOGIN USER
+========================================= */
+
+async function loginUser() {
 
     const email =
         document.getElementById("email").value.trim();
@@ -173,6 +245,14 @@ function loginUser() {
     const button =
         document.getElementById("loginBtn");
 
+
+    /* Clear old message */
+
+    message.className = "message";
+
+
+    /* Check fields */
+
     if (!email || !password) {
 
         message.textContent =
@@ -181,32 +261,97 @@ function loginUser() {
         return;
     }
 
+
+    /* Disable button */
+
     button.disabled = true;
 
-    message.textContent = "Logging in...";
+    button.textContent = "Logging in...";
 
-    firebase.auth()
-        .signInWithEmailAndPassword(email, password)
+    message.textContent = "";
 
-        .then(function() {
 
-            window.location.href =
-                "dashboard.html";
+    try {
 
-        })
+        /*
+         * Make sure the session is saved locally.
+         */
 
-        .catch(function(error) {
+        await auth.setPersistence(
+            firebase.auth.Auth.Persistence.LOCAL
+        );
 
-            console.error(error);
 
-            message.textContent =
-                getErrorMessage(error);
+        /*
+         * Sign in and WAIT for Firebase to finish.
+         */
 
-            button.disabled = false;
+        const userCredential =
+            await auth.signInWithEmailAndPassword(
+                email,
+                password
+            );
 
-        });
+
+        console.log(
+            "TexUs login successful:",
+            userCredential.user.email
+        );
+
+
+        message.className =
+            "message success";
+
+        message.textContent =
+            "Login successful. Opening TexUs...";
+
+
+        /*
+         * Give Firebase a moment to finish
+         * updating the authentication state.
+         */
+
+        await userCredential.user.getIdToken();
+
+
+        /*
+         * Replace the login page instead of adding
+         * it to browser history.
+         */
+
+        window.location.replace(
+            "dashboard.html"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "TexUs login error:",
+            error
+        );
+
+
+        message.className =
+            "message";
+
+        message.textContent =
+            getErrorMessage(error);
+
+
+        button.disabled = false;
+
+        button.textContent = "Log In";
+
+    }
 
 }
+
+
+/* =========================================
+   FIREBASE ERROR MESSAGES
+========================================= */
 
 function getErrorMessage(error) {
 
@@ -214,26 +359,87 @@ function getErrorMessage(error) {
         error.code === "auth/invalid-credential" ||
         error.code === "auth/wrong-password"
     ) {
+
         return "Email or password is incorrect.";
+
     }
 
-    if (error.code === "auth/user-not-found") {
+
+    if (
+        error.code === "auth/user-not-found"
+    ) {
+
         return "No account was found with this email.";
+
     }
 
-    if (error.code === "auth/invalid-email") {
+
+    if (
+        error.code === "auth/invalid-email"
+    ) {
+
         return "Please enter a valid email address.";
+
     }
 
-    if (error.code === "auth/too-many-requests") {
+
+    if (
+        error.code === "auth/too-many-requests"
+    ) {
+
         return "Too many attempts. Please try again later.";
+
     }
 
-    if (error.code === "auth/network-request-failed") {
+
+    if (
+        error.code === "auth/network-request-failed"
+    ) {
+
         return "Network error. Check your internet connection.";
+
     }
 
-    return error.message || "Login failed.";
+
+    if (
+        error.code === "auth/api-key-not-valid"
+    ) {
+
+        return "Firebase API key is not valid. Please check your Firebase settings.";
+
+    }
+
+
+    if (
+        error.code === "auth/operation-not-allowed"
+    ) {
+
+        return "Email/password login is not enabled in Firebase Authentication.";
+
+    }
+
+
+    if (
+        error.code === "auth/user-disabled"
+    ) {
+
+        return "This account has been disabled.";
+
+    }
+
+
+    if (
+        error.code === "auth/requests-from-referer-https://beyou-app.onrender.com-are-blocked."
+    ) {
+
+        return "This website is blocked by your Firebase API key settings.";
+
+    }
+
+
+    return error.message ||
+        "Login failed. Please try again.";
+
 }
 
 </script>
