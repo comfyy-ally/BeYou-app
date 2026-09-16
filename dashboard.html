@@ -956,7 +956,44 @@
       font-size: 20px;
     }
 
+    /* =========================
+       AUTH LOADING SCREEN
+    ========================== */
+
+    #authLoading {
+      position: fixed;
+      inset: 0;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+    }
+
+    #authLoading .loading-logo {
+      font-family: "Pacifico", cursive;
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    #authLoading p {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    body.auth-ready #authLoading {
+      display: none;
+    }
+
+    body.auth-waiting .page,
+    body.auth-waiting .top-header,
+    body.auth-waiting .bottom-nav {
+      visibility: hidden;
+    }
+
     @media (max-width: 600px) {
+
       .page {
         padding: 13px;
       }
@@ -968,24 +1005,51 @@
       .profile-buttons {
         flex-wrap: wrap;
       }
+
+      .friend-card {
+        flex-wrap: wrap;
+      }
+
+      .friend-action {
+        margin-top: 5px;
+      }
     }
   </style>
 </head>
 
-<body>
+<body class="auth-waiting">
+
+  <!-- =========================
+       AUTH LOADING
+  ========================== -->
+
+  <div id="authLoading">
+
+    <div class="loading-logo">
+      <span class="tex">Tex</span><span class="us">Us</span>
+    </div>
+
+    <p>Checking your account...</p>
+
+  </div>
+
 
   <!-- =========================
        HEADER
   ========================== -->
 
   <header class="top-header">
+
     <div class="logo">
       <span class="tex">Tex</span><span class="us">Us</span>
     </div>
 
-    <button class="header-icon" onclick="showPage('settings')">
+    <button
+      class="header-icon"
+      onclick="showPage('settings')">
       ⚙️
     </button>
+
   </header>
 
 
@@ -1018,9 +1082,7 @@
     </div>
 
 
-    <!-- =====================
-         HOME FEED TAB
-    ====================== -->
+    <!-- HOME FEED -->
 
     <section id="homeFeedTab">
 
@@ -1042,7 +1104,10 @@
 
         </div>
 
-        <div id="otherStories" style="display:flex;gap:12px;"></div>
+        <div
+          id="otherStories"
+          style="display:flex;gap:12px;">
+        </div>
 
       </div>
 
@@ -1091,17 +1156,17 @@
       </div>
 
       <div id="feed">
+
         <div class="empty">
           Loading live feed...
         </div>
+
       </div>
 
     </section>
 
 
-    <!-- =====================
-         REELS TAB
-    ====================== -->
+    <!-- REELS -->
 
     <section
       id="reelsTab"
@@ -1145,9 +1210,7 @@
     </section>
 
 
-    <!-- =====================
-         MUSIC TAB
-    ====================== -->
+    <!-- MUSIC -->
 
     <section
       id="musicTab"
@@ -1235,16 +1298,22 @@
 
       </div>
 
-      <div id="musicResults" class="music-results">
+      <div
+        id="musicResults"
+        class="music-results">
 
         <h3 style="margin-bottom:12px;">
           Global Trending Hits
         </h3>
 
         <div class="song-card">
-          <div class="album">🎵</div>
+
+          <div class="album">
+            🎵
+          </div>
 
           <div class="song-info">
+
             <div class="song-title">
               Water
             </div>
@@ -1252,6 +1321,7 @@
             <div class="song-artist">
               Tyla
             </div>
+
           </div>
 
           <button
@@ -1259,12 +1329,17 @@
             onclick="playSong('Water - Tyla')">
             ▶
           </button>
+
         </div>
 
         <div class="song-card">
-          <div class="album">🎶</div>
+
+          <div class="album">
+            🎶
+          </div>
 
           <div class="song-info">
+
             <div class="song-title">
               Rush
             </div>
@@ -1272,6 +1347,7 @@
             <div class="song-artist">
               Ayra Starr
             </div>
+
           </div>
 
           <button
@@ -1279,12 +1355,17 @@
             onclick="playSong('Rush - Ayra Starr')">
             ▶
           </button>
+
         </div>
 
         <div class="song-card">
-          <div class="album">🎧</div>
+
+          <div class="album">
+            🎧
+          </div>
 
           <div class="song-info">
+
             <div class="song-title">
               Amapiano Hits
             </div>
@@ -1292,6 +1373,7 @@
             <div class="song-artist">
               TexUs Global Music
             </div>
+
           </div>
 
           <button
@@ -1299,6 +1381,7 @@
             onclick="playSong('Amapiano Hits')">
             ▶
           </button>
+
         </div>
 
       </div>
@@ -1342,9 +1425,11 @@
       </h3>
 
       <div id="usersList">
+
         <div class="empty">
           Loading users...
         </div>
+
       </div>
 
     </section>
@@ -1359,9 +1444,11 @@
       </h3>
 
       <div id="requestsList">
+
         <div class="empty">
           Loading requests...
         </div>
+
       </div>
 
     </section>
@@ -1426,10 +1513,12 @@
     <div class="profile-header">
 
       <div class="profile-avatar">
+
         <img
           id="profileAvatar"
           src=""
           alt="Profile">
+
       </div>
 
       <div
@@ -1446,6 +1535,7 @@
       <div class="profile-stats">
 
         <div class="stat">
+
           <div
             id="postCount"
             class="stat-number">
@@ -1455,9 +1545,11 @@
           <div class="stat-label">
             posts
           </div>
+
         </div>
 
         <div class="stat">
+
           <div
             id="friendCount"
             class="stat-number">
@@ -1467,9 +1559,11 @@
           <div class="stat-label">
             friends
           </div>
+
         </div>
 
         <div class="stat">
+
           <div
             id="followingCount"
             class="stat-number">
@@ -1479,6 +1573,7 @@
           <div class="stat-label">
             following
           </div>
+
         </div>
 
       </div>
@@ -1782,6 +1877,7 @@
       measurementId: "G-KCF9J53BGH"
     };
 
+
     firebase.initializeApp(firebaseConfig);
 
     const auth = firebase.auth();
@@ -1790,28 +1886,212 @@
 
     let currentUser = null;
     let selectedChatUser = null;
+    let dashboardStarted = false;
 
 
     /* =========================================
-       AUTH
+       AUTHENTICATION
+       FIXED LOGIN LOOP
     ========================================== */
 
-    auth.onAuthStateChanged(async user => {
+    auth.setPersistence(
+      firebase.auth.Auth.Persistence.LOCAL
+    )
+    .then(() => {
 
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
+      auth.onAuthStateChanged(async user => {
 
-      currentUser = user;
+        /*
+          IMPORTANT:
 
-      await loadProfile();
-      await loadStories();
-      await loadFeed();
-      await loadUsers();
-      await loadRequests();
-      await loadChatUsers();
-      await loadReels();
+          We wait for Firebase to finish checking
+          the saved login session before showing
+          the dashboard.
+
+          This prevents the dashboard from appearing
+          and immediately sending the user back to
+          login.html.
+        */
+
+        if (!user) {
+
+          currentUser = null;
+
+          document.body.classList.remove(
+            "auth-ready"
+          );
+
+          document.body.classList.add(
+            "auth-waiting"
+          );
+
+          /*
+            Firebase has confirmed that there is
+            genuinely no logged-in user.
+          */
+
+          window.location.replace("login.html");
+
+          return;
+        }
+
+
+        /*
+          User is authenticated.
+        */
+
+        currentUser = user;
+
+
+        /*
+          Prevent the dashboard initialization
+          from running more than once.
+        */
+
+        if (dashboardStarted) {
+
+          document.body.classList.remove(
+            "auth-waiting"
+          );
+
+          document.body.classList.add(
+            "auth-ready"
+          );
+
+          return;
+        }
+
+        dashboardStarted = true;
+
+
+        /*
+          Show dashboard only after Firebase
+          confirms the user.
+        */
+
+        document.body.classList.remove(
+          "auth-waiting"
+        );
+
+        document.body.classList.add(
+          "auth-ready"
+        );
+
+
+        console.log(
+          "TexUs login session confirmed:",
+          currentUser.email
+        );
+
+
+        /*
+          Load dashboard data.
+          Each function has its own error handling,
+          so one Firebase collection problem won't
+          force the user back to the login page.
+        */
+
+        try {
+          await loadProfile();
+        } catch (error) {
+          console.error(
+            "Profile loading error:",
+            error
+          );
+        }
+
+        try {
+          await loadStories();
+        } catch (error) {
+          console.error(
+            "Stories loading error:",
+            error
+          );
+        }
+
+        try {
+          await loadFeed();
+        } catch (error) {
+          console.error(
+            "Feed loading error:",
+            error
+          );
+        }
+
+        try {
+          await loadUsers();
+        } catch (error) {
+          console.error(
+            "Users loading error:",
+            error
+          );
+        }
+
+        try {
+          await loadRequests();
+        } catch (error) {
+          console.error(
+            "Requests loading error:",
+            error
+          );
+        }
+
+        try {
+          await loadChatUsers();
+        } catch (error) {
+          console.error(
+            "Chat users loading error:",
+            error
+          );
+        }
+
+        try {
+          await loadReels();
+        } catch (error) {
+          console.error(
+            "Reels loading error:",
+            error
+          );
+        }
+
+      });
+
+    })
+    .catch(error => {
+
+      console.error(
+        "Firebase persistence error:",
+        error
+      );
+
+      /*
+        Even if persistence configuration has a
+        problem, let Firebase's auth state listener
+        handle the actual account state.
+      */
+
+      auth.onAuthStateChanged(async user => {
+
+        if (!user) {
+
+          window.location.replace(
+            "login.html"
+          );
+
+          return;
+        }
+
+        currentUser = user;
+
+        document.body.classList.remove(
+          "auth-waiting"
+        );
+
+        document.body.classList.add(
+          "auth-ready"
+        );
+
+      });
 
     });
 
@@ -1822,30 +2102,46 @@
 
     function showPage(pageId, button) {
 
-      document.querySelectorAll(".page").forEach(page => {
-        page.classList.remove("active");
-      });
+      document
+        .querySelectorAll(".page")
+        .forEach(page => {
 
-      const page = document.getElementById(pageId);
+          page.classList.remove("active");
+
+        });
+
+
+      const page =
+        document.getElementById(pageId);
+
 
       if (page) {
+
         page.classList.add("active");
+
       }
+
 
       if (button) {
 
-        document.querySelectorAll(".nav-button").forEach(btn => {
-          btn.classList.remove("active");
-        });
+        document
+          .querySelectorAll(".nav-button")
+          .forEach(btn => {
+
+            btn.classList.remove("active");
+
+          });
 
         button.classList.add("active");
 
       }
 
+
       window.scrollTo({
         top: 0,
         behavior: "smooth"
       });
+
     }
 
 
@@ -1855,23 +2151,46 @@
 
     function switchHomeTab(tab, button) {
 
-      document.querySelectorAll(".home-tab").forEach(btn => {
-        btn.classList.remove("active");
-      });
+      document
+        .querySelectorAll(".home-tab")
+        .forEach(btn => {
+
+          btn.classList.remove("active");
+
+        });
+
 
       button.classList.add("active");
 
-      document.getElementById("homeFeedTab").style.display =
-        tab === "feed" ? "block" : "none";
 
-      document.getElementById("reelsTab").style.display =
-        tab === "reels" ? "block" : "none";
+      document.getElementById(
+        "homeFeedTab"
+      ).style.display =
+        tab === "feed"
+          ? "block"
+          : "none";
 
-      document.getElementById("musicTab").style.display =
-        tab === "music" ? "block" : "none";
+
+      document.getElementById(
+        "reelsTab"
+      ).style.display =
+        tab === "reels"
+          ? "block"
+          : "none";
+
+
+      document.getElementById(
+        "musicTab"
+      ).style.display =
+        tab === "music"
+          ? "block"
+          : "none";
+
 
       if (tab === "reels") {
+
         loadReels();
+
       }
 
     }
@@ -1883,7 +2202,17 @@
 
     function openStoryUpload() {
 
-      document.getElementById("storyFile").click();
+      if (!currentUser) {
+
+        alert("Please log in first.");
+
+        return;
+
+      }
+
+      document
+        .getElementById("storyFile")
+        .click();
 
     }
 
@@ -1891,23 +2220,38 @@
     async function uploadStory() {
 
       const file =
-        document.getElementById("storyFile").files[0];
+        document
+          .getElementById("storyFile")
+          .files[0];
+
 
       if (!file || !currentUser) {
+
         return;
+
       }
 
+
       const status =
-        document.getElementById("uploadStatus");
+        document.getElementById(
+          "uploadStatus"
+        );
+
 
       status.textContent =
         "Uploading your story... 0%";
 
+
       try {
 
         const filename =
-          Date.now() + "_" +
-          file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          Date.now() +
+          "_" +
+          file.name.replace(
+            /[^a-zA-Z0-9._-]/g,
+            "_"
+          );
+
 
         const storageRef =
           storage.ref(
@@ -1917,8 +2261,10 @@
             filename
           );
 
+
         const uploadTask =
           storageRef.put(file);
+
 
         uploadTask.on(
 
@@ -1928,10 +2274,12 @@
 
             const percent =
               Math.round(
-                snapshot.bytesTransferred /
-                snapshot.totalBytes *
-                100
+                (
+                  snapshot.bytesTransferred /
+                  snapshot.totalBytes
+                ) * 100
               );
+
 
             status.textContent =
               "Uploading your story... " +
@@ -1940,72 +2288,129 @@
 
           },
 
+
           error => {
 
-            console.error(error);
+            console.error(
+              "Story upload error:",
+              error
+            );
+
 
             status.textContent =
               "Story upload failed: " +
-              (error.code || error.message);
+              (
+                error.code ||
+                error.message
+              );
 
           },
 
+
           async () => {
 
-            const mediaUrl =
-              await uploadTask.snapshot.ref
-                .getDownloadURL();
+            try {
 
-            const now =
-              firebase.firestore.Timestamp.now();
+              const mediaUrl =
+                await uploadTask
+                  .snapshot.ref
+                  .getDownloadURL();
 
-            const expiresAt =
-              new firebase.firestore.Timestamp(
-                now.seconds + 86400,
-                now.nanoseconds
+
+              const now =
+                firebase.firestore
+                  .Timestamp
+                  .now();
+
+
+              const expiresAt =
+                new firebase.firestore.Timestamp(
+                  now.seconds + 86400,
+                  now.nanoseconds
+                );
+
+
+              await db
+                .collection("stories")
+                .add({
+
+                  uid:
+                    currentUser.uid,
+
+                  username:
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0],
+
+                  mediaUrl:
+                    mediaUrl,
+
+                  mediaType:
+                    file.type.startsWith("video/")
+                      ? "video"
+                      : "image",
+
+                  createdAt:
+                    now,
+
+                  expiresAt:
+                    expiresAt
+
+                });
+
+
+              status.textContent =
+                "Your story has been posted!";
+
+
+              document
+                .getElementById("storyFile")
+                .value = "";
+
+
+              await loadStories();
+
+
+              setTimeout(() => {
+
+                status.textContent = "";
+
+              }, 3000);
+
+            } catch (error) {
+
+              console.error(
+                "Story database error:",
+                error
               );
 
-            await db.collection("stories").add({
 
-              uid: currentUser.uid,
+              status.textContent =
+                "Story could not be posted: " +
+                (
+                  error.code ||
+                  error.message
+                );
 
-              username:
-                currentUser.displayName ||
-                currentUser.email.split("@")[0],
-
-              mediaUrl: mediaUrl,
-
-              mediaType:
-                file.type.startsWith("video/")
-                  ? "video"
-                  : "image",
-
-              createdAt: now,
-
-              expiresAt: expiresAt
-
-            });
-
-            status.textContent =
-              "Your story has been posted!";
-
-            document.getElementById("storyFile").value = "";
-
-            await loadStories();
-
-            setTimeout(() => {
-              status.textContent = "";
-            }, 3000);
+            }
 
           }
+
         );
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Story upload error:",
+          error
+        );
+
 
         status.textContent =
-          "Story upload failed.";
+          "Story upload failed: " +
+          (
+            error.code ||
+            error.message
+          );
 
       }
 
@@ -2014,38 +2419,74 @@
 
     async function loadStories() {
 
+      if (!currentUser) return;
+
+
       const container =
-        document.getElementById("otherStories");
+        document.getElementById(
+          "otherStories"
+        );
+
 
       container.innerHTML = "";
+
 
       try {
 
         const now =
-          firebase.firestore.Timestamp.now();
+          firebase.firestore
+            .Timestamp
+            .now();
+
 
         const snapshot =
-          await db.collection("stories")
-            .where("expiresAt", ">", now)
-            .orderBy("expiresAt", "asc")
+          await db
+            .collection("stories")
+            .where(
+              "expiresAt",
+              ">",
+              now
+            )
+            .orderBy(
+              "expiresAt",
+              "asc"
+            )
             .get();
+
 
         snapshot.forEach(doc => {
 
-          const story = doc.data();
+          const story =
+            doc.data();
 
-          if (story.uid === currentUser.uid) {
+
+          if (
+            story.uid ===
+            currentUser.uid
+          ) {
+
             return;
+
           }
 
+
           const card =
-            document.createElement("div");
+            document.createElement(
+              "div"
+            );
 
-          card.className = "story-card";
 
-          if (story.mediaType === "video") {
+          card.className =
+            "story-card";
+
+
+          if (
+            story.mediaType ===
+            "video"
+          ) {
 
             card.innerHTML = `
+
               <video
                 src="${escapeHtml(story.mediaUrl)}"
                 muted>
@@ -2054,13 +2495,18 @@
               <div class="story-overlay"></div>
 
               <div class="story-name">
-                ${escapeHtml(story.username || "User")}
+                ${escapeHtml(
+                  story.username ||
+                  "User"
+                )}
               </div>
+
             `;
 
           } else {
 
             card.innerHTML = `
+
               <img
                 src="${escapeHtml(story.mediaUrl)}"
                 alt="Story">
@@ -2068,25 +2514,42 @@
               <div class="story-overlay"></div>
 
               <div class="story-name">
-                ${escapeHtml(story.username || "User")}
+                ${escapeHtml(
+                  story.username ||
+                  "User"
+                )}
               </div>
+
             `;
 
           }
 
+
           card.onclick = () => {
-            openStoryViewer(story);
+
+            openStoryViewer(
+              story
+            );
+
           };
 
-          container.appendChild(card);
+
+          container.appendChild(
+            card
+          );
 
         });
 
       } catch (error) {
 
-        console.error("Stories error:", error);
+        console.error(
+          "Stories error:",
+          error
+        );
+
 
         container.innerHTML = `
+
           <div style="
             color:#94a3b8;
             padding:15px;
@@ -2095,6 +2558,7 @@
             Stories are ready, but Firestore may need
             an index.
           </div>
+
         `;
 
       }
@@ -2105,32 +2569,48 @@
     function openStoryViewer(story) {
 
       const modal =
-        document.getElementById("storyViewer");
+        document.getElementById(
+          "storyViewer"
+        );
+
 
       const content =
-        document.getElementById("storyViewerContent");
+        document.getElementById(
+          "storyViewerContent"
+        );
 
-      if (story.mediaType === "video") {
+
+      if (
+        story.mediaType ===
+        "video"
+      ) {
 
         content.innerHTML = `
+
           <video
             src="${escapeHtml(story.mediaUrl)}"
             controls
             autoplay>
           </video>
+
         `;
 
       } else {
 
         content.innerHTML = `
+
           <img
             src="${escapeHtml(story.mediaUrl)}"
             alt="Story">
+
         `;
 
       }
 
-      modal.classList.add("active");
+
+      modal.classList.add(
+        "active"
+      );
 
     }
 
@@ -2138,11 +2618,18 @@
     function closeStoryViewer() {
 
       document
-        .getElementById("storyViewer")
-        .classList.remove("active");
+        .getElementById(
+          "storyViewer"
+        )
+        .classList.remove(
+          "active"
+        );
+
 
       document
-        .getElementById("storyViewerContent")
+        .getElementById(
+          "storyViewerContent"
+        )
         .innerHTML = "";
 
     }
@@ -2154,29 +2641,61 @@
 
     async function createPost() {
 
+      if (!currentUser) {
+
+        alert(
+          "Please log in first."
+        );
+
+        return;
+
+      }
+
+
       const text =
-        document.getElementById("postText").value.trim();
+        document
+          .getElementById(
+            "postText"
+          )
+          .value
+          .trim();
+
 
       const file =
-        document.getElementById("postFile").files[0];
+        document
+          .getElementById(
+            "postFile"
+          )
+          .files[0];
+
 
       if (!text && !file) {
 
-        alert("Write something or select a photo/video.");
+        alert(
+          "Write something or select a photo/video."
+        );
 
         return;
+
       }
+
 
       try {
 
         let mediaUrl = "";
         let mediaType = "";
 
+
         if (file) {
 
           const filename =
-            Date.now() + "_" +
-            file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+            Date.now() +
+            "_" +
+            file.name.replace(
+              /[^a-zA-Z0-9._-]/g,
+              "_"
+            );
+
 
           const ref =
             storage.ref(
@@ -2186,52 +2705,91 @@
               filename
             );
 
+
           const upload =
             await ref.put(file);
 
+
           mediaUrl =
-            await upload.ref.getDownloadURL();
+            await upload
+              .ref
+              .getDownloadURL();
+
 
           mediaType =
-            file.type.startsWith("video/")
+            file.type.startsWith(
+              "video/"
+            )
               ? "video"
               : "image";
+
         }
 
-        await db.collection("posts").add({
 
-          uid: currentUser.uid,
+        await db
+          .collection("posts")
+          .add({
 
-          username:
-            currentUser.displayName ||
-            currentUser.email.split("@")[0],
+            uid:
+              currentUser.uid,
 
-          email: currentUser.email,
+            username:
+              currentUser.displayName ||
+              currentUser.email.split("@")[0],
 
-          text: text,
+            email:
+              currentUser.email,
 
-          mediaUrl: mediaUrl,
+            text:
+              text,
 
-          mediaType: mediaType,
+            mediaUrl:
+              mediaUrl,
 
-          createdAt:
-            firebase.firestore.FieldValue.serverTimestamp()
+            mediaType:
+              mediaType,
 
-        });
+            createdAt:
+              firebase.firestore
+                .FieldValue
+                .serverTimestamp()
 
-        document.getElementById("postText").value = "";
-        document.getElementById("postFile").value = "";
+          });
+
+
+        document
+          .getElementById(
+            "postText"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "postFile"
+          )
+          .value = "";
+
 
         await loadFeed();
+
         await loadProfilePosts();
+
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Post error:",
+          error
+        );
+
 
         alert(
           "Could not create post: " +
-          (error.message || "Unknown error")
+          (
+            error.message ||
+            "Unknown error"
+          )
         );
 
       }
@@ -2241,71 +2799,106 @@
 
     async function loadFeed() {
 
+      if (!currentUser) return;
+
+
       const feed =
-        document.getElementById("feed");
+        document.getElementById(
+          "feed"
+        );
+
 
       feed.innerHTML = `
+
         <div class="empty">
           Loading feed...
         </div>
+
       `;
+
 
       try {
 
         const snapshot =
-          await db.collection("posts")
-            .orderBy("createdAt", "desc")
+          await db
+            .collection("posts")
+            .orderBy(
+              "createdAt",
+              "desc"
+            )
             .limit(30)
             .get();
+
 
         if (snapshot.empty) {
 
           feed.innerHTML = `
+
             <div class="empty">
               No posts yet. Be the first to post!
             </div>
+
           `;
 
           return;
+
         }
+
 
         feed.innerHTML = "";
 
+
         snapshot.forEach(doc => {
 
-          const post = doc.data();
+          const post =
+            doc.data();
+
 
           const div =
-            document.createElement("div");
+            document.createElement(
+              "div"
+            );
 
-          div.className = "post";
+
+          div.className =
+            "post";
+
 
           let media = "";
 
+
           if (post.mediaUrl) {
 
-            if (post.mediaType === "video") {
+            if (
+              post.mediaType ===
+              "video"
+            ) {
 
               media = `
+
                 <video
                   class="post-media"
                   src="${escapeHtml(post.mediaUrl)}"
                   controls>
                 </video>
+
               `;
 
             } else {
 
               media = `
+
                 <img
                   class="post-media"
                   src="${escapeHtml(post.mediaUrl)}"
                   alt="Post">
+
               `;
 
             }
 
           }
+
 
           div.innerHTML = `
 
@@ -2316,19 +2909,27 @@
               </div>
 
               <div>
+
                 <div class="post-username">
-                  ${escapeHtml(post.username || "User")}
+                  ${escapeHtml(
+                    post.username ||
+                    "User"
+                  )}
                 </div>
 
                 <small style="color:#94a3b8;">
                   TexUs
                 </small>
+
               </div>
 
             </div>
 
             <div class="post-text">
-              ${escapeHtml(post.text || "")}
+              ${escapeHtml(
+                post.text ||
+                ""
+              )}
             </div>
 
             ${media}
@@ -2348,20 +2949,31 @@
               </button>
 
             </div>
+
           `;
 
-          feed.appendChild(div);
+
+          feed.appendChild(
+            div
+          );
 
         });
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Feed error:",
+          error
+        );
+
 
         feed.innerHTML = `
+
           <div class="empty">
             Could not load the feed.
           </div>
+
         `;
 
       }
@@ -2375,8 +2987,21 @@
 
     function openReelUpload() {
 
+      if (!currentUser) {
+
+        alert(
+          "Please log in first."
+        );
+
+        return;
+
+      }
+
+
       document
-        .getElementById("reelFile")
+        .getElementById(
+          "reelFile"
+        )
         .click();
 
     }
@@ -2385,28 +3010,51 @@
     async function uploadReel() {
 
       const file =
-        document.getElementById("reelFile").files[0];
+        document
+          .getElementById(
+            "reelFile"
+          )
+          .files[0];
+
 
       if (!file) return;
 
-      if (!file.type.startsWith("video/")) {
 
-        alert("Please select a video.");
+      if (
+        !file.type.startsWith(
+          "video/"
+        )
+      ) {
+
+        alert(
+          "Please select a video."
+        );
 
         return;
+
       }
 
+
       const status =
-        document.getElementById("reelUploadStatus");
+        document.getElementById(
+          "reelUploadStatus"
+        );
+
 
       status.textContent =
         "Uploading your reel... 0%";
 
+
       try {
 
         const filename =
-          Date.now() + "_" +
-          file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          Date.now() +
+          "_" +
+          file.name.replace(
+            /[^a-zA-Z0-9._-]/g,
+            "_"
+          );
+
 
         const ref =
           storage.ref(
@@ -2416,8 +3064,10 @@
             filename
           );
 
+
         const uploadTask =
           ref.put(file);
+
 
         uploadTask.on(
 
@@ -2427,10 +3077,12 @@
 
             const percent =
               Math.round(
-                snapshot.bytesTransferred /
-                snapshot.totalBytes *
-                100
+                (
+                  snapshot.bytesTransferred /
+                  snapshot.totalBytes
+                ) * 100
               );
+
 
             status.textContent =
               "Uploading your reel... " +
@@ -2439,57 +3091,113 @@
 
           },
 
+
           error => {
 
-            console.error(error);
+            console.error(
+              "Reel upload error:",
+              error
+            );
+
 
             status.textContent =
               "Reel upload failed: " +
-              (error.code || error.message);
+              (
+                error.code ||
+                error.message
+              );
 
           },
 
+
           async () => {
 
-            const url =
-              await uploadTask.snapshot.ref
-                .getDownloadURL();
+            try {
 
-            await db.collection("reels").add({
+              const url =
+                await uploadTask
+                  .snapshot.ref
+                  .getDownloadURL();
 
-              uid: currentUser.uid,
 
-              username:
-                currentUser.displayName ||
-                currentUser.email.split("@")[0],
+              await db
+                .collection("reels")
+                .add({
 
-              videoUrl: url,
+                  uid:
+                    currentUser.uid,
 
-              createdAt:
-                firebase.firestore.FieldValue.serverTimestamp()
+                  username:
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0],
 
-            });
+                  videoUrl:
+                    url,
 
-            status.textContent =
-              "Reel posted successfully!";
+                  createdAt:
+                    firebase.firestore
+                      .FieldValue
+                      .serverTimestamp()
 
-            document.getElementById("reelFile").value = "";
+                });
 
-            await loadReels();
 
-            setTimeout(() => {
-              status.textContent = "";
-            }, 3000);
+              status.textContent =
+                "Reel posted successfully!";
+
+
+              document
+                .getElementById(
+                  "reelFile"
+                )
+                .value = "";
+
+
+              await loadReels();
+
+
+              setTimeout(() => {
+
+                status.textContent = "";
+
+              }, 3000);
+
+
+            } catch (error) {
+
+              console.error(
+                "Reel database error:",
+                error
+              );
+
+
+              status.textContent =
+                "Reel could not be posted: " +
+                (
+                  error.code ||
+                  error.message
+                );
+
+            }
 
           }
+
         );
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Reel upload error:",
+          error
+        );
+
 
         status.textContent =
-          "Could not upload reel.";
+          "Could not upload reel: " +
+          (
+            error.code ||
+            error.message
+          );
 
       }
 
@@ -2498,38 +3206,61 @@
 
     async function loadReels() {
 
+      if (!currentUser) return;
+
+
       const container =
-        document.getElementById("reelsContainer");
+        document.getElementById(
+          "reelsContainer"
+        );
+
 
       try {
 
         const snapshot =
-          await db.collection("reels")
-            .orderBy("createdAt", "desc")
+          await db
+            .collection("reels")
+            .orderBy(
+              "createdAt",
+              "desc"
+            )
             .limit(30)
             .get();
+
 
         if (snapshot.empty) {
 
           container.innerHTML = `
+
             <div class="empty">
               No reels yet. Create the first one!
             </div>
+
           `;
 
           return;
+
         }
+
 
         container.innerHTML = "";
 
+
         snapshot.forEach(doc => {
 
-          const reel = doc.data();
+          const reel =
+            doc.data();
+
 
           const div =
-            document.createElement("div");
+            document.createElement(
+              "div"
+            );
 
-          div.className = "reel";
+
+          div.className =
+            "reel";
+
 
           div.innerHTML = `
 
@@ -2543,7 +3274,10 @@
             <div class="reel-info">
 
               <strong>
-                @${escapeHtml(reel.username || "user")}
+                @${escapeHtml(
+                  reel.username ||
+                  "user"
+                )}
               </strong>
 
               <div class="reel-actions">
@@ -2563,20 +3297,31 @@
               </div>
 
             </div>
+
           `;
 
-          container.appendChild(div);
+
+          container.appendChild(
+            div
+          );
 
         });
 
+
       } catch (error) {
 
-        console.error("Reels error:", error);
+        console.error(
+          "Reels error:",
+          error
+        );
+
 
         container.innerHTML = `
+
           <div class="empty">
             No reels available yet.
           </div>
+
         `;
 
       }
@@ -2585,7 +3330,7 @@
 
 
     /* =========================================
-       MUSIC SEARCH
+       MUSIC
     ========================================== */
 
     const musicLibrary = [
@@ -2657,81 +3402,144 @@
 
       const query =
         document
-          .getElementById("musicSearchInput")
+          .getElementById(
+            "musicSearchInput"
+          )
           .value
           .trim()
           .toLowerCase();
+
 
       const results =
         musicLibrary.filter(song => {
 
           return (
-            song.title.toLowerCase().includes(query) ||
-            song.artist.toLowerCase().includes(query) ||
-            song.genre.toLowerCase().includes(query)
+
+            song.title
+              .toLowerCase()
+              .includes(query)
+
+            ||
+
+            song.artist
+              .toLowerCase()
+              .includes(query)
+
+            ||
+
+            song.genre
+              .toLowerCase()
+              .includes(query)
+
           );
 
         });
 
-      displayMusicResults(results, query);
+
+      displayMusicResults(
+        results,
+        query
+      );
 
     }
 
 
-    function searchGenre(genre, button) {
+    function searchGenre(
+      genre,
+      button
+    ) {
 
       document
-        .querySelectorAll(".genre")
+        .querySelectorAll(
+          ".genre"
+        )
         .forEach(btn => {
-          btn.classList.remove("active");
+
+          btn.classList.remove(
+            "active"
+          );
+
         });
 
-      button.classList.add("active");
+
+      button.classList.add(
+        "active"
+      );
+
 
       document
-        .getElementById("musicSearchInput")
+        .getElementById(
+          "musicSearchInput"
+        )
         .value = genre;
+
 
       const results =
         musicLibrary.filter(song =>
-          song.genre.toLowerCase() ===
-          genre.toLowerCase()
+          song.genre
+            .toLowerCase() ===
+          genre
+            .toLowerCase()
         );
 
-      displayMusicResults(results, genre);
+
+      displayMusicResults(
+        results,
+        genre
+      );
 
     }
 
 
-    function displayMusicResults(results, query) {
+    function displayMusicResults(
+      results,
+      query
+    ) {
 
       const container =
-        document.getElementById("musicResults");
+        document.getElementById(
+          "musicResults"
+        );
 
-      if (results.length === 0) {
+
+      if (
+        results.length === 0
+      ) {
 
         container.innerHTML = `
+
           <div class="empty">
             No music found for
             "${escapeHtml(query)}".
           </div>
+
         `;
 
         return;
+
       }
 
+
       container.innerHTML = `
+
         <h3 style="margin-bottom:12px;">
           Search results
         </h3>
+
       `;
+
 
       results.forEach(song => {
 
         const card =
-          document.createElement("div");
+          document.createElement(
+            "div"
+          );
 
-        card.className = "song-card";
+
+        card.className =
+          "song-card";
+
 
         card.innerHTML = `
 
@@ -2742,12 +3550,19 @@
           <div class="song-info">
 
             <div class="song-title">
-              ${escapeHtml(song.title)}
+              ${escapeHtml(
+                song.title
+              )}
             </div>
 
             <div class="song-artist">
-              ${escapeHtml(song.artist)}
-              • ${escapeHtml(song.genre)}
+              ${escapeHtml(
+                song.artist
+              )}
+              •
+              ${escapeHtml(
+                song.genre
+              )}
             </div>
 
           </div>
@@ -2760,7 +3575,10 @@
 
         `;
 
-        container.appendChild(card);
+
+        container.appendChild(
+          card
+        );
 
       });
 
@@ -2770,7 +3588,8 @@
     function playSong(song) {
 
       alert(
-        "Music player selected: " + song +
+        "Music player selected: " +
+        song +
         "\n\nThe full streaming player can be connected next."
       );
 
@@ -2781,24 +3600,51 @@
        FRIENDS
     ========================================== */
 
-    function switchFriendTab(tab, button) {
+    function switchFriendTab(
+      tab,
+      button
+    ) {
 
       document
-        .querySelectorAll(".friend-tab")
+        .querySelectorAll(
+          ".friend-tab"
+        )
         .forEach(btn => {
-          btn.classList.remove("active");
+
+          btn.classList.remove(
+            "active"
+          );
+
         });
 
-      button.classList.add("active");
 
-      document.getElementById("availableFriends").style.display =
-        tab === "available" ? "block" : "none";
+      button.classList.add(
+        "active"
+      );
 
-      document.getElementById("friendRequests").style.display =
-        tab === "requests" ? "block" : "none";
 
-      if (tab === "requests") {
+      document.getElementById(
+        "availableFriends"
+      ).style.display =
+        tab === "available"
+          ? "block"
+          : "none";
+
+
+      document.getElementById(
+        "friendRequests"
+      ).style.display =
+        tab === "requests"
+          ? "block"
+          : "none";
+
+
+      if (
+        tab === "requests"
+      ) {
+
         loadRequests();
+
       }
 
     }
@@ -2806,34 +3652,58 @@
 
     async function loadUsers() {
 
+      if (!currentUser) return;
+
+
       const list =
-        document.getElementById("usersList");
+        document.getElementById(
+          "usersList"
+        );
+
 
       try {
 
         const snapshot =
-          await db.collection("users")
+          await db
+            .collection("users")
             .limit(50)
             .get();
 
+
         list.innerHTML = "";
+
 
         let found = false;
 
+
         snapshot.forEach(doc => {
 
-          const user = doc.data();
+          const user =
+            doc.data();
 
-          if (doc.id === currentUser.uid) {
+
+          if (
+            doc.id ===
+            currentUser.uid
+          ) {
+
             return;
+
           }
+
 
           found = true;
 
-          const card =
-            document.createElement("div");
 
-          card.className = "friend-card";
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "friend-card";
+
 
           card.innerHTML = `
 
@@ -2852,7 +3722,10 @@
               </div>
 
               <div class="friend-email">
-                ${escapeHtml(user.email || "")}
+                ${escapeHtml(
+                  user.email ||
+                  ""
+                )}
               </div>
 
             </div>
@@ -2865,28 +3738,41 @@
 
           `;
 
-          list.appendChild(card);
+
+          list.appendChild(
+            card
+          );
 
         });
+
 
         if (!found) {
 
           list.innerHTML = `
+
             <div class="empty">
               No other users found yet.
             </div>
+
           `;
 
         }
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Users error:",
+          error
+        );
+
 
         list.innerHTML = `
+
           <div class="empty">
             Could not load users.
           </div>
+
         `;
 
       }
@@ -2894,30 +3780,54 @@
     }
 
 
-    async function sendFriendRequest(toUid) {
+    async function sendFriendRequest(
+      toUid
+    ) {
+
+      if (!currentUser) return;
+
 
       try {
 
-        await db.collection("friendRequests").add({
+        await db
+          .collection(
+            "friendRequests"
+          )
+          .add({
 
-          fromUid: currentUser.uid,
+            fromUid:
+              currentUser.uid,
 
-          toUid: toUid,
+            toUid:
+              toUid,
 
-          status: "pending",
+            status:
+              "pending",
 
-          createdAt:
-            firebase.firestore.FieldValue.serverTimestamp()
+            createdAt:
+              firebase.firestore
+                .FieldValue
+                .serverTimestamp()
 
-        });
+          });
 
-        alert("Friend request sent!");
+
+        alert(
+          "Friend request sent!"
+        );
+
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Friend request error:",
+          error
+        );
 
-        alert("Could not send friend request.");
+
+        alert(
+          "Could not send friend request."
+        );
 
       }
 
@@ -2926,13 +3836,22 @@
 
     async function loadRequests() {
 
+      if (!currentUser) return;
+
+
       const list =
-        document.getElementById("requestsList");
+        document.getElementById(
+          "requestsList"
+        );
+
 
       try {
 
         const snapshot =
-          await db.collection("friendRequests")
+          await db
+            .collection(
+              "friendRequests"
+            )
             .where(
               "toUid",
               "==",
@@ -2945,55 +3864,90 @@
             )
             .get();
 
+
         list.innerHTML = "";
 
-        if (snapshot.empty) {
+
+        if (
+          snapshot.empty
+        ) {
 
           list.innerHTML = `
+
             <div class="empty">
               You have no new friend requests.
             </div>
+
           `;
 
           return;
+
         }
 
-        for (const doc of snapshot.docs) {
 
-          const request = doc.data();
+        for (
+          const doc of snapshot.docs
+        ) {
 
-          let senderName = "TexUs User";
-          let senderEmail = "";
+          const request =
+            doc.data();
+
+
+          let senderName =
+            "TexUs User";
+
+
+          let senderEmail =
+            "";
+
 
           try {
 
             const userDoc =
-              await db.collection("users")
-                .doc(request.fromUid)
+              await db
+                .collection("users")
+                .doc(
+                  request.fromUid
+                )
                 .get();
 
-            if (userDoc.exists) {
 
-              const user = userDoc.data();
+            if (
+              userDoc.exists
+            ) {
+
+              const user =
+                userDoc.data();
+
 
               senderName =
                 user.username ||
                 user.email ||
                 senderName;
 
+
               senderEmail =
-                user.email || "";
+                user.email ||
+                "";
 
             }
 
           } catch (e) {
+
             console.log(e);
+
           }
 
-          const card =
-            document.createElement("div");
 
-          card.className = "friend-card";
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "friend-card";
+
 
           card.innerHTML = `
 
@@ -3004,11 +3958,15 @@
             <div class="friend-info">
 
               <div class="friend-name">
-                ${escapeHtml(senderName)}
+                ${escapeHtml(
+                  senderName
+                )}
               </div>
 
               <div class="friend-email">
-                ${escapeHtml(senderEmail)}
+                ${escapeHtml(
+                  senderEmail
+                )}
               </div>
 
             </div>
@@ -3027,18 +3985,28 @@
 
           `;
 
-          list.appendChild(card);
+
+          list.appendChild(
+            card
+          );
 
         }
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Requests error:",
+          error
+        );
+
 
         list.innerHTML = `
+
           <div class="empty">
             Could not load requests.
           </div>
+
         `;
 
       }
@@ -3053,64 +4021,115 @@
 
       try {
 
-        await db.collection("friendRequests")
+        await db
+          .collection(
+            "friendRequests"
+          )
           .doc(requestId)
           .update({
-            status: "accepted"
+
+            status:
+              "accepted"
+
           });
 
-        await db.collection("friends")
-          .doc(currentUser.uid)
+
+        await db
+          .collection("friends")
+          .doc(
+            currentUser.uid
+          )
           .collection("list")
           .doc(otherUid)
           .set({
-            uid: otherUid,
+
+            uid:
+              otherUid,
+
             addedAt:
-              firebase.firestore.FieldValue.serverTimestamp()
+              firebase.firestore
+                .FieldValue
+                .serverTimestamp()
+
           });
 
-        await db.collection("friends")
+
+        await db
+          .collection("friends")
           .doc(otherUid)
           .collection("list")
           .doc(currentUser.uid)
           .set({
-            uid: currentUser.uid,
+
+            uid:
+              currentUser.uid,
+
             addedAt:
-              firebase.firestore.FieldValue.serverTimestamp()
+              firebase.firestore
+                .FieldValue
+                .serverTimestamp()
+
           });
+
 
         await loadRequests();
 
-        alert("Friend request accepted!");
+
+        alert(
+          "Friend request accepted!"
+        );
+
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Accept request error:",
+          error
+        );
 
-        alert("Could not accept request.");
+
+        alert(
+          "Could not accept request."
+        );
 
       }
 
     }
 
 
-    async function declineFriendRequest(requestId) {
+    async function declineFriendRequest(
+      requestId
+    ) {
 
       try {
 
-        await db.collection("friendRequests")
+        await db
+          .collection(
+            "friendRequests"
+          )
           .doc(requestId)
           .update({
-            status: "declined"
+
+            status:
+              "declined"
+
           });
+
 
         await loadRequests();
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Decline request error:",
+          error
+        );
 
-        alert("Could not decline request.");
+
+        alert(
+          "Could not decline request."
+        );
 
       }
 
@@ -3123,34 +4142,58 @@
 
     async function loadChatUsers() {
 
+      if (!currentUser) return;
+
+
       const list =
-        document.getElementById("chatList");
+        document.getElementById(
+          "chatList"
+        );
+
 
       try {
 
         const snapshot =
-          await db.collection("users")
+          await db
+            .collection("users")
             .limit(50)
             .get();
 
+
         list.innerHTML = "";
+
 
         let found = false;
 
+
         snapshot.forEach(doc => {
 
-          if (doc.id === currentUser.uid) {
+          if (
+            doc.id ===
+            currentUser.uid
+          ) {
+
             return;
+
           }
+
 
           found = true;
 
-          const user = doc.data();
+
+          const user =
+            doc.data();
+
 
           const div =
-            document.createElement("div");
+            document.createElement(
+              "div"
+            );
 
-          div.className = "chat-user";
+
+          div.className =
+            "chat-user";
+
 
           div.innerHTML = `
 
@@ -3176,53 +4219,83 @@
               </div>
 
             </div>
+
           `;
 
+
           div.onclick = () => {
+
             openChat(
               doc.id,
               user.username ||
               user.email ||
               "User"
             );
+
           };
 
-          list.appendChild(div);
+
+          list.appendChild(
+            div
+          );
 
         });
+
 
         if (!found) {
 
           list.innerHTML = `
+
             <div class="empty">
               No users available to chat with yet.
             </div>
+
           `;
 
         }
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Chat users error:",
+          error
+        );
 
       }
 
     }
 
 
-    function openChat(uid, username) {
+    function openChat(
+      uid,
+      username
+    ) {
 
       selectedChatUser = {
-        uid: uid,
-        username: username
+
+        uid:
+          uid,
+
+        username:
+          username
+
       };
 
-      document
-        .getElementById("chatWindow")
-        .classList.add("active");
 
       document
-        .getElementById("chatHeader")
+        .getElementById(
+          "chatWindow"
+        )
+        .classList.add(
+          "active"
+        );
+
+
+      document
+        .getElementById(
+          "chatHeader"
+        )
         .innerHTML = `
 
           <div class="avatar">
@@ -3230,9 +4303,13 @@
           </div>
 
           <strong>
-            ${escapeHtml(username)}
+            ${escapeHtml(
+              username
+            )}
           </strong>
+
         `;
+
 
       loadMessages();
 
@@ -3242,14 +4319,25 @@
     async function sendMessage() {
 
       const input =
-        document.getElementById("messageInput");
+        document.getElementById(
+          "messageInput"
+        );
+
 
       const text =
         input.value.trim();
 
-      if (!text || !selectedChatUser) {
+
+      if (
+        !text ||
+        !selectedChatUser ||
+        !currentUser
+      ) {
+
         return;
+
       }
+
 
       try {
 
@@ -3259,32 +4347,47 @@
             selectedChatUser.uid
           );
 
-        await db.collection("chats")
+
+        await db
+          .collection("chats")
           .doc(chatId)
           .collection("messages")
           .add({
 
-            senderId: currentUser.uid,
+            senderId:
+              currentUser.uid,
 
             receiverId:
               selectedChatUser.uid,
 
-            text: text,
+            text:
+              text,
 
             createdAt:
-              firebase.firestore.FieldValue.serverTimestamp()
+              firebase.firestore
+                .FieldValue
+                .serverTimestamp()
 
           });
 
+
         input.value = "";
+
 
         loadMessages();
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Message error:",
+          error
+        );
 
-        alert("Message could not be sent.");
+
+        alert(
+          "Message could not be sent."
+        );
 
       }
 
@@ -3293,12 +4396,21 @@
 
     async function loadMessages() {
 
-      if (!selectedChatUser) {
+      if (
+        !selectedChatUser ||
+        !currentUser
+      ) {
+
         return;
+
       }
 
+
       const messages =
-        document.getElementById("messages");
+        document.getElementById(
+          "messages"
+        );
+
 
       const chatId =
         getChatId(
@@ -3306,55 +4418,84 @@
           selectedChatUser.uid
         );
 
+
       try {
 
         const snapshot =
-          await db.collection("chats")
+          await db
+            .collection("chats")
             .doc(chatId)
             .collection("messages")
-            .orderBy("createdAt", "asc")
+            .orderBy(
+              "createdAt",
+              "asc"
+            )
             .limit(100)
             .get();
 
+
         messages.innerHTML = "";
+
 
         snapshot.forEach(doc => {
 
-          const message = doc.data();
+          const message =
+            doc.data();
+
 
           const div =
-            document.createElement("div");
+            document.createElement(
+              "div"
+            );
+
 
           div.className =
             "message " +
             (
-              message.senderId === currentUser.uid
+              message.senderId ===
+              currentUser.uid
                 ? "me"
                 : ""
             );
 
-          div.textContent =
-            message.text || "";
 
-          messages.appendChild(div);
+          div.textContent =
+            message.text ||
+            "";
+
+
+          messages.appendChild(
+            div
+          );
 
         });
+
 
         messages.scrollTop =
           messages.scrollHeight;
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Messages error:",
+          error
+        );
 
       }
 
     }
 
 
-    function getChatId(a, b) {
+    function getChatId(
+      a,
+      b
+    ) {
 
-      return [a, b].sort().join("_");
+      return [
+        a,
+        b
+      ].sort().join("_");
 
     }
 
@@ -3365,20 +4506,32 @@
 
     async function loadProfile() {
 
+      if (!currentUser) return;
+
+
       try {
 
         const userDoc =
-          await db.collection("users")
-            .doc(currentUser.uid)
+          await db
+            .collection("users")
+            .doc(
+              currentUser.uid
+            )
             .get();
+
 
         let username =
           currentUser.displayName ||
           currentUser.email.split("@")[0];
 
-        if (userDoc.exists) {
 
-          const data = userDoc.data();
+        if (
+          userDoc.exists
+        ) {
+
+          const data =
+            userDoc.data();
+
 
           username =
             data.username ||
@@ -3386,22 +4539,41 @@
 
         }
 
-        document.getElementById("profileName")
-          .textContent = username;
 
-        document.getElementById("profileEmail")
-          .textContent = currentUser.email;
+        document
+          .getElementById(
+            "profileName"
+          )
+          .textContent =
+          username;
 
-        document.getElementById("profileAvatar")
+
+        document
+          .getElementById(
+            "profileEmail"
+          )
+          .textContent =
+          currentUser.email;
+
+
+        document
+          .getElementById(
+            "profileAvatar"
+          )
           .src =
           currentUser.photoURL ||
           "https://via.placeholder.com/150";
 
+
         await loadProfilePosts();
+
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Profile error:",
+          error
+        );
 
       }
 
@@ -3410,13 +4582,20 @@
 
     async function loadProfilePosts() {
 
+      if (!currentUser) return;
+
+
       const container =
-        document.getElementById("profilePosts");
+        document.getElementById(
+          "profilePosts"
+        );
+
 
       try {
 
         const snapshot =
-          await db.collection("posts")
+          await db
+            .collection("posts")
             .where(
               "uid",
               "==",
@@ -3424,75 +4603,116 @@
             )
             .get();
 
-        document.getElementById("postCount")
-          .textContent = snapshot.size;
 
-        if (snapshot.empty) {
+        document
+          .getElementById(
+            "postCount"
+          )
+          .textContent =
+          snapshot.size;
+
+
+        if (
+          snapshot.empty
+        ) {
 
           container.innerHTML = `
+
             <div class="empty">
               No posts yet.
             </div>
+
           `;
 
           return;
+
         }
+
 
         container.innerHTML = "";
 
+
         snapshot.forEach(doc => {
 
-          const post = doc.data();
+          const post =
+            doc.data();
+
 
           const div =
-            document.createElement("div");
+            document.createElement(
+              "div"
+            );
 
-          div.className = "post";
+
+          div.className =
+            "post";
+
 
           let media = "";
 
-          if (post.mediaUrl) {
 
-            if (post.mediaType === "video") {
+          if (
+            post.mediaUrl
+          ) {
+
+            if (
+              post.mediaType ===
+              "video"
+            ) {
 
               media = `
+
                 <video
                   class="post-media"
                   src="${escapeHtml(post.mediaUrl)}"
                   controls>
                 </video>
+
               `;
 
             } else {
 
               media = `
+
                 <img
                   class="post-media"
                   src="${escapeHtml(post.mediaUrl)}"
                   alt="Post">
+
               `;
 
             }
 
           }
 
+
           div.innerHTML = `
 
             <div class="post-text">
-              ${escapeHtml(post.text || "")}
+              ${escapeHtml(
+                post.text ||
+                ""
+              )}
             </div>
 
             ${media}
 
           `;
 
-          container.appendChild(div);
+
+          container.appendChild(
+            div
+          );
 
         });
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Profile posts error:",
+          error
+        );
 
       }
 
@@ -3502,15 +4722,25 @@
     function openEditProfile() {
 
       document
-        .getElementById("editProfileModal")
-        .classList.add("active");
+        .getElementById(
+          "editProfileModal"
+        )
+        .classList.add(
+          "active"
+        );
+
 
       document
-        .getElementById("editUsername")
+        .getElementById(
+          "editUsername"
+        )
         .value =
         document
-          .getElementById("profileName")
-          .textContent || "";
+          .getElementById(
+            "profileName"
+          )
+          .textContent ||
+        "";
 
     }
 
@@ -3518,29 +4748,48 @@
     function closeEditProfile() {
 
       document
-        .getElementById("editProfileModal")
-        .classList.remove("active");
+        .getElementById(
+          "editProfileModal"
+        )
+        .classList.remove(
+          "active"
+        );
 
     }
 
 
     async function saveProfile() {
 
+      if (!currentUser) {
+
+        return;
+
+      }
+
+
       const username =
         document
-          .getElementById("editUsername")
+          .getElementById(
+            "editUsername"
+          )
           .value
           .trim();
 
+
       const file =
         document
-          .getElementById("avatarFileInput")
+          .getElementById(
+            "avatarFileInput"
+          )
           .files[0];
+
 
       try {
 
         let photoURL =
-          currentUser.photoURL || "";
+          currentUser.photoURL ||
+          "";
+
 
         if (file) {
 
@@ -3551,55 +4800,92 @@
               "/avatar"
             );
 
+
           const upload =
             await ref.put(file);
 
+
           photoURL =
-            await upload.ref.getDownloadURL();
+            await upload
+              .ref
+              .getDownloadURL();
 
         }
 
-        await db.collection("users")
-          .doc(currentUser.uid)
+
+        const finalUsername =
+          username ||
+          currentUser.email
+            .split("@")[0];
+
+
+        await db
+          .collection("users")
+          .doc(
+            currentUser.uid
+          )
           .set({
 
             username:
-              username ||
-              currentUser.email.split("@")[0],
+              finalUsername,
 
-            email: currentUser.email,
+            email:
+              currentUser.email,
 
             updatedAt:
-              firebase.firestore.FieldValue.serverTimestamp()
+              firebase.firestore
+                .FieldValue
+                .serverTimestamp()
 
           }, {
             merge: true
           });
 
+
         if (photoURL) {
 
-          await currentUser.updateProfile({
-            displayName: username,
-            photoURL: photoURL
-          });
+          await currentUser
+            .updateProfile({
+
+              displayName:
+                finalUsername,
+
+              photoURL:
+                photoURL
+
+            });
 
         } else {
 
-          await currentUser.updateProfile({
-            displayName: username
-          });
+          await currentUser
+            .updateProfile({
+
+              displayName:
+                finalUsername
+
+            });
 
         }
 
+
         closeEditProfile();
+
 
         await loadProfile();
 
-        alert("Profile updated!");
+
+        alert(
+          "Profile updated!"
+        );
+
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Profile update error:",
+          error
+        );
+
 
         alert(
           "Could not update profile: " +
@@ -3614,29 +4900,47 @@
     function shareProfile() {
 
       const username =
-        document.getElementById("profileName")
+        document
+          .getElementById(
+            "profileName"
+          )
           .textContent;
+
 
       const shareText =
         "Check out " +
         username +
         " on TexUs!";
 
-      if (navigator.share) {
+
+      if (
+        navigator.share
+      ) {
 
         navigator.share({
-          title: "TexUs Profile",
-          text: shareText,
-          url: window.location.href
+
+          title:
+            "TexUs Profile",
+
+          text:
+            shareText,
+
+          url:
+            window.location.href
+
         });
 
       } else {
 
-        navigator.clipboard.writeText(
-          window.location.href
-        );
+        navigator.clipboard
+          .writeText(
+            window.location.href
+          );
 
-        alert("Profile link copied!");
+
+        alert(
+          "Profile link copied!"
+        );
 
       }
 
@@ -3647,19 +4951,46 @@
        UTILITIES
     ========================================== */
 
-    function escapeHtml(value) {
+    function escapeHtml(
+      value
+    ) {
 
-      if (value === null ||
-          value === undefined) {
+      if (
+        value === null ||
+        value === undefined
+      ) {
+
         return "";
+
       }
 
+
       return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
 
     }
 
