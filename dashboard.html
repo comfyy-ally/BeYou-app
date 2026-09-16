@@ -1,2798 +1,2378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>TexUs</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
-<style>
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: white;
-    min-height: 100vh;
-    padding-bottom: 90px;
-}
-
-button,
-input,
-textarea {
-    font-family: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* =========================
-   LOGO
-========================= */
-
-.logo {
-    font-family: "Pacifico", cursive;
-    font-size: 30px;
-    letter-spacing: 1px;
-}
-
-.tex {
-    color: #ec4899;
-}
-
-.us {
-    color: #10b981;
-}
-
-/* =========================
-   TOP BAR
-========================= */
-
-.topbar {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    height: 65px;
-    background: #0f172a;
-    border-bottom: 1px solid #243047;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 18px;
-}
-
-.top-title {
-    font-size: 21px;
-    font-weight: bold;
-}
-
-.top-action {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: none;
-    background: #1e293b;
-    color: white;
-    font-size: 21px;
-}
-
-/* =========================
-   MAIN
-========================= */
-
-main {
-    max-width: 850px;
-    margin: auto;
-    padding: 18px;
-}
-
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
-/* =========================
-   CARDS
-========================= */
-
-.card {
-    background: #1e293b;
-    border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 16px;
-}
-
-/* =========================
-   STORIES
-========================= */
-
-.section-title {
-    font-size: 21px;
-    font-weight: bold;
-    margin-bottom: 14px;
-}
-
-.story-scroll {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    scrollbar-width: none;
-}
-
-.story-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.story-card {
-    flex: 0 0 125px;
-    height: 185px;
-    border-radius: 17px;
-    overflow: hidden;
-    position: relative;
-    background: #334155;
-    border: 1px solid #475569;
-}
-
-.story-card img,
-.story-card video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.story-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        transparent 45%,
-        rgba(0,0,0,.8)
-    );
-}
-
-.story-name {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 5px;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.your-story {
-    background: #273449;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-
-.your-story-image {
-    height: 125px;
-    background: #475569;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.plus-story {
-    width: 52px;
-    height: 52px;
-    background: #10b981;
-    color: white;
-    border-radius: 50%;
-    border: 4px solid #1e293b;
-    font-size: 31px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.your-story-label {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-/* =========================
-   POST CREATOR
-========================= */
-
-.post-creator {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.avatar-small {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #64748b;
-}
-
-.post-input {
-    flex: 1;
-    background: #334155;
-    border: none;
-    color: white;
-    padding: 13px 16px;
-    border-radius: 25px;
-    cursor: pointer;
-}
-
-.post-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 14px;
-}
-
-.action-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    background: #334155;
-    color: white;
-    font-weight: bold;
-}
-
-.action-btn:hover {
-    background: #475569;
-}
-
-/* =========================
-   POSTS
-========================= */
-
-.post {
-    background: #1e293b;
-    border-radius: 18px;
-    margin-bottom: 16px;
-    overflow: hidden;
-}
-
-.post-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px;
-}
-
-.post-user {
-    font-weight: bold;
-}
-
-.post-time {
-    color: #94a3b8;
-    font-size: 12px;
-}
-
-.post-text {
-    padding: 0 15px 15px;
-    line-height: 1.5;
-}
-
-.post-media {
-    width: 100%;
-    max-height: 550px;
-    object-fit: cover;
-    display: block;
-}
-
-.post-bottom {
-    padding: 12px 15px;
-    display: flex;
-    gap: 10px;
-}
-
-.post-button {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 10px;
-}
-
-.post-button:hover {
-    background: #334155;
-}
-
-/* =========================
-   FRIENDS
-========================= */
-
-.friend-tabs {
-    display: flex;
-    background: #1e293b;
-    padding: 5px;
-    border-radius: 15px;
-    margin-bottom: 18px;
-}
-
-.friend-tab {
-    flex: 1;
-    border: none;
-    background: transparent;
-    color: #94a3b8;
-    padding: 13px;
-    border-radius: 11px;
-    font-size: 15px;
-    font-weight: bold;
-}
-
-.friend-tab.active {
-    background: #10b981;
-    color: white;
-}
-
-.friend-section {
-    display: none;
-}
-
-.friend-section.active {
-    display: block;
-}
-
-.user-card {
-    background: #1e293b;
-    border-radius: 16px;
-    padding: 14px;
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    margin-bottom: 12px;
-}
-
-.user-info {
-    flex: 1;
-}
-
-.user-name {
-    font-weight: bold;
-    margin-bottom: 4px;
-}
-
-.user-email {
-    font-size: 12px;
-    color: #94a3b8;
-}
-
-.friend-btn {
-    border: none;
-    background: #10b981;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.friend-btn.decline {
-    background: #475569;
-}
-
-.friend-btn.accept {
-    background: #10b981;
-}
-
-.request-buttons {
-    display: flex;
-    gap: 7px;
-}
-
-.empty-message {
-    text-align: center;
-    padding: 35px 10px;
-    color: #94a3b8;
-}
-
-/* =========================
-   CHAT
-========================= */
-
-.chat-users {
-    margin-bottom: 15px;
-}
-
-.chat-user {
-    background: #1e293b;
-    padding: 14px;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-}
-
-.chat-user button {
-    margin-left: auto;
-    background: #10b981;
-    color: white;
-    border: none;
-    padding: 9px 13px;
-    border-radius: 9px;
-}
-
-.chat-window {
-    display: none;
-}
-
-.chat-window.active {
-    display: block;
-}
-
-.chat-header {
-    background: #1e293b;
-    padding: 15px;
-    border-radius: 15px 15px 0 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.back-chat {
-    border: none;
-    background: transparent;
-    color: white;
-    font-size: 22px;
-}
-
-.messages {
-    min-height: 350px;
-    max-height: 500px;
-    overflow-y: auto;
-    padding: 15px;
-    background: #111827;
-}
-
-.message {
-    max-width: 75%;
-    padding: 10px 14px;
-    border-radius: 16px;
-    margin-bottom: 8px;
-    line-height: 1.4;
-}
-
-.message.me {
-    margin-left: auto;
-    background: #10b981;
-}
-
-.message.them {
-    background: #334155;
-}
-
-.chat-input-area {
-    display: flex;
-    gap: 8px;
-    background: #1e293b;
-    padding: 12px;
-    border-radius: 0 0 15px 15px;
-}
-
-.chat-input {
-    flex: 1;
-    background: #334155;
-    border: none;
-    color: white;
-    border-radius: 20px;
-    padding: 12px 15px;
-}
-
-.send-btn {
-    width: 45px;
-    border: none;
-    border-radius: 50%;
-    background: #10b981;
-    color: white;
-    font-size: 18px;
-}
-
-/* =========================
-   PROFILE
-========================= */
-
-.profile-header {
-    padding-top: 10px;
-}
-
-.profile-top {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-    margin-bottom: 20px;
-}
-
-.profile-avatar-wrap {
-    position: relative;
-}
-
-.profile-avatar {
-    width: 105px;
-    height: 105px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #e5e7eb;
-    border: 3px solid #e2e8f0;
-}
-
-.avatar-plus {
-    position: absolute;
-    right: -2px;
-    bottom: 3px;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: white;
-    color: #111827;
-    border: 3px solid #0f172a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 23px;
-    font-weight: bold;
-}
-
-.profile-info {
-    flex: 1;
-}
-
-.profile-username {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 12px;
-}
-
-.profile-stats {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-}
-
-.stat {
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 21px;
-    font-weight: bold;
-}
-
-.stat-label {
-    color: #cbd5e1;
-    font-size: 13px;
-}
-
-.profile-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 22px;
-}
-
-.profile-btn {
-    flex: 1;
-    background: #334155;
-    border: none;
-    color: white;
-    padding: 13px 8px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.profile-btn.primary {
-    background: #10b981;
-}
-
-.profile-tabs {
-    display: flex;
-    border-bottom: 1px solid #334155;
-    margin-bottom: 18px;
-}
-
-.profile-tab {
-    flex: 1;
-    text-align: center;
-    padding: 15px;
-    color: #94a3b8;
-    border: none;
-    background: transparent;
-    font-size: 22px;
-}
-
-.profile-tab.active {
-    color: white;
-    border-bottom: 3px solid white;
-}
-
-.profile-post-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3px;
-}
-
-.profile-post {
-    aspect-ratio: 1;
-    background: #1e293b;
-    overflow: hidden;
-}
-
-.profile-post img,
-.profile-post video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.no-posts {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-    background: #1e293b;
-    border-radius: 12px;
-}
-
-.no-posts h2 {
-    margin-bottom: 10px;
-}
-
-.no-posts p {
-    color: #94a3b8;
-}
-
-/* =========================
-   DISCOVER PEOPLE
-========================= */
-
-.discover-title {
-    font-size: 21px;
-    font-weight: bold;
-    margin: 25px 0 15px;
-}
-
-.discover-scroll {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-
-.discover-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.discover-card {
-    flex: 0 0 210px;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 18px;
-    padding: 18px;
-    text-align: center;
-}
-
-.discover-avatar {
-    width: 95px;
-    height: 95px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #e5e7eb;
-    margin-bottom: 10px;
-}
-
-.discover-name {
-    font-weight: bold;
-    margin-bottom: 12px;
-}
-
-.discover-follow {
-    width: 100%;
-    background: #10b981;
-    border: none;
-    color: white;
-    padding: 11px;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-/* =========================
-   SETTINGS
-========================= */
-
-.settings-header {
-    margin-bottom: 20px;
-}
-
-.settings-header h1 {
-    font-size: 28px;
-}
-
-.settings-header p {
-    color: #94a3b8;
-    margin-top: 5px;
-}
-
-.settings-card {
-    background: #1e293b;
-    border-radius: 18px;
-    overflow: hidden;
-    margin-bottom: 18px;
-}
-
-.settings-title {
-    padding: 16px;
-    font-weight: bold;
-    color: #10b981;
-    border-bottom: 1px solid #334155;
-}
-
-.setting-item {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    padding: 17px;
-    border-bottom: 1px solid #334155;
-}
-
-.setting-item:last-child {
-    border-bottom: none;
-}
-
-.setting-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: #334155;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-}
-
-.setting-text {
-    flex: 1;
-}
-
-.setting-name {
-    font-weight: bold;
-    margin-bottom: 4px;
-}
-
-.setting-description {
-    color: #94a3b8;
-    font-size: 12px;
-}
-
-.setting-arrow {
-    color: #94a3b8;
-    font-size: 20px;
-}
-
-.settings-button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    background: #334155;
-    color: white;
-    font-weight: bold;
-    margin-top: 8px;
-}
-
-/* =========================
-   MODAL
-========================= */
-
-.modal {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(0,0,0,.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.modal.active {
-    display: flex;
-}
-
-.modal-box {
-    background: #1e293b;
-    width: 100%;
-    max-width: 500px;
-    border-radius: 20px;
-    padding: 20px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.close-modal {
-    border: none;
-    background: transparent;
-    color: white;
-    font-size: 25px;
-}
-
-.modal-input {
-    width: 100%;
-    background: #334155;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 12px;
-    outline: none;
-}
-
-.modal-submit {
-    width: 100%;
-    border: none;
-    background: #10b981;
-    color: white;
-    padding: 14px;
-    border-radius: 12px;
-    font-weight: bold;
-}
-
-/* =========================
-   STORY VIEWER
-========================= */
-
-.story-viewer {
-    position: fixed;
-    inset: 0;
-    z-index: 300;
-    background: #000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-.story-viewer.active {
-    display: flex;
-}
-
-.story-viewer-content {
-    width: 100%;
-    height: 100%;
-    max-width: 500px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.story-viewer-content img,
-.story-viewer-content video {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.close-story {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    z-index: 5;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(0,0,0,.6);
-    color: white;
-    font-size: 25px;
-}
-
-/* =========================
-   BOTTOM NAVIGATION
-========================= */
-
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 72px;
-    z-index: 100;
-    background: #0b1220;
-    border-top: 1px solid #243047;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.nav-item {
-    border: none;
-    background: transparent;
-    color: #94a3b8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    min-width: 60px;
-    font-size: 11px;
-}
-
-.nav-icon {
-    font-size: 23px;
-}
-
-.nav-item.active {
-    color: #10b981;
-}
-
-.nav-item.active .nav-icon {
-    transform: scale(1.05);
-}
-
-/* =========================
-   STATUS
-========================= */
-
-.status {
-    background: #172033;
-    padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    color: #cbd5e1;
-    font-size: 14px;
-    display: none;
-}
-
-.status.show {
-    display: block;
-}
-
-.success {
-    color: #34d399;
-}
-
-.error {
-    color: #fb7185;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 600px) {
-
-    main {
-        padding: 12px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>TexUs</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    button,
+    input,
+    textarea {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     .topbar {
-        padding: 0 13px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 64px;
+      background: #0f172a;
+      border-bottom: 1px solid #243044;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
     }
 
-    .profile-top {
-        gap: 14px;
+    .logo {
+      font-family: "Pacifico", cursive;
+      font-size: 30px;
+      letter-spacing: 1px;
+    }
+
+    .tex {
+      color: #ec4899;
+    }
+
+    .us {
+      color: #10b981;
+    }
+
+    .top-profile {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid #10b981;
+      overflow: hidden;
+      background: #334155;
+      cursor: pointer;
+    }
+
+    .top-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .page {
+      display: none;
+      padding: 18px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    h1 {
+      font-size: 25px;
+      margin-bottom: 15px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* HOME TABS */
+
+    .home-tabs {
+      display: flex;
+      gap: 8px;
+      background: #172033;
+      padding: 6px;
+      border-radius: 15px;
+      margin-bottom: 18px;
+    }
+
+    .home-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      padding: 12px 8px;
+      border-radius: 11px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .home-tab.active {
+      background: #10b981;
+      color: white;
+    }
+
+    .home-content {
+      display: none;
+    }
+
+    .home-content.active {
+      display: block;
+    }
+
+    /* STORIES */
+
+    .stories-section {
+      margin-bottom: 20px;
+    }
+
+    .stories-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .stories-title h2 {
+      margin: 0;
+    }
+
+    .story-container {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      scrollbar-width: none;
+    }
+
+    .story-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .story-card {
+      min-width: 115px;
+      width: 115px;
+      height: 175px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      background: #334155;
+      flex-shrink: 0;
+      border: 1px solid #475569;
+    }
+
+    .story-card img,
+    .story-card video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .story-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        transparent 45%,
+        rgba(0,0,0,0.85)
+      );
+    }
+
+    .story-name {
+      position: absolute;
+      bottom: 10px;
+      left: 8px;
+      right: 8px;
+      font-size: 13px;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    .your-story {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: #1e293b;
+    }
+
+    .story-plus {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      border: none;
+      background: #10b981;
+      color: white;
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .your-story-text {
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    #storyFile {
+      display: none;
+    }
+
+    .upload-status {
+      background: #172033;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 10px;
+      display: none;
+      color: #10b981;
+      font-size: 14px;
+    }
+
+    /* CREATE POST */
+
+    .create-post {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .create-post input {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 25px;
+      padding: 13px 16px;
+      color: white;
+      outline: none;
+    }
+
+    .primary-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 18px;
+      font-weight: bold;
+    }
+
+    .secondary-btn {
+      background: #334155;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 18px;
+      font-weight: bold;
+    }
+
+    .post-file {
+      margin-top: 12px;
+      width: 100%;
+      color: #cbd5e1;
+    }
+
+    /* POSTS */
+
+    .post {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #475569;
+      object-fit: cover;
+    }
+
+    .post-user {
+      font-weight: bold;
+    }
+
+    .post-time {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .post-text {
+      padding: 0 14px 14px;
+      line-height: 1.5;
+    }
+
+    .post-media {
+      width: 100%;
+      max-height: 600px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 8px;
+      padding: 12px 14px;
+      border-top: 1px solid #334155;
+    }
+
+    .post-action {
+      background: transparent;
+      color: #cbd5e1;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+
+    .post-action:hover {
+      background: #334155;
+    }
+
+    /* REELS */
+
+    .reel {
+      background: #020617;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 1px solid #334155;
+    }
+
+    .reel video {
+      width: 100%;
+      max-height: 650px;
+      display: block;
+      object-fit: cover;
+      background: black;
+    }
+
+    .reel-info {
+      padding: 14px;
+    }
+
+    .reel-user {
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    .reel-text {
+      color: #cbd5e1;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+      background: #1e293b;
+      border-radius: 18px;
+      border: 1px solid #334155;
+    }
+
+    /* MUSIC */
+
+    .music-header {
+      background: linear-gradient(135deg, #ec4899, #10b981);
+      padding: 22px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
+
+    .music-header h2 {
+      margin-bottom: 5px;
+    }
+
+    .music-header p {
+      color: #f8fafc;
+    }
+
+    .track {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 15px;
+      padding: 13px;
+      margin-bottom: 10px;
+    }
+
+    .track-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .track-info {
+      flex: 1;
+    }
+
+    .track-title {
+      font-weight: bold;
+    }
+
+    .track-artist {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .play-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: #10b981;
+      color: white;
+      font-size: 18px;
+    }
+
+    /* FRIENDS */
+
+    .section-tabs {
+      display: flex;
+      gap: 8px;
+      background: #172033;
+      padding: 6px;
+      border-radius: 15px;
+      margin-bottom: 18px;
+    }
+
+    .section-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      padding: 12px;
+      border-radius: 11px;
+      font-weight: bold;
+    }
+
+    .section-tab.active {
+      background: #10b981;
+      color: white;
+    }
+
+    .friends-content {
+      display: none;
+    }
+
+    .friends-content.active {
+      display: block;
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 13px;
+      border-radius: 16px;
+      margin-bottom: 10px;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: bold;
+    }
+
+    .user-email {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .request-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .accept-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-weight: bold;
+    }
+
+    .decline-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-weight: bold;
+    }
+
+    .add-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-weight: bold;
+    }
+
+    .pending-btn {
+      background: #475569;
+      color: #cbd5e1;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 13px;
+    }
+
+    /* CHAT */
+
+    .chat-users {
+      margin-bottom: 15px;
+    }
+
+    .chat-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .chat-user.active {
+      border-color: #10b981;
+    }
+
+    .messages {
+      height: 400px;
+      overflow-y: auto;
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 15px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 10px 13px;
+      border-radius: 15px;
+      margin-bottom: 8px;
+      background: #334155;
+      width: fit-content;
+    }
+
+    .message.me {
+      margin-left: auto;
+      background: #10b981;
+    }
+
+    .message-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .message-form input {
+      flex: 1;
+      background: #1e293b;
+      color: white;
+      border: 1px solid #475569;
+      border-radius: 22px;
+      padding: 12px 16px;
+      outline: none;
+    }
+
+    /* PROFILE */
+
+    .profile-cover {
+      height: 150px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #ec4899, #10b981);
+      position: relative;
+      margin-bottom: 65px;
     }
 
     .profile-avatar {
-        width: 90px;
-        height: 90px;
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 5px solid #0f172a;
+      background: #475569;
+      object-fit: cover;
+      left: 25px;
+      bottom: -60px;
     }
 
-    .profile-username {
-        font-size: 18px;
+    .profile-info {
+      padding: 0 10px;
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .profile-email {
+      color: #94a3b8;
+      margin-bottom: 18px;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      text-align: center;
     }
 
     .stat-number {
-        font-size: 18px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .stat-label {
+      color: #94a3b8;
+      font-size: 13px;
     }
 
     .profile-buttons {
-        gap: 7px;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
-    .profile-btn {
-        padding: 12px 5px;
+    .profile-buttons button {
+      flex: 1;
+    }
+
+    .profile-tabs {
+      display: flex;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 18px;
+    }
+
+    .profile-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      padding: 15px;
+      font-size: 22px;
+    }
+
+    .profile-tab.active {
+      color: white;
+      border-bottom: 3px solid white;
+    }
+
+    .profile-posts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+    }
+
+    .profile-post-item {
+      aspect-ratio: 1;
+      background: #1e293b;
+      overflow: hidden;
+    }
+
+    .profile-post-item img,
+    .profile-post-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* SETTINGS */
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 15px;
+      margin-bottom: 10px;
+    }
+
+    .settings-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .settings-info {
+      flex: 1;
+    }
+
+    .settings-title {
+      font-weight: bold;
+    }
+
+    .settings-subtitle {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    /* BOTTOM NAV */
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: #0b1220;
+      border-top: 1px solid #334155;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 200;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      min-width: 65px;
+    }
+
+    .nav-icon {
+      font-size: 24px;
+    }
+
+    .nav-btn.active {
+      color: #10b981;
+    }
+
+    /* MODALS */
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,0.88);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #1e293b;
+      width: 100%;
+      max-width: 550px;
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      right: 15px;
+      top: 12px;
+      border: none;
+      background: #334155;
+      color: white;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+
+    .modal-box input,
+    .modal-box textarea {
+      width: 100%;
+      background: #0f172a;
+      color: white;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .story-viewer-media {
+      width: 100%;
+      max-height: 75vh;
+      object-fit: contain;
+      border-radius: 12px;
+      background: black;
+    }
+
+    .story-viewer-name {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #94a3b8;
+      padding: 25px;
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        padding: 14px;
+      }
+
+      .profile-stats {
+        justify-content: space-around;
+      }
+
+      .request-actions {
+        flex-direction: column;
+      }
+
+      .home-tab {
         font-size: 12px;
+      }
+
+      .profile-buttons {
+        flex-direction: column;
+      }
     }
-
-    .discover-card {
-        flex-basis: 190px;
-    }
-
-}
-
-</style>
+  </style>
 </head>
 
 <body>
 
-<!-- =========================
-     TOP BAR
-========================= -->
-
-<header class="topbar">
-
+  <!-- TOP BAR -->
+  <header class="topbar">
     <div class="logo">
-        <span class="tex">Tex</span><span class="us">Us</span>
+      <span class="tex">Tex</span><span class="us">Us</span>
     </div>
 
-    <div id="topTitle" class="top-title">
-        Home
+    <div class="top-profile" onclick="showPage('profile')">
+      <img id="topAvatar" src="https://via.placeholder.com/100" alt="Profile">
+    </div>
+  </header>
+
+
+  <!-- ================= HOME ================= -->
+
+  <section id="homePage" class="page active">
+
+    <h1>Home</h1>
+
+    <!-- THREE HOME TABS -->
+    <div class="home-tabs">
+
+      <button class="home-tab active"
+              onclick="showHomeTab('feed', this)">
+        🏠 Home Feed
+      </button>
+
+      <button class="home-tab"
+              onclick="showHomeTab('reels', this)">
+        ▶️ Reels
+      </button>
+
+      <button class="home-tab"
+              onclick="showHomeTab('music', this)">
+        🎵 Music
+      </button>
+
     </div>
 
-    <button class="top-action" onclick="showPage('settings')">
-        ⚙️
-    </button>
 
-</header>
+    <!-- HOME FEED TAB -->
 
+    <div id="feedContent" class="home-content active">
 
-<main>
+      <!-- STORIES -->
 
-<!-- =========================
-     HOME
-========================= -->
+      <div class="stories-section">
 
-<section id="homePage" class="page active">
+        <div class="stories-title">
+          <h2>Stories</h2>
+        </div>
 
-    <div class="section-title">
-        Stories
-    </div>
+        <div id="storyContainer" class="story-container">
 
-    <div id="uploadStatus" class="status">
-        Uploading your story...
-    </div>
+          <div class="story-card your-story"
+               onclick="openStoryUpload()">
 
-    <div class="story-scroll" id="storyContainer">
+            <button class="story-plus">+</button>
 
-        <div class="story-card your-story"
-             onclick="openStoryUpload()">
-
-            <div class="your-story-image">
-
-                <div class="plus-story">
-                    +
-                </div>
-
+            <div class="your-story-text">
+              Your Story
             </div>
 
-            <div class="your-story-label">
-                Your Story
-            </div>
+          </div>
+
+          <div id="otherStories"></div>
 
         </div>
 
-        <div id="otherStories"
-             style="display:flex;gap:12px;">
-        </div>
+        <div id="uploadStatus" class="upload-status"></div>
 
-    </div>
+        <input
+          id="storyFile"
+          type="file"
+          accept="image/*,video/*"
+          onchange="uploadStory()"
+        >
 
-
-    <input
-        type="file"
-        id="storyFile"
-        accept="image/*,video/*"
-        class="hidden"
-        onchange="uploadStory()"
-    >
+      </div>
 
 
-    <div class="card">
+      <!-- CREATE POST -->
 
-        <div class="post-creator">
+      <div class="card">
 
-            <img
-                id="homeAvatar"
-                class="avatar-small"
-                src=""
-                alt="Profile"
-            >
+        <div class="create-post">
 
-            <button
-                class="post-input"
-                onclick="openPostModal()"
-            >
-                Tell us something fun about yourself! 🚀
-            </button>
+          <img
+            id="createPostAvatar"
+            class="avatar"
+            src="https://via.placeholder.com/100"
+            alt="Avatar"
+          >
+
+          <input
+            id="postText"
+            type="text"
+            placeholder="Tell us something fun about yourself! 🚀"
+          >
 
         </div>
 
-        <div class="post-actions">
-
-            <button
-                class="action-btn"
-                onclick="openPostModal()"
-            >
-                📝 Post
-            </button>
-
-            <button
-                class="action-btn"
-                onclick="document.getElementById('postFile').click()"
-            >
-                📷 Photo/Video
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <input
-        type="file"
-        id="postFile"
-        accept="image/*,video/*"
-        class="hidden"
-        onchange="createPost()"
-    >
-
-
-    <div class="section-title">
-        Home Feed
-    </div>
-
-    <div id="feed">
-
-        <div class="empty-message">
-            Loading live feed...
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     FRIENDS & REQUESTS
-========================= -->
-
-<section id="friendsPage" class="page">
-
-    <div class="section-title">
-        Friends & Requests
-    </div>
-
-    <div class="friend-tabs">
+        <input
+          id="postFile"
+          class="post-file"
+          type="file"
+          accept="image/*,video/*"
+        >
 
         <button
-            id="friendsTab"
-            class="friend-tab active"
-            onclick="switchFriendTab('friends')"
-        >
-            👥 Friends
+          class="primary-btn"
+          style="margin-top:12px;"
+          onclick="createPost()">
+          Post
         </button>
 
-        <button
-            id="requestsTab"
-            class="friend-tab"
-            onclick="switchFriendTab('requests')"
-        >
-            🔔 Requests
-            <span id="requestCount"></span>
+        <div id="postStatus" class="upload-status"></div>
+
+      </div>
+
+
+      <!-- FEED -->
+
+      <div id="feed">
+        <div class="loading">
+          Loading live feed...
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- REELS TAB -->
+
+    <div id="reelsContent" class="home-content">
+
+      <h2>Reels</h2>
+
+      <div id="reelsFeed">
+
+        <div class="loading">
+          Loading Reels...
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- MUSIC TAB -->
+
+    <div id="musicContent" class="home-content">
+
+      <div class="music-header">
+
+        <h2>TexUs Global Music</h2>
+
+        <p>
+          Discover music and trending sounds from around the world.
+        </p>
+
+      </div>
+
+
+      <h2>Global Trending Hits</h2>
+
+      <div class="track">
+
+        <div class="track-number">1</div>
+
+        <div class="track-info">
+
+          <div class="track-title">
+            Water
+          </div>
+
+          <div class="track-artist">
+            Tyla
+          </div>
+
+        </div>
+
+        <button class="play-btn"
+                onclick="musicMessage('Water - Tyla')">
+          ▶
         </button>
+
+      </div>
+
+
+      <div class="track">
+
+        <div class="track-number">2</div>
+
+        <div class="track-info">
+
+          <div class="track-title">
+            Umbrella
+          </div>
+
+          <div class="track-artist">
+            Rihanna ft. Jay-Z
+          </div>
+
+        </div>
+
+        <button class="play-btn"
+                onclick="musicMessage('Umbrella - Rihanna ft. Jay-Z')">
+          ▶
+        </button>
+
+      </div>
+
+
+      <div class="track">
+
+        <div class="track-number">3</div>
+
+        <div class="track-info">
+
+          <div class="track-title">
+            Rush
+          </div>
+
+          <div class="track-artist">
+            Ayra Starr
+          </div>
+
+        </div>
+
+        <button class="play-btn"
+                onclick="musicMessage('Rush - Ayra Starr')">
+          ▶
+        </button>
+
+      </div>
+
+
+      <div class="track">
+
+        <div class="track-number">4</div>
+
+        <div class="track-info">
+
+          <div class="track-title">
+            Neon Nights
+          </div>
+
+          <div class="track-artist">
+            CyberPulse
+          </div>
+
+        </div>
+
+        <button class="play-btn"
+                onclick="musicMessage('Neon Nights - CyberPulse')">
+          ▶
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= FRIENDS ================= -->
+
+  <section id="friendsPage" class="page">
+
+    <h1>Friends & Requests</h1>
+
+
+    <div class="section-tabs">
+
+      <button
+        id="friendsTabButton"
+        class="section-tab active"
+        onclick="showFriendsTab('friends', this)">
+        Friends
+      </button>
+
+      <button
+        id="requestsTabButton"
+        class="section-tab"
+        onclick="showFriendsTab('requests', this)">
+        Requests
+      </button>
 
     </div>
 
 
     <!-- FRIENDS TAB -->
 
-    <div
-        id="friendsSection"
-        class="friend-section active"
-    >
+    <div id="friendsContent" class="friends-content active">
 
-        <div class="card">
+      <div class="card">
 
-            <h3 style="margin-bottom:8px;">
-                Find People
-            </h3>
+        <h2>Find People</h2>
 
-            <p style="color:#94a3b8;font-size:14px;">
-                Connect with people who are available on TexUs.
-            </p>
+        <p style="color:#94a3b8; margin-bottom:15px;">
+          Find users who are available on TexUs and send them a friend request.
+        </p>
 
+        <input
+          id="friendSearch"
+          type="text"
+          placeholder="Search users..."
+          oninput="filterFriends()"
+          style="
+            width:100%;
+            padding:13px;
+            border-radius:12px;
+            background:#0f172a;
+            color:white;
+            border:1px solid #475569;
+            outline:none;
+          "
+        >
+
+      </div>
+
+      <div id="friendsList">
+
+        <div class="loading">
+          Loading users...
         </div>
 
-        <div id="availableUsers">
-
-            <div class="empty-message">
-                Loading people...
-            </div>
-
-        </div>
+      </div>
 
     </div>
 
 
     <!-- REQUESTS TAB -->
 
-    <div
-        id="requestsSection"
-        class="friend-section"
-    >
+    <div id="requestsContent" class="friends-content">
 
-        <div id="friendRequests">
+      <div class="card">
 
-            <div class="empty-message">
-                Loading requests...
-            </div>
+        <h2>Friend Requests</h2>
 
+        <p style="color:#94a3b8;">
+          Users who have sent you a friend request will appear here.
+        </p>
+
+      </div>
+
+      <div id="requestsList">
+
+        <div class="loading">
+          Loading requests...
         </div>
 
+      </div>
+
     </div>
 
-</section>
+  </section>
 
 
-<!-- =========================
-     CHAT
-========================= -->
+  <!-- ================= CHAT ================= -->
 
-<section id="chatPage" class="page">
+  <section id="chatPage" class="page">
 
-    <div class="section-title">
-        Messages
-    </div>
-
+    <h1>Messages</h1>
 
     <div id="chatUsers" class="chat-users">
 
-        <div class="empty-message">
-            Loading connections...
-        </div>
+      <div class="loading">
+        Loading your connections...
+      </div>
 
     </div>
 
+    <div id="chatArea" style="display:none;">
 
-    <div id="chatWindow" class="chat-window">
+      <div class="card">
 
-        <div class="chat-header">
+        <h2 id="chatWithName">
+          Chat
+        </h2>
 
-            <button
-                class="back-chat"
-                onclick="closeChat()"
-            >
-                ←
-            </button>
+      </div>
 
-            <img
-                id="chatAvatar"
-                class="avatar-small"
-                src=""
-            >
+      <div id="messages" class="messages"></div>
 
-            <div>
-                <div id="chatName">
-                    Chat
-                </div>
-            </div>
-
-        </div>
-
-
-        <div
-            id="messages"
-            class="messages"
-        ></div>
-
-
-        <div class="chat-input-area">
-
-            <input
-                id="messageInput"
-                class="chat-input"
-                placeholder="Aa"
-                onkeydown="if(event.key==='Enter') sendMessage()"
-            >
-
-            <button
-                class="send-btn"
-                onclick="sendMessage()"
-            >
-                ➤
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     PROFILE
-========================= -->
-
-<section id="profilePage" class="page">
-
-    <div class="profile-header">
-
-        <div class="profile-top">
-
-            <div class="profile-avatar-wrap">
-
-                <img
-                    id="profileAvatar"
-                    class="profile-avatar"
-                    src=""
-                    alt="Profile"
-                >
-
-                <button
-                    class="avatar-plus"
-                    onclick="document.getElementById('avatarFileInput').click()"
-                >
-                    +
-                </button>
-
-            </div>
-
-
-            <div class="profile-info">
-
-                <div
-                    id="profileUsername"
-                    class="profile-username"
-                >
-                    User
-                </div>
-
-                <div class="profile-stats">
-
-                    <div class="stat">
-
-                        <div
-                            id="postCount"
-                            class="stat-number"
-                        >
-                            0
-                        </div>
-
-                        <div class="stat-label">
-                            posts
-                        </div>
-
-                    </div>
-
-
-                    <div class="stat">
-
-                        <div
-                            id="friendCount"
-                            class="stat-number"
-                        >
-                            0
-                        </div>
-
-                        <div class="stat-label">
-                            friends
-                        </div>
-
-                    </div>
-
-
-                    <div class="stat">
-
-                        <div
-                            id="followingCount"
-                            class="stat-number"
-                        >
-                            0
-                        </div>
-
-                        <div class="stat-label">
-                            following
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="profile-buttons">
-
-            <button
-                class="profile-btn primary"
-                onclick="openEditProfile()"
-            >
-                Edit profile
-            </button>
-
-            <button
-                class="profile-btn"
-                onclick="shareProfile()"
-            >
-                Share profile
-            </button>
-
-        </div>
-
+      <div class="message-form">
 
         <input
-            type="file"
-            id="avatarFileInput"
-            accept="image/*"
-            class="hidden"
-            onchange="uploadAvatar()"
+          id="messageInput"
+          type="text"
+          placeholder="Aa"
+          onkeydown="if(event.key==='Enter') sendMessage()"
         >
 
+        <button
+          class="primary-btn"
+          onclick="sendMessage()">
+          Send
+        </button>
 
-        <div class="discover-title">
-            Discover people
-        </div>
-
-        <div
-            id="discoverPeople"
-            class="discover-scroll"
-        ></div>
-
-
-        <div class="profile-tabs">
-
-            <button
-                class="profile-tab active"
-                onclick="switchProfileTab('posts', this)"
-            >
-                ▦
-            </button>
-
-            <button
-                class="profile-tab"
-                onclick="switchProfileTab('tagged', this)"
-            >
-                ♙
-            </button>
-
-        </div>
-
-
-        <div id="profilePosts">
-
-            <div class="no-posts">
-
-                <h2>
-                    Create your first post
-                </h2>
-
-                <p>
-                    Give this space some love.
-                </p>
-
-                <button
-                    class="profile-btn primary"
-                    style="margin-top:20px;max-width:140px;"
-                    onclick="openPostModal()"
-                >
-                    Create
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div
-            id="taggedPosts"
-            class="hidden"
-        >
-
-            <div class="no-posts">
-
-                <h2>
-                    No tagged posts
-                </h2>
-
-                <p>
-                    Posts you're tagged in will appear here.
-                </p>
-
-            </div>
-
-        </div>
+      </div>
 
     </div>
 
-</section>
+  </section>
 
 
-<!-- =========================
-     SETTINGS
-========================= -->
+  <!-- ================= PROFILE ================= -->
 
-<section id="settingsPage" class="page">
+  <section id="profilePage" class="page">
 
-    <div class="settings-header">
+    <div class="profile-cover">
 
-        <h1>
-            Settings
-        </h1>
-
-        <p>
-            Manage your TexUs account and preferences.
-        </p>
+      <img
+        id="profileAvatar"
+        class="profile-avatar"
+        src="https://via.placeholder.com/150"
+        alt="Profile"
+      >
 
     </div>
 
 
-    <div class="settings-card">
+    <div class="profile-info">
+
+      <div id="profileName"
+           class="profile-name">
+        User
+      </div>
+
+      <div id="profileEmail"
+           class="profile-email">
+        Loading...
+      </div>
+
+
+      <div class="profile-stats">
+
+        <div class="stat">
+          <div id="postCount" class="stat-number">0</div>
+          <div class="stat-label">posts</div>
+        </div>
+
+        <div class="stat">
+          <div id="friendCount" class="stat-number">0</div>
+          <div class="stat-label">friends</div>
+        </div>
+
+        <div class="stat">
+          <div id="followingCount" class="stat-number">0</div>
+          <div class="stat-label">following</div>
+        </div>
+
+      </div>
+
+
+      <!-- NO LOGOUT BUTTON -->
+
+      <div class="profile-buttons">
+
+        <button
+          class="primary-btn"
+          onclick="openEditProfile()">
+          Edit profile
+        </button>
+
+        <button
+          class="secondary-btn"
+          onclick="shareProfile()">
+          Share profile
+        </button>
+
+      </div>
+
+
+      <div class="profile-tabs">
+
+        <button
+          class="profile-tab active"
+          onclick="showProfileTab('posts', this)">
+          ▦
+        </button>
+
+        <button
+          class="profile-tab"
+          onclick="showProfileTab('saved', this)">
+          ♙
+        </button>
+
+      </div>
+
+
+      <div id="profilePosts"
+           class="profile-posts">
+
+      </div>
+
+
+      <div id="profileSaved"
+           style="display:none;">
+
+        <div class="empty">
+          Saved posts will appear here.
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= SETTINGS ================= -->
+
+  <section id="settingsPage" class="page">
+
+    <h1>Settings</h1>
+
+
+    <div class="settings-item">
+
+      <div class="settings-icon">
+        👤
+      </div>
+
+      <div class="settings-info">
 
         <div class="settings-title">
-            Account
+          Account
         </div>
 
-
-        <div
-            class="setting-item"
-            onclick="openEditProfile()"
-        >
-
-            <div class="setting-icon">
-                👤
-            </div>
-
-            <div class="setting-text">
-
-                <div class="setting-name">
-                    Edit profile
-                </div>
-
-                <div class="setting-description">
-                    Change your username and profile information
-                </div>
-
-            </div>
-
-            <div class="setting-arrow">
-                ›
-            </div>
-
+        <div class="settings-subtitle">
+          Manage your TexUs account
         </div>
 
-
-        <div class="setting-item">
-
-            <div class="setting-icon">
-                ✉️
-            </div>
-
-            <div class="setting-text">
-
-                <div class="setting-name">
-                    Email
-                </div>
-
-                <div
-                    id="settingsEmail"
-                    class="setting-description"
-                >
-                    Loading...
-                </div>
-
-            </div>
-
-        </div>
+      </div>
 
     </div>
 
 
-    <div class="settings-card">
+    <div class="settings-item">
+
+      <div class="settings-icon">
+        🔔
+      </div>
+
+      <div class="settings-info">
 
         <div class="settings-title">
-            Preferences
+          Notifications
         </div>
 
-
-        <div class="setting-item">
-
-            <div class="setting-icon">
-                🔔
-            </div>
-
-            <div class="setting-text">
-
-                <div class="setting-name">
-                    Notifications
-                </div>
-
-                <div class="setting-description">
-                    Manage your TexUs notifications
-                </div>
-
-            </div>
-
-            <div class="setting-arrow">
-                ›
-            </div>
-
+        <div class="settings-subtitle">
+          Manage your notifications
         </div>
 
-
-        <div class="setting-item">
-
-            <div class="setting-icon">
-                🔒
-            </div>
-
-            <div class="setting-text">
-
-                <div class="setting-name">
-                    Privacy
-                </div>
-
-                <div class="setting-description">
-                    Control who can see your content
-                </div>
-
-            </div>
-
-            <div class="setting-arrow">
-                ›
-            </div>
-
-        </div>
-
-
-        <div class="setting-item">
-
-            <div class="setting-icon">
-                🌐
-            </div>
-
-            <div class="setting-text">
-
-                <div class="setting-name">
-                    Language
-                </div>
-
-                <div class="setting-description">
-                    English
-                </div>
-
-            </div>
-
-            <div class="setting-arrow">
-                ›
-            </div>
-
-        </div>
+      </div>
 
     </div>
 
 
-    <div class="settings-card">
+    <div class="settings-item">
+
+      <div class="settings-icon">
+        🔒
+      </div>
+
+      <div class="settings-info">
 
         <div class="settings-title">
-            TexUs
+          Privacy
         </div>
 
-
-        <div class="setting-item">
-
-            <div class="setting-icon">
-                ℹ️
-            </div>
-
-            <div class="setting-text">
-
-                <div class="setting-name">
-                    About TexUs
-                </div>
-
-                <div class="setting-description">
-                    Version 1.0
-                </div>
-
-            </div>
-
+        <div class="settings-subtitle">
+          Control your privacy settings
         </div>
+
+      </div>
 
     </div>
 
-</section>
 
-</main>
+    <div class="settings-item">
 
+      <div class="settings-icon">
+        🎨
+      </div>
 
-<!-- =========================
-     BOTTOM NAVIGATION
-========================= -->
+      <div class="settings-info">
 
-<nav class="bottom-nav">
+        <div class="settings-title">
+          Appearance
+        </div>
 
-    <button
-        id="navHome"
-        class="nav-item active"
-        onclick="showPage('home')"
-    >
+        <div class="settings-subtitle">
+          Customize your TexUs experience
+        </div>
 
-        <span class="nav-icon">
-            🏠
-        </span>
+      </div>
 
-        <span>
-            Home
-        </span>
-
-    </button>
+    </div>
 
 
-    <button
-        id="navFriends"
-        class="nav-item"
-        onclick="showPage('friends')"
-    >
+    <div class="settings-item">
 
-        <span class="nav-icon">
-            👥
-        </span>
+      <div class="settings-icon">
+        ℹ️
+      </div>
 
-        <span>
-            Friends
-        </span>
+      <div class="settings-info">
 
-    </button>
+        <div class="settings-title">
+          About TexUs
+        </div>
 
+        <div class="settings-subtitle">
+          TexUs social platform
+        </div>
 
-    <button
-        id="navChat"
-        class="nav-item"
-        onclick="showPage('chat')"
-    >
+      </div>
 
-        <span class="nav-icon">
-            💬
-        </span>
+    </div>
 
-        <span>
-            Chat
-        </span>
-
-    </button>
+  </section>
 
 
-    <button
-        id="navProfile"
-        class="nav-item"
-        onclick="showPage('profile')"
-    >
+  <!-- ================= STORY VIEWER ================= -->
 
-        <span class="nav-icon">
-            👤
-        </span>
-
-        <span>
-            Profile
-        </span>
-
-    </button>
-
-
-    <!-- MUSIC HAS BEEN REMOVED.
-         SETTINGS IS NOW HERE. -->
-
-    <button
-        id="navSettings"
-        class="nav-item"
-        onclick="showPage('settings')"
-    >
-
-        <span class="nav-icon">
-            ⚙️
-        </span>
-
-        <span>
-            Settings
-        </span>
-
-    </button>
-
-</nav>
-
-
-<!-- =========================
-     POST MODAL
-========================= -->
-
-<div
-    id="postModal"
-    class="modal"
->
+  <div id="storyViewer" class="modal">
 
     <div class="modal-box">
 
-        <div class="modal-header">
+      <button
+        class="modal-close"
+        onclick="closeStoryViewer()">
+        ×
+      </button>
 
-            <h2>
-                Create Post
-            </h2>
-
-            <button
-                class="close-modal"
-                onclick="closePostModal()"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <textarea
-            id="postText"
-            class="modal-input"
-            rows="5"
-            placeholder="What's on your mind?"
-        ></textarea>
-
-
-        <button
-            class="modal-submit"
-            onclick="createTextPost()"
-        >
-            Post
-        </button>
+      <div id="storyViewerContent"></div>
 
     </div>
 
-</div>
+  </div>
 
 
-<!-- =========================
-     EDIT PROFILE MODAL
-========================= -->
+  <!-- ================= EDIT PROFILE ================= -->
 
-<div
-    id="editProfileModal"
-    class="modal"
->
+  <div id="editProfileModal" class="modal">
 
     <div class="modal-box">
 
-        <div class="modal-header">
+      <button
+        class="modal-close"
+        onclick="closeEditProfile()">
+        ×
+      </button>
 
-            <h2>
-                Edit Profile
-            </h2>
+      <h2>Edit Profile</h2>
 
-            <button
-                class="close-modal"
-                onclick="closeEditProfile()"
-            >
-                ×
-            </button>
+      <input
+        id="editUsername"
+        type="text"
+        placeholder="Username"
+      >
 
-        </div>
+      <input
+        id="avatarFileInput"
+        type="file"
+        accept="image/*"
+      >
 
+      <button
+        class="primary-btn"
+        onclick="saveProfile()">
+        Save changes
+      </button>
 
-        <input
-            id="editUsername"
-            class="modal-input"
-            placeholder="Username"
-        >
-
-
-        <button
-            class="modal-submit"
-            onclick="saveProfile()"
-        >
-            Save Changes
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =========================
-     STORY VIEWER
-========================= -->
-
-<div
-    id="storyViewer"
-    class="story-viewer"
->
-
-    <div class="story-viewer-content">
-
-        <button
-            class="close-story"
-            onclick="closeStoryViewer()"
-        >
-            ×
-        </button>
-
-        <div id="storyViewerMedia"></div>
+      <div id="profileStatus"
+           class="upload-status">
+      </div>
 
     </div>
 
-</div>
+  </div>
 
 
-<script>
+  <!-- ================= BOTTOM NAV ================= -->
 
-/* =====================================================
-   FIREBASE
-===================================================== */
+  <nav class="bottom-nav">
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
-    authDomain: "texus-5c99e.firebaseapp.com",
-    projectId: "texus-5c99e",
-    storageBucket: "texus-5c99e.firebasestorage.app",
-    messagingSenderId: "1040040305137",
-    appId: "1:1040040305137:web:86f4f717204378a22da450",
-    measurementId: "G-KCF9J53BGH"
-};
+    <button
+      id="navHome"
+      class="nav-btn active"
+      onclick="showPage('home')">
 
-firebase.initializeApp(firebaseConfig);
+      <span class="nav-icon">⌂</span>
+      <span>Home</span>
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+    </button>
 
-let currentUser = null;
-let currentChatUser = null;
-let messagesListener = null;
 
+    <button
+      id="navFriends"
+      class="nav-btn"
+      onclick="showPage('friends')">
 
-/* =====================================================
-   DEFAULT AVATAR
-===================================================== */
+      <span class="nav-icon">👥</span>
+      <span>Friends</span>
 
-const defaultAvatar =
-    "data:image/svg+xml;charset=UTF-8," +
-    encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg"
-             width="200"
-             height="200"
-             viewBox="0 0 200 200">
+    </button>
 
-            <rect width="200"
-                  height="200"
-                  fill="#e5e7eb"/>
 
-            <circle
-                cx="100"
-                cy="75"
-                r="45"
-                fill="#6b7280"/>
+    <button
+      id="navChat"
+      class="nav-btn"
+      onclick="showPage('chat')">
 
-            <path
-                d="M30 190
-                   C35 135 65 115 100 115
-                   C135 115 165 135 170 190"
-                fill="#6b7280"/>
+      <span class="nav-icon">💬</span>
+      <span>Chat</span>
 
-        </svg>
-    `);
+    </button>
 
 
-/* =====================================================
-   AUTH
-===================================================== */
+    <button
+      id="navProfile"
+      class="nav-btn"
+      onclick="showPage('profile')">
 
-auth.onAuthStateChanged(async user => {
+      <span class="nav-icon">◉</span>
+      <span>Profile</span>
 
-    if (!user) {
+    </button>
 
-        window.location.href = "login.html";
 
-        return;
-    }
+    <button
+      id="navSettings"
+      class="nav-btn"
+      onclick="showPage('settings')">
 
-    currentUser = user;
+      <span class="nav-icon">☰</span>
+      <span>Settings</span>
 
-    await loadCurrentUser();
+    </button>
 
-    await loadFeed();
+  </nav>
 
-    await loadStories();
 
-    await loadUsers();
+  <!-- ================= FIREBASE ================= -->
 
-    await loadRequests();
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
-    await loadChatUsers();
 
-    await loadProfile();
+  <script>
 
-});
+    /* ==========================================
+       FIREBASE
+    ========================================== */
 
-
-/* =====================================================
-   LOAD CURRENT USER
-===================================================== */
-
-async function loadCurrentUser() {
-
-    try {
-
-        const doc =
-            await db.collection("users")
-                .doc(currentUser.uid)
-                .get();
-
-        let data = {};
-
-        if (doc.exists) {
-            data = doc.data();
-        }
-
-        const username =
-            data.username ||
-            currentUser.email.split("@")[0];
-
-        const avatar =
-            data.avatar ||
-            defaultAvatar;
-
-
-        document.getElementById("homeAvatar").src = avatar;
-
-        document.getElementById("profileAvatar").src = avatar;
-
-        document.getElementById("profileUsername").textContent =
-            username;
-
-        document.getElementById("settingsEmail").textContent =
-            currentUser.email;
-
-
-        document.getElementById("editUsername").value =
-            username;
-
-    } catch (error) {
-
-        console.error(
-            "Could not load user:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   PAGE NAVIGATION
-===================================================== */
-
-function showPage(page) {
-
-    document.querySelectorAll(".page")
-        .forEach(element => {
-            element.classList.remove("active");
-        });
-
-
-    document.querySelectorAll(".nav-item")
-        .forEach(element => {
-            element.classList.remove("active");
-        });
-
-
-    const pageElement =
-        document.getElementById(page + "Page");
-
-    if (pageElement) {
-
-        pageElement.classList.add("active");
-
-    }
-
-
-    const navElement =
-        document.getElementById("nav" +
-            page.charAt(0).toUpperCase() +
-            page.slice(1));
-
-    if (navElement) {
-
-        navElement.classList.add("active");
-
-    }
-
-
-    const titles = {
-
-        home: "Home",
-
-        friends: "Friends",
-
-        chat: "Chat",
-
-        profile: "Profile",
-
-        settings: "Settings"
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
+      authDomain: "texus-5c99e.firebaseapp.com",
+      projectId: "texus-5c99e",
+      storageBucket: "texus-5c99e.firebasestorage.app",
+      messagingSenderId: "1040040305137",
+      appId: "1:1040040305137:web:86f4f717204378a22da450",
+      measurementId: "G-KCF9J53BGH"
     };
 
+    firebase.initializeApp(firebaseConfig);
 
-    document.getElementById("topTitle").textContent =
-        titles[page] || "TexUs";
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    let currentUser = null;
+    let currentChatUser = null;
+    let allUsers = [];
+    let allFriendRequests = [];
+    let allFriends = [];
 
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+    /* ==========================================
+       AUTH
+    ========================================== */
+
+    auth.onAuthStateChanged(async user => {
+
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+
+      await loadCurrentUser();
+      await loadStories();
+      await loadFeed();
+      await loadFriends();
+      await loadRequests();
+      await loadChatUsers();
+      await loadProfile();
+
     });
 
 
-    if (page === "friends") {
+    /* ==========================================
+       PAGE NAVIGATION
+    ========================================== */
 
-        loadUsers();
+    function showPage(page) {
+
+      document.querySelectorAll(".page").forEach(p => {
+        p.classList.remove("active");
+      });
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+
+      if (page === "home") {
+
+        document.getElementById("homePage").classList.add("active");
+        document.getElementById("navHome").classList.add("active");
+
+      }
+
+      if (page === "friends") {
+
+        document.getElementById("friendsPage").classList.add("active");
+        document.getElementById("navFriends").classList.add("active");
+
+        loadFriends();
         loadRequests();
 
-    }
+      }
 
+      if (page === "chat") {
 
-    if (page === "chat") {
+        document.getElementById("chatPage").classList.add("active");
+        document.getElementById("navChat").classList.add("active");
 
         loadChatUsers();
 
-    }
+      }
 
+      if (page === "profile") {
 
-    if (page === "profile") {
+        document.getElementById("profilePage").classList.add("active");
+        document.getElementById("navProfile").classList.add("active");
 
         loadProfile();
 
+      }
+
+      if (page === "settings") {
+
+        document.getElementById("settingsPage").classList.add("active");
+        document.getElementById("navSettings").classList.add("active");
+
+      }
+
     }
 
-}
+
+    /* ==========================================
+       HOME TABS
+    ========================================== */
+
+    function showHomeTab(tab, button) {
+
+      document.querySelectorAll(".home-tab").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      document.querySelectorAll(".home-content").forEach(content => {
+        content.classList.remove("active");
+      });
 
 
-/* =====================================================
-   STORIES
-===================================================== */
-
-function openStoryUpload() {
-
-    document.getElementById("storyFile").click();
-
-}
+      button.classList.add("active");
 
 
-async function uploadStory() {
+      if (tab === "feed") {
 
-    const file =
+        document.getElementById("feedContent").classList.add("active");
+
+      }
+
+      if (tab === "reels") {
+
+        document.getElementById("reelsContent").classList.add("active");
+
+        loadReels();
+
+      }
+
+      if (tab === "music") {
+
+        document.getElementById("musicContent").classList.add("active");
+
+      }
+
+    }
+
+
+    /* ==========================================
+       CURRENT USER
+    ========================================== */
+
+    async function loadCurrentUser() {
+
+      try {
+
+        const doc = await db
+          .collection("users")
+          .doc(currentUser.uid)
+          .get();
+
+        if (doc.exists) {
+
+          const data = doc.data();
+
+          const username =
+            data.username ||
+            currentUser.email.split("@")[0];
+
+          document.getElementById("profileName").textContent = username;
+
+          document.getElementById("profileEmail").textContent =
+            currentUser.email;
+
+          window.currentUsername = username;
+
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+
+
+    /* ==========================================
+       STORIES
+    ========================================== */
+
+    function openStoryUpload() {
+
+      document.getElementById("storyFile").click();
+
+    }
+
+
+    async function uploadStory() {
+
+      const file =
         document.getElementById("storyFile").files[0];
 
-    if (!file || !currentUser) {
+      if (!file || !currentUser) {
         return;
-    }
+      }
 
 
-    const status =
+      const status =
         document.getElementById("uploadStatus");
 
-    status.classList.add("show");
+      status.style.display = "block";
 
-    status.textContent =
+      status.textContent =
         "Uploading your story...";
 
 
-    try {
-
-        const safeName =
-            file.name.replace(
-                /[^a-zA-Z0-9._-]/g,
-                "_"
-            );
-
+      try {
 
         const filename =
-            Date.now() + "_" + safeName;
-
+          Date.now() + "_" +
+          file.name.replace(/\s+/g, "_");
 
         const path =
-            "stories/" +
-            currentUser.uid +
-            "/" +
-            filename;
-
+          "stories/" +
+          currentUser.uid +
+          "/" +
+          filename;
 
         const storageRef =
-            storage.ref(path);
+          storage.ref(path);
 
 
         const uploadTask =
-            storageRef.put(file);
+          storageRef.put(file);
 
 
         uploadTask.on(
 
-            "state_changed",
+          firebase.storage.TaskEvent.STATE_CHANGED,
 
-            snapshot => {
+          snapshot => {
 
-                if (snapshot.totalBytes > 0) {
+            const percent =
+              Math.round(
+                snapshot.bytesTransferred /
+                snapshot.totalBytes *
+                100
+              );
 
-                    const percent =
-                        Math.round(
-                            snapshot.bytesTransferred /
-                            snapshot.totalBytes *
-                            100
-                        );
+            status.textContent =
+              "Uploading your story... " +
+              percent +
+              "%";
 
-                    status.textContent =
-                        "Uploading your story... " +
-                        percent +
-                        "%";
+          },
 
-                }
+          error => {
 
-            },
+            console.error(
+              "Story upload error:",
+              error
+            );
 
-            error => {
+            status.textContent =
+              "Story upload failed: " +
+              (error.code || error.message);
 
-                console.error(
-                    "Story upload error:",
-                    error
-                );
+          },
 
-                status.textContent =
-                    "Story upload failed: " +
-                    (error.code ||
-                    error.message);
+          async () => {
 
-                status.classList.add("error");
-
-            },
-
-            async () => {
-
-                const mediaUrl =
-                    await uploadTask
-                        .snapshot
-                        .ref
-                        .getDownloadURL();
+            const mediaUrl =
+              await uploadTask.snapshot
+                .ref
+                .getDownloadURL();
 
 
-                const mediaType =
-                    file.type.startsWith("video")
-                    ? "video"
-                    : "image";
+            const now =
+              firebase.firestore.Timestamp.now();
 
 
-                const now =
-                    firebase.firestore.Timestamp.now();
+            const expires =
+              firebase.firestore.Timestamp.fromMillis(
+                Date.now() +
+                24 * 60 * 60 * 1000
+              );
 
 
-                const expires =
-                    new firebase.firestore.Timestamp(
-                        now.seconds + 86400,
-                        now.nanoseconds
-                    );
+            await db.collection("stories").add({
+
+              uid: currentUser.uid,
+
+              username:
+                window.currentUsername ||
+                currentUser.email.split("@")[0],
+
+              mediaUrl: mediaUrl,
+
+              mediaType:
+                file.type.startsWith("video/")
+                  ? "video"
+                  : "image",
+
+              createdAt: now,
+
+              expiresAt: expires
+
+            });
 
 
-                await db.collection("stories")
-                    .add({
-
-                        uid: currentUser.uid,
-
-                        username:
-                            document
-                                .getElementById(
-                                    "profileUsername"
-                                )
-                                .textContent,
-
-                        mediaUrl:
-
-                            mediaUrl,
-
-                        mediaType:
-
-                            mediaType,
-
-                        createdAt:
-
-                            firebase.firestore
-                                .FieldValue
-                                .serverTimestamp(),
-
-                        expiresAt:
-
-                            expires
-
-                    });
+            status.textContent =
+              "Your story was uploaded!";
 
 
-                status.textContent =
-                    "Story uploaded successfully!";
+            document.getElementById("storyFile").value = "";
+
+            await loadStories();
 
 
-                status.classList.add("success");
+            setTimeout(() => {
 
+              status.style.display = "none";
 
-                await loadStories();
+            }, 2500);
 
-
-                setTimeout(() => {
-
-                    status.classList.remove(
-                        "show"
-                    );
-
-                }, 2500);
-
-            }
+          }
 
         );
 
-    } catch (error) {
+      } catch (error) {
 
         console.error(error);
 
         status.textContent =
-            "Could not upload story.";
+          "Story upload failed: " +
+          (error.code || error.message);
+
+      }
 
     }
 
-}
+
+    async function loadStories() {
+
+      const otherStories =
+        document.getElementById("otherStories");
+
+      otherStories.innerHTML = "";
 
 
-async function loadStories() {
-
-    const container =
-        document.getElementById(
-            "otherStories"
-        );
-
-
-    container.innerHTML = "";
-
-
-    try {
+      try {
 
         const now =
-            firebase.firestore.Timestamp.now();
+          firebase.firestore.Timestamp.now();
 
 
         const snapshot =
-            await db.collection("stories")
-                .where(
-                    "expiresAt",
-                    ">",
-                    now
-                )
-                .orderBy(
-                    "expiresAt",
-                    "asc"
-                )
-                .get();
+          await db
+            .collection("stories")
+            .where("expiresAt", ">", now)
+            .orderBy("expiresAt", "asc")
+            .get();
+
+
+        if (snapshot.empty) {
+          return;
+        }
 
 
         snapshot.forEach(doc => {
 
-            const story =
-                doc.data();
+          const story =
+            doc.data();
 
 
-            if (story.uid === currentUser.uid) {
-                return;
-            }
+          if (story.uid === currentUser.uid) {
+            return;
+          }
 
 
-            const card =
-                document.createElement("div");
+          const card =
+            document.createElement("div");
 
-            card.className =
-                "story-card";
-
-
-            if (story.mediaType === "video") {
-
-                card.innerHTML = `
-
-                    <video
-                        src="${escapeHtml(story.mediaUrl)}"
-                        muted
-                        playsinline
-                    ></video>
-
-                    <div class="story-overlay"></div>
-
-                    <div class="story-name">
-                        ${escapeHtml(
-                            story.username ||
-                            "User"
-                        )}
-                    </div>
-
-                `;
-
-            } else {
-
-                card.innerHTML = `
-
-                    <img
-                        src="${escapeHtml(story.mediaUrl)}"
-                        alt="Story"
-                    >
-
-                    <div class="story-overlay"></div>
-
-                    <div class="story-name">
-                        ${escapeHtml(
-                            story.username ||
-                            "User"
-                        )}
-                    </div>
-
-                `;
-
-            }
+          card.className =
+            "story-card";
 
 
-            card.onclick = () => {
+          let media = "";
 
-                openStoryViewer(
-                    story.mediaUrl,
-                    story.mediaType
-                );
+          if (story.mediaType === "video") {
 
-            };
+            media =
+              `<video src="${escapeHtml(story.mediaUrl)}"
+                      muted
+                      playsinline>
+               </video>`;
+
+          } else {
+
+            media =
+              `<img src="${escapeHtml(story.mediaUrl)}"
+                    alt="Story">`;
+
+          }
 
 
-            container.appendChild(card);
+          card.innerHTML =
+
+            media +
+
+            `<div class="story-overlay"></div>
+
+             <div class="story-name">
+               ${escapeHtml(story.username || "User")}
+             </div>`;
+
+
+          card.onclick = () => {
+
+            openStoryViewer(story);
+
+          };
+
+
+          otherStories.appendChild(card);
 
         });
 
-    } catch (error) {
+      } catch (error) {
 
         console.error(
-            "Could not load stories:",
-            error
+          "Stories error:",
+          error
         );
 
-    }
-
-}
-
-
-/* =====================================================
-   STORY VIEWER
-===================================================== */
-
-function openStoryViewer(url, type) {
-
-    const viewer =
-        document.getElementById(
-            "storyViewer"
-        );
-
-    const media =
-        document.getElementById(
-            "storyViewerMedia"
-        );
-
-
-    if (type === "video") {
-
-        media.innerHTML = `
-
-            <video
-                src="${escapeHtml(url)}"
-                controls
-                autoplay
-                playsinline
-                style="
-                    max-width:100%;
-                    max-height:100%;
-                "
-            ></video>
-
-        `;
-
-    } else {
-
-        media.innerHTML = `
-
-            <img
-                src="${escapeHtml(url)}"
-                style="
-                    max-width:100%;
-                    max-height:100%;
-                "
-            >
-
-        `;
+      }
 
     }
 
 
-    viewer.classList.add("active");
+    function openStoryViewer(story) {
 
-}
+      const viewer =
+        document.getElementById("storyViewer");
 
-
-function closeStoryViewer() {
-
-    document.getElementById(
-        "storyViewer"
-    ).classList.remove("active");
+      const content =
+        document.getElementById("storyViewerContent");
 
 
-    document.getElementById(
-        "storyViewerMedia"
-    ).innerHTML = "";
+      if (story.mediaType === "video") {
 
-}
+        content.innerHTML = `
 
+          <video
+            class="story-viewer-media"
+            src="${escapeHtml(story.mediaUrl)}"
+            controls
+            autoplay
+            playsinline>
+          </video>
 
-/* =====================================================
-   POST MODAL
-===================================================== */
+          <div class="story-viewer-name">
+            ${escapeHtml(story.username || "User")}
+          </div>
 
-function openPostModal() {
+        `;
 
-    document.getElementById(
-        "postModal"
-    ).classList.add("active");
+      } else {
 
-}
+        content.innerHTML = `
 
+          <img
+            class="story-viewer-media"
+            src="${escapeHtml(story.mediaUrl)}"
+            alt="Story">
 
-function closePostModal() {
+          <div class="story-viewer-name">
+            ${escapeHtml(story.username || "User")}
+          </div>
 
-    document.getElementById(
-        "postModal"
-    ).classList.remove("active");
+        `;
 
-}
-
-
-/* =====================================================
-   CREATE TEXT POST
-===================================================== */
-
-async function createTextPost() {
-
-    const text =
-        document.getElementById(
-            "postText"
-        ).value.trim();
+      }
 
 
-    if (!text) {
+      viewer.classList.add("show");
 
-        alert("Please write something first.");
+    }
+
+
+    function closeStoryViewer() {
+
+      document
+        .getElementById("storyViewer")
+        .classList.remove("show");
+
+      document
+        .getElementById("storyViewerContent")
+        .innerHTML = "";
+
+    }
+
+
+    /* ==========================================
+       CREATE POST
+    ========================================== */
+
+    async function createPost() {
+
+      if (!currentUser) {
+        return;
+      }
+
+
+      const text =
+        document
+          .getElementById("postText")
+          .value
+          .trim();
+
+
+      const file =
+        document
+          .getElementById("postFile")
+          .files[0];
+
+
+      const status =
+        document.getElementById("postStatus");
+
+
+      if (!text && !file) {
+
+        status.style.display = "block";
+
+        status.textContent =
+          "Write something or choose a photo/video.";
 
         return;
 
-    }
+      }
 
 
-    try {
+      status.style.display = "block";
 
-        await db.collection("posts")
-            .add({
-
-                uid: currentUser.uid,
-
-                username:
-                    document
-                        .getElementById(
-                            "profileUsername"
-                        )
-                        .textContent,
-
-                text: text,
-
-                mediaUrl: "",
-
-                mediaType: "",
-
-                createdAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
-
-            });
+      status.textContent =
+        "Creating your post...";
 
 
-        document.getElementById(
-            "postText"
-        ).value = "";
+      try {
+
+        let mediaUrl = "";
+        let mediaType = "";
 
 
-        closePostModal();
+        if (file) {
+
+          const filename =
+            Date.now() +
+            "_" +
+            file.name.replace(/\s+/g, "_");
+
+
+          const ref =
+            storage.ref(
+              "posts/" +
+              currentUser.uid +
+              "/" +
+              filename
+            );
+
+
+          const uploadTask =
+            ref.put(file);
+
+
+          await new Promise(
+            (resolve, reject) => {
+
+              uploadTask.on(
+
+                firebase.storage.TaskEvent.STATE_CHANGED,
+
+                snapshot => {
+
+                  const percent =
+                    Math.round(
+                      snapshot.bytesTransferred /
+                      snapshot.totalBytes *
+                      100
+                    );
+
+                  status.textContent =
+                    "Uploading post... " +
+                    percent +
+                    "%";
+
+                },
+
+                reject,
+
+                resolve
+
+              );
+
+            }
+          );
+
+
+          mediaUrl =
+            await uploadTask.snapshot
+              .ref
+              .getDownloadURL();
+
+
+          mediaType =
+            file.type.startsWith("video/")
+              ? "video"
+              : "image";
+
+        }
+
+
+        await db.collection("posts").add({
+
+          uid: currentUser.uid,
+
+          username:
+            window.currentUsername ||
+            currentUser.email.split("@")[0],
+
+          text: text,
+
+          mediaUrl: mediaUrl,
+
+          mediaType: mediaType,
+
+          createdAt:
+            firebase.firestore.FieldValue.serverTimestamp()
+
+        });
+
+
+        document.getElementById("postText").value = "";
+
+        document.getElementById("postFile").value = "";
+
+        status.textContent =
+          "Post created!";
 
 
         await loadFeed();
-
         await loadProfile();
 
 
-    } catch (error) {
+        setTimeout(() => {
+
+          status.style.display = "none";
+
+        }, 2000);
+
+      } catch (error) {
 
         console.error(error);
 
-        alert(
-            "Could not create post."
-        );
+        status.textContent =
+          "Post failed: " +
+          (error.code || error.message);
+
+      }
 
     }
 
-}
+
+    /* ==========================================
+       FEED
+    ========================================== */
+
+    async function loadFeed() {
+
+      const feed =
+        document.getElementById("feed");
 
 
-/* =====================================================
-   CREATE MEDIA POST
-===================================================== */
-
-async function createPost() {
-
-    const file =
-        document.getElementById(
-            "postFile"
-        ).files[0];
+      feed.innerHTML =
+        `<div class="loading">
+          Loading live feed...
+        </div>`;
 
 
-    if (!file) {
-        return;
-    }
-
-
-    try {
-
-        const filename =
-            Date.now() +
-            "_" +
-            file.name.replace(
-                /[^a-zA-Z0-9._-]/g,
-                "_"
-            );
-
-
-        const ref =
-            storage.ref(
-                "posts/" +
-                currentUser.uid +
-                "/" +
-                filename
-            );
-
+      try {
 
         const snapshot =
-            await ref.put(file);
-
-
-        const url =
-            await snapshot.ref
-                .getDownloadURL();
-
-
-        const type =
-            file.type.startsWith("video")
-            ? "video"
-            : "image";
-
-
-        await db.collection("posts")
-            .add({
-
-                uid:
-                    currentUser.uid,
-
-                username:
-                    document
-                        .getElementById(
-                            "profileUsername"
-                        )
-                        .textContent,
-
-                text: "",
-
-                mediaUrl: url,
-
-                mediaType: type,
-
-                createdAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
-
-            });
-
-
-        document.getElementById(
-            "postFile"
-        ).value = "";
-
-
-        await loadFeed();
-
-        await loadProfile();
-
-
-    } catch (error) {
-
-        console.error(
-            "Post upload error:",
-            error
-        );
-
-
-        alert(
-            "Could not upload the post: " +
-            (error.code ||
-            error.message)
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   LOAD FEED
-===================================================== */
-
-async function loadFeed() {
-
-    const feed =
-        document.getElementById(
-            "feed"
-        );
-
-
-    try {
-
-        const snapshot =
-            await db.collection("posts")
-                .orderBy(
-                    "createdAt",
-                    "desc"
-                )
-                .limit(30)
-                .get();
+          await db
+            .collection("posts")
+            .orderBy("createdAt", "desc")
+            .limit(50)
+            .get();
 
 
         if (snapshot.empty) {
 
-            feed.innerHTML = `
+          feed.innerHTML = `
 
-                <div class="empty-message">
-                    No posts yet.
-                </div>
+            <div class="empty">
+              <h2>No posts yet</h2>
+              <p>
+                Be the first person to share something!
+              </p>
+            </div>
 
-            `;
+          `;
 
-            return;
+          return;
 
         }
 
@@ -2802,1820 +2382,1877 @@ async function loadFeed() {
 
         snapshot.forEach(doc => {
 
-            const post =
-                doc.data();
+          const post =
+            doc.data();
 
 
-            const postElement =
-                document.createElement(
-                    "div"
-                );
+          const postElement =
+            document.createElement("div");
+
+          postElement.className =
+            "post";
 
 
-            postElement.className =
-                "post";
+          let media = "";
 
 
-            const date =
-                post.createdAt
-                ? post.createdAt
-                    .toDate()
-                    .toLocaleString()
-                : "Just now";
+          if (post.mediaUrl) {
 
+            if (post.mediaType === "video") {
 
-            let media = "";
+              media =
+                `<video
+                  class="post-media"
+                  src="${escapeHtml(post.mediaUrl)}"
+                  controls
+                  playsinline>
+                </video>`;
 
+            } else {
 
-            if (
-                post.mediaUrl &&
-                post.mediaType === "image"
-            ) {
-
-                media = `
-
-                    <img
-                        class="post-media"
-                        src="${escapeHtml(
-                            post.mediaUrl
-                        )}"
-                    >
-
-                `;
+              media =
+                `<img
+                  class="post-media"
+                  src="${escapeHtml(post.mediaUrl)}"
+                  alt="Post">`;
 
             }
 
+          }
 
-            if (
-                post.mediaUrl &&
-                post.mediaType === "video"
-            ) {
 
-                media = `
+          const date =
+            post.createdAt &&
+            post.createdAt.toDate
+              ? post.createdAt.toDate().toLocaleString()
+              : "Just now";
 
-                    <video
-                        class="post-media"
-                        src="${escapeHtml(
-                            post.mediaUrl
-                        )}"
-                        controls
-                    ></video>
 
-                `;
+          postElement.innerHTML = `
 
+            <div class="post-header">
+
+              <img
+                class="avatar"
+                src="https://via.placeholder.com/100"
+                alt="Avatar">
+
+              <div>
+
+                <div class="post-user">
+                  ${escapeHtml(post.username || "User")}
+                </div>
+
+                <div class="post-time">
+                  ${escapeHtml(date)}
+                </div>
+
+              </div>
+
+            </div>
+
+
+            ${
+              post.text
+                ? `<div class="post-text">
+                    ${escapeHtml(post.text)}
+                   </div>`
+                : ""
             }
 
 
-            postElement.innerHTML = `
-
-                <div class="post-header">
-
-                    <img
-                        class="avatar-small"
-                        src="${defaultAvatar}"
-                    >
-
-                    <div>
-
-                        <div class="post-user">
-                            ${escapeHtml(
-                                post.username ||
-                                "User"
-                            )}
-                        </div>
-
-                        <div class="post-time">
-                            ${escapeHtml(date)}
-                        </div>
-
-                    </div>
-
-                </div>
+            ${media}
 
 
-                ${
-                    post.text
-                    ? `
-                        <div class="post-text">
-                            ${escapeHtml(
-                                post.text
-                            )}
-                        </div>
-                    `
-                    : ""
-                }
+            <div class="post-actions">
+
+              <button class="post-action">
+                ❤️ Like
+              </button>
+
+              <button class="post-action">
+                💬 Comment
+              </button>
+
+              <button class="post-action">
+                ↗ Share
+              </button>
+
+            </div>
+
+          `;
 
 
-                ${media}
-
-
-                <div class="post-bottom">
-
-                    <button
-                        class="post-button"
-                        onclick="alert('Like feature coming soon')"
-                    >
-                        ❤️ Like
-                    </button>
-
-                    <button
-                        class="post-button"
-                        onclick="alert('Comments feature coming soon')"
-                    >
-                        💬 Comment
-                    </button>
-
-                    <button
-                        class="post-button"
-                        onclick="sharePost()"
-                    >
-                        ↗️ Share
-                    </button>
-
-                </div>
-
-            `;
-
-
-            feed.appendChild(
-                postElement
-            );
+          feed.appendChild(postElement);
 
         });
 
-
-    } catch (error) {
+      } catch (error) {
 
         console.error(
-            "Feed error:",
-            error
+          "Feed error:",
+          error
         );
 
 
         feed.innerHTML = `
 
-            <div class="empty-message">
-                Unable to load the feed.
-            </div>
+          <div class="empty">
+            Unable to load the feed right now.
+          </div>
 
         `;
 
+      }
+
     }
 
-}
+
+    /* ==========================================
+       REELS
+    ========================================== */
+
+    async function loadReels() {
+
+      const reels =
+        document.getElementById("reelsFeed");
 
 
-/* =====================================================
-   FRIEND TABS
-===================================================== */
-
-function switchFriendTab(tab) {
-
-    document
-        .getElementById("friendsTab")
-        .classList.remove("active");
+      reels.innerHTML =
+        `<div class="loading">
+          Loading Reels...
+        </div>`;
 
 
-    document
-        .getElementById("requestsTab")
-        .classList.remove("active");
+      try {
+
+        const snapshot =
+          await db
+            .collection("posts")
+            .orderBy("createdAt", "desc")
+            .limit(50)
+            .get();
 
 
-    document
-        .getElementById("friendsSection")
-        .classList.remove("active");
+        reels.innerHTML = "";
 
 
-    document
-        .getElementById("requestsSection")
-        .classList.remove("active");
+        let reelCount = 0;
 
 
-    if (tab === "friends") {
+        snapshot.forEach(doc => {
+
+          const post =
+            doc.data();
+
+
+          if (
+            post.mediaType !== "video" ||
+            !post.mediaUrl
+          ) {
+            return;
+          }
+
+
+          reelCount++;
+
+
+          const reel =
+            document.createElement("div");
+
+          reel.className =
+            "reel";
+
+
+          reel.innerHTML = `
+
+            <video
+              src="${escapeHtml(post.mediaUrl)}"
+              controls
+              playsinline
+              loop>
+            </video>
+
+            <div class="reel-info">
+
+              <div class="reel-user">
+                @${escapeHtml(post.username || "user")}
+              </div>
+
+              ${
+                post.text
+                  ? `<div class="reel-text">
+                      ${escapeHtml(post.text)}
+                     </div>`
+                  : ""
+              }
+
+            </div>
+
+          `;
+
+
+          reels.appendChild(reel);
+
+        });
+
+
+        if (reelCount === 0) {
+
+          reels.innerHTML = `
+
+            <div class="empty">
+
+              <h2>No Reels yet</h2>
+
+              <p>
+                Upload a video post and it can appear here as a Reel.
+              </p>
+
+            </div>
+
+          `;
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Reels error:",
+          error
+        );
+
+
+        reels.innerHTML = `
+
+          <div class="empty">
+            Unable to load Reels.
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* ==========================================
+       MUSIC
+    ========================================== */
+
+    function musicMessage(song) {
+
+      alert(
+        song +
+        "\n\nMusic playback can be connected to your music system later."
+      );
+
+    }
+
+
+    /* ==========================================
+       FRIENDS TABS
+    ========================================== */
+
+    function showFriendsTab(tab, button) {
+
+      document.querySelectorAll(".section-tab")
+        .forEach(btn => {
+          btn.classList.remove("active");
+        });
+
+
+      document.querySelectorAll(".friends-content")
+        .forEach(content => {
+          content.classList.remove("active");
+        });
+
+
+      button.classList.add("active");
+
+
+      if (tab === "friends") {
 
         document
-            .getElementById("friendsTab")
-            .classList.add("active");
+          .getElementById("friendsContent")
+          .classList.add("active");
+
+        loadFriends();
+
+      }
 
 
-        document
-            .getElementById("friendsSection")
-            .classList.add("active");
-
-        loadUsers();
-
-    } else {
+      if (tab === "requests") {
 
         document
-            .getElementById("requestsTab")
-            .classList.add("active");
-
-
-        document
-            .getElementById("requestsSection")
-            .classList.add("active");
+          .getElementById("requestsContent")
+          .classList.add("active");
 
         loadRequests();
 
+      }
+
     }
 
-}
+
+    /* ==========================================
+       LOAD FRIENDS
+    ========================================== */
+
+    async function loadFriends() {
+
+      if (!currentUser) {
+        return;
+      }
 
 
-/* =====================================================
-   LOAD USERS
-===================================================== */
-
-async function loadUsers() {
-
-    const container =
-        document.getElementById(
-            "availableUsers"
-        );
+      const list =
+        document.getElementById("friendsList");
 
 
-    const discover =
-        document.getElementById(
-            "discoverPeople"
-        );
+      list.innerHTML =
+        `<div class="loading">
+          Loading users...
+        </div>`;
 
 
-    try {
+      try {
 
-        const snapshot =
-            await db.collection("users")
-                .limit(100)
-                .get();
-
-
-        container.innerHTML = "";
-
-        discover.innerHTML = "";
+        const usersSnapshot =
+          await db
+            .collection("users")
+            .get();
 
 
-        let count = 0;
+        const requestsSnapshot =
+          await db
+            .collection("friendRequests")
+            .where("fromUid", "==", currentUser.uid)
+            .get();
 
 
-        for (const doc of snapshot.docs) {
-
-            if (
-                doc.id === currentUser.uid
-            ) {
-                continue;
-            }
-
-
-            const user =
-                doc.data();
+        const friendsSnapshot =
+          await db
+            .collection("friends")
+            .where(
+              "members",
+              "array-contains",
+              currentUser.uid
+            )
+            .get();
 
 
-            const username =
-                user.username ||
-                user.email?.split("@")[0] ||
-                "User";
+        allUsers = [];
 
 
-            const avatar =
-                user.avatar ||
-                defaultAvatar;
+        usersSnapshot.forEach(doc => {
+
+          if (doc.id !== currentUser.uid) {
+
+            allUsers.push({
+              id: doc.id,
+              ...doc.data()
+            });
+
+          }
+
+        });
 
 
-            const card =
-                document.createElement(
-                    "div"
-                );
+        const outgoing = {};
 
 
-            card.className =
-                "user-card";
+        requestsSnapshot.forEach(doc => {
+
+          const request =
+            doc.data();
+
+          if (request.status === "pending") {
+
+            outgoing[request.toUid] = true;
+
+          }
+
+        });
 
 
-            card.innerHTML = `
-
-                <img
-                    class="avatar-small"
-                    src="${escapeHtml(avatar)}"
-                >
-
-                <div class="user-info">
-
-                    <div class="user-name">
-                        ${escapeHtml(username)}
-                    </div>
-
-                    <div class="user-email">
-                        ${escapeHtml(
-                            user.email || ""
-                        )}
-                    </div>
-
-                </div>
-
-                <button
-                    class="friend-btn"
-                    onclick="sendFriendRequest('${doc.id}')"
-                >
-                    Add Friend
-                </button>
-
-            `;
+        const friendIds = {};
 
 
-            container.appendChild(card);
+        friendsSnapshot.forEach(doc => {
+
+          const members =
+            doc.data().members || [];
 
 
-            if (count < 10) {
+          members.forEach(uid => {
 
-                const discoverCard =
-                    document.createElement(
-                        "div"
-                    );
+            if (uid !== currentUser.uid) {
 
-
-                discoverCard.className =
-                    "discover-card";
-
-
-                discoverCard.innerHTML = `
-
-                    <img
-                        class="discover-avatar"
-                        src="${escapeHtml(avatar)}"
-                    >
-
-                    <div class="discover-name">
-                        ${escapeHtml(username)}
-                    </div>
-
-                    <button
-                        class="discover-follow"
-                        onclick="sendFriendRequest('${doc.id}')"
-                    >
-                        Add Friend
-                    </button>
-
-                `;
-
-
-                discover.appendChild(
-                    discoverCard
-                );
+              friendIds[uid] = true;
 
             }
 
+          });
 
-            count++;
-
-        }
+        });
 
 
-        if (container.innerHTML === "") {
+        allFriendRequests =
+          requestsSnapshot.docs.map(
+            doc => ({
+              id: doc.id,
+              ...doc.data()
+            })
+          );
 
-            container.innerHTML = `
 
-                <div class="empty-message">
-                    No other users found yet.
-                </div>
+        renderFriends(
+          allUsers,
+          outgoing,
+          friendIds
+        );
 
-            `;
 
-        }
-
-    } catch (error) {
+      } catch (error) {
 
         console.error(
-            "Users error:",
-            error
+          "Friends error:",
+          error
         );
 
 
-        container.innerHTML = `
+        list.innerHTML = `
 
-            <div class="empty-message">
-                Could not load users.
-            </div>
+          <div class="empty">
+            Unable to load users.
+          </div>
 
         `;
 
+      }
+
     }
 
-}
 
-
-/* =====================================================
-   SEND FRIEND REQUEST
-===================================================== */
-
-async function sendFriendRequest(receiverId) {
-
-    if (
-        !currentUser ||
-        receiverId === currentUser.uid
+    function renderFriends(
+      users,
+      outgoing,
+      friendIds
     ) {
+
+      const list =
+        document.getElementById("friendsList");
+
+
+      list.innerHTML = "";
+
+
+      if (users.length === 0) {
+
+        list.innerHTML = `
+
+          <div class="empty">
+            No other users available yet.
+          </div>
+
+        `;
+
         return;
+
+      }
+
+
+      users.forEach(user => {
+
+        const card =
+          document.createElement("div");
+
+        card.className =
+          "user-card";
+
+
+        let action = "";
+
+
+        if (friendIds[user.id]) {
+
+          action =
+            `<button class="pending-btn">
+              Friends
+            </button>`;
+
+        } else if (outgoing[user.id]) {
+
+          action =
+            `<button class="pending-btn">
+              Request sent
+            </button>`;
+
+        } else {
+
+          action =
+            `<button
+              class="add-btn"
+              onclick="sendFriendRequest('${user.id}')">
+              Add Friend
+            </button>`;
+
+        }
+
+
+        card.innerHTML = `
+
+          <img
+            class="avatar"
+            src="${escapeHtml(
+              user.avatarUrl ||
+              "https://via.placeholder.com/100"
+            )}"
+            alt="Avatar">
+
+          <div class="user-info">
+
+            <div class="user-name">
+              ${escapeHtml(
+                user.username ||
+                user.email ||
+                "User"
+              )}
+            </div>
+
+            <div class="user-email">
+              ${escapeHtml(
+                user.email || ""
+              )}
+            </div>
+
+          </div>
+
+          ${action}
+
+        `;
+
+
+        list.appendChild(card);
+
+      });
+
     }
 
 
-    try {
+    function filterFriends() {
 
-        const requestId =
-            currentUser.uid +
-            "_" +
-            receiverId;
+      const search =
+        document
+          .getElementById("friendSearch")
+          .value
+          .toLowerCase()
+          .trim();
 
+
+      const filtered =
+        allUsers.filter(user => {
+
+          const username =
+            (user.username || "")
+              .toLowerCase();
+
+          const email =
+            (user.email || "")
+              .toLowerCase();
+
+
+          return (
+            username.includes(search) ||
+            email.includes(search)
+          );
+
+        });
+
+
+      const outgoing = {};
+
+
+      allFriendRequests.forEach(request => {
+
+        if (
+          request.fromUid === currentUser.uid &&
+          request.status === "pending"
+        ) {
+
+          outgoing[request.toUid] = true;
+
+        }
+
+      });
+
+
+      const friendIds = {};
+
+
+      allFriends.forEach(friend => {
+
+        const members =
+          friend.members || [];
+
+
+        members.forEach(uid => {
+
+          if (uid !== currentUser.uid) {
+
+            friendIds[uid] = true;
+
+          }
+
+        });
+
+      });
+
+
+      renderFriends(
+        filtered,
+        outgoing,
+        friendIds
+      );
+
+    }
+
+
+    /* ==========================================
+       SEND FRIEND REQUEST
+    ========================================== */
+
+    async function sendFriendRequest(toUid) {
+
+      if (!currentUser || !toUid) {
+        return;
+      }
+
+
+      try {
 
         const existing =
-            await db.collection(
-                "friendRequests"
-            )
-            .doc(requestId)
+          await db
+            .collection("friendRequests")
+            .where("fromUid", "==", currentUser.uid)
             .get();
 
 
-        if (existing.exists) {
+        let alreadyExists = false;
 
-            alert(
-                "A friend request already exists."
-            );
 
-            return;
+        existing.forEach(doc => {
+
+          const data =
+            doc.data();
+
+
+          if (
+            data.toUid === toUid &&
+            data.status === "pending"
+          ) {
+
+            alreadyExists = true;
+
+          }
+
+        });
+
+
+        if (alreadyExists) {
+
+          alert("Friend request already sent.");
+
+          return;
 
         }
 
 
-        await db.collection(
-            "friendRequests"
-        )
-        .doc(requestId)
-        .set({
+        await db
+          .collection("friendRequests")
+          .add({
 
-            senderId:
-                currentUser.uid,
+            fromUid: currentUser.uid,
 
-            receiverId:
-                receiverId,
+            toUid: toUid,
 
-            status:
-                "pending",
+            status: "pending",
 
             createdAt:
-                firebase.firestore
-                    .FieldValue
-                    .serverTimestamp()
+              firebase.firestore.FieldValue.serverTimestamp()
 
-        });
+          });
 
 
-        alert(
-            "Friend request sent!"
-        );
+        alert("Friend request sent!");
 
 
-    } catch (error) {
+        await loadFriends();
+
+      } catch (error) {
 
         console.error(error);
 
         alert(
-            "Could not send friend request."
+          "Could not send friend request: " +
+          (error.code || error.message)
         );
+
+      }
 
     }
 
-}
+
+    /* ==========================================
+       LOAD REQUESTS
+    ========================================== */
+
+    async function loadRequests() {
+
+      if (!currentUser) {
+        return;
+      }
 
 
-/* =====================================================
-   LOAD REQUESTS
-===================================================== */
-
-async function loadRequests() {
-
-    const container =
-        document.getElementById(
-            "friendRequests"
-        );
+      const list =
+        document.getElementById("requestsList");
 
 
-    const countElement =
-        document.getElementById(
-            "requestCount"
-        );
+      list.innerHTML =
+        `<div class="loading">
+          Loading requests...
+        </div>`;
 
 
-    try {
+      try {
 
         const snapshot =
-            await db.collection(
-                "friendRequests"
-            )
+          await db
+            .collection("friendRequests")
             .where(
-                "receiverId",
-                "==",
-                currentUser.uid
-            )
-            .where(
-                "status",
-                "==",
-                "pending"
+              "toUid",
+              "==",
+              currentUser.uid
             )
             .get();
 
 
-        container.innerHTML = "";
+        const requests =
+          [];
 
 
-        countElement.textContent =
-            snapshot.size > 0
-            ? ` (${snapshot.size})`
-            : "";
+        snapshot.forEach(doc => {
+
+          const data =
+            doc.data();
 
 
-        if (snapshot.empty) {
+          if (data.status === "pending") {
 
-            container.innerHTML = `
+            requests.push({
+              id: doc.id,
+              ...data
+            });
 
-                <div class="empty-message">
+          }
 
-                    <h3 style="margin-bottom:8px;">
-                        No friend requests
-                    </h3>
-
-                    <p>
-                        Requests from other TexUs users will appear here.
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-
-        }
+        });
 
 
-        for (const doc of snapshot.docs) {
-
-            const request =
-                doc.data();
+        allFriendRequests = requests;
 
 
-            let sender = {};
+        if (requests.length === 0) {
 
+          list.innerHTML = `
 
-            try {
+            <div class="empty">
 
-                const senderDoc =
-                    await db.collection(
-                        "users"
-                    )
-                    .doc(
-                        request.senderId
-                    )
-                    .get();
+              <h2>No friend requests</h2>
 
+              <p>
+                When someone sends you a friend request,
+                it will appear here.
+              </p>
 
-                if (senderDoc.exists) {
+            </div>
 
-                    sender =
-                        senderDoc.data();
+          `;
 
-                }
-
-            } catch (e) {
-
-                console.error(e);
-
-            }
-
-
-            const username =
-                sender.username ||
-                sender.email?.split("@")[0] ||
-                "User";
-
-
-            const avatar =
-                sender.avatar ||
-                defaultAvatar;
-
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className =
-                "user-card";
-
-
-            card.innerHTML = `
-
-                <img
-                    class="avatar-small"
-                    src="${escapeHtml(avatar)}"
-                >
-
-                <div class="user-info">
-
-                    <div class="user-name">
-                        ${escapeHtml(username)}
-                    </div>
-
-                    <div class="user-email">
-                        Sent you a friend request
-                    </div>
-
-                </div>
-
-
-                <div class="request-buttons">
-
-                    <button
-                        class="friend-btn accept"
-                        onclick="acceptFriendRequest('${doc.id}', '${request.senderId}')"
-                    >
-                        Accept
-                    </button>
-
-                    <button
-                        class="friend-btn decline"
-                        onclick="declineFriendRequest('${doc.id}')"
-                    >
-                        Decline
-                    </button>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(
-                card
-            );
+          return;
 
         }
 
-    } catch (error) {
+
+        list.innerHTML = "";
+
+
+        for (const request of requests) {
+
+          const userDoc =
+            await db
+              .collection("users")
+              .doc(request.fromUid)
+              .get();
+
+
+          const user =
+            userDoc.exists
+              ? userDoc.data()
+              : {};
+
+
+          const card =
+            document.createElement("div");
+
+          card.className =
+            "user-card";
+
+
+          card.innerHTML = `
+
+            <img
+              class="avatar"
+              src="${escapeHtml(
+                user.avatarUrl ||
+                "https://via.placeholder.com/100"
+              )}"
+              alt="Avatar">
+
+
+            <div class="user-info">
+
+              <div class="user-name">
+                ${escapeHtml(
+                  user.username ||
+                  user.email ||
+                  "User"
+                )}
+              </div>
+
+              <div class="user-email">
+                wants to be your friend
+              </div>
+
+            </div>
+
+
+            <div class="request-actions">
+
+              <button
+                class="accept-btn"
+                onclick="acceptFriendRequest('${request.id}', '${request.fromUid}')">
+                Accept
+              </button>
+
+              <button
+                class="decline-btn"
+                onclick="declineFriendRequest('${request.id}')">
+                Decline
+              </button>
+
+            </div>
+
+          `;
+
+
+          list.appendChild(card);
+
+        }
+
+      } catch (error) {
 
         console.error(
-            "Requests error:",
-            error
+          "Requests error:",
+          error
         );
 
 
-        container.innerHTML = `
+        list.innerHTML = `
 
-            <div class="empty-message">
-                Could not load friend requests.
-            </div>
+          <div class="empty">
+            Unable to load friend requests.
+          </div>
 
         `;
 
+      }
+
     }
 
-}
+
+    /* ==========================================
+       ACCEPT REQUEST
+    ========================================== */
+
+    async function acceptFriendRequest(
+      requestId,
+      otherUid
+    ) {
+
+      try {
+
+        await db
+          .collection("friendRequests")
+          .doc(requestId)
+          .update({
+
+            status: "accepted",
+
+            acceptedAt:
+              firebase.firestore.FieldValue.serverTimestamp()
+
+          });
 
 
-/* =====================================================
-   ACCEPT FRIEND REQUEST
-===================================================== */
+        await db
+          .collection("friends")
+          .add({
 
-async function acceptFriendRequest(
-    requestId,
-    senderId
-) {
+            members: [
+              currentUser.uid,
+              otherUid
+            ],
 
-    try {
+            createdAt:
+              firebase.firestore.FieldValue.serverTimestamp()
 
-        const batch =
-            db.batch();
-
-
-        const requestRef =
-            db.collection(
-                "friendRequests"
-            )
-            .doc(requestId);
+          });
 
 
-        batch.update(
-            requestRef,
-            {
-                status: "accepted",
-                acceptedAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
-            }
-        );
-
-
-        const myFriendRef =
-            db.collection("friends")
-                .doc(currentUser.uid)
-                .collection("list")
-                .doc(senderId);
-
-
-        const senderFriendRef =
-            db.collection("friends")
-                .doc(senderId)
-                .collection("list")
-                .doc(currentUser.uid);
-
-
-        batch.set(
-            myFriendRef,
-            {
-                uid: senderId,
-                createdAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
-            }
-        );
-
-
-        batch.set(
-            senderFriendRef,
-            {
-                uid: currentUser.uid,
-                createdAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
-            }
-        );
-
-
-        await batch.commit();
+        alert("Friend request accepted!");
 
 
         await loadRequests();
-
-        await loadChatUsers();
-
+        await loadFriends();
         await loadProfile();
 
-
-        alert(
-            "Friend request accepted!"
-        );
-
-    } catch (error) {
+      } catch (error) {
 
         console.error(error);
 
         alert(
-            "Could not accept request."
+          "Could not accept request: " +
+          (error.code || error.message)
         );
+
+      }
 
     }
 
-}
 
+    /* ==========================================
+       DECLINE REQUEST
+    ========================================== */
 
-/* =====================================================
-   DECLINE FRIEND REQUEST
-===================================================== */
+    async function declineFriendRequest(
+      requestId
+    ) {
 
-async function declineFriendRequest(
-    requestId
-) {
+      try {
 
-    try {
+        await db
+          .collection("friendRequests")
+          .doc(requestId)
+          .update({
 
-        await db.collection(
-            "friendRequests"
-        )
-        .doc(requestId)
-        .update({
+            status: "declined",
 
-            status:
-                "declined"
+            declinedAt:
+              firebase.firestore.FieldValue.serverTimestamp()
 
-        });
+          });
 
 
         await loadRequests();
 
-
-    } catch (error) {
+      } catch (error) {
 
         console.error(error);
 
         alert(
-            "Could not decline request."
+          "Could not decline request: " +
+          (error.code || error.message)
         );
+
+      }
 
     }
 
-}
+
+    /* ==========================================
+       CHAT USERS
+    ========================================== */
+
+    async function loadChatUsers() {
+
+      const container =
+        document.getElementById("chatUsers");
 
 
-/* =====================================================
-   CHAT USERS
-===================================================== */
-
-async function loadChatUsers() {
-
-    const container =
-        document.getElementById(
-            "chatUsers"
-        );
+      container.innerHTML =
+        `<div class="loading">
+          Loading your connections...
+        </div>`;
 
 
-    try {
+      try {
 
         const snapshot =
-            await db.collection(
-                "friends"
+          await db
+            .collection("friends")
+            .where(
+              "members",
+              "array-contains",
+              currentUser.uid
             )
-            .doc(currentUser.uid)
-            .collection("list")
             .get();
+
+
+        allFriends =
+          snapshot.docs.map(
+            doc => ({
+              id: doc.id,
+              ...doc.data()
+            })
+          );
+
+
+        if (allFriends.length === 0) {
+
+          container.innerHTML = `
+
+            <div class="empty">
+
+              <h2>No friends yet</h2>
+
+              <p>
+                Accept or send friend requests to start chatting.
+              </p>
+
+            </div>
+
+          `;
+
+          return;
+
+        }
 
 
         container.innerHTML = "";
 
 
-        if (snapshot.empty) {
+        for (const friend of allFriends) {
 
-            container.innerHTML = `
-
-                <div class="empty-message">
-
-                    <h3 style="margin-bottom:8px;">
-                        No connections yet
-                    </h3>
-
-                    <p>
-                        Add friends to start chatting.
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-
-        }
-
-
-        for (const doc of snapshot.docs) {
-
-            const friendId =
-                doc.id;
-
-
-            const friendDoc =
-                await db.collection(
-                    "users"
-                )
-                .doc(friendId)
-                .get();
-
-
-            const friend =
-                friendDoc.exists
-                ? friendDoc.data()
-                : {};
-
-
-            const username =
-                friend.username ||
-                friend.email?.split("@")[0] ||
-                "User";
-
-
-            const avatar =
-                friend.avatar ||
-                defaultAvatar;
-
-
-            const element =
-                document.createElement(
-                    "div"
-                );
-
-
-            element.className =
-                "chat-user";
-
-
-            element.innerHTML = `
-
-                <img
-                    class="avatar-small"
-                    src="${escapeHtml(avatar)}"
-                >
-
-                <div>
-                    <strong>
-                        ${escapeHtml(username)}
-                    </strong>
-                </div>
-
-                <button
-                    onclick="openChat('${friendId}')"
-                >
-                    Message
-                </button>
-
-            `;
-
-
-            container.appendChild(
-                element
+          const otherUid =
+            friend.members.find(
+              uid => uid !== currentUser.uid
             );
 
+
+          if (!otherUid) {
+            continue;
+          }
+
+
+          const userDoc =
+            await db
+              .collection("users")
+              .doc(otherUid)
+              .get();
+
+
+          const user =
+            userDoc.exists
+              ? userDoc.data()
+              : {};
+
+
+          const div =
+            document.createElement("div");
+
+          div.className =
+            "chat-user";
+
+
+          div.onclick = () => {
+
+            openChat(
+              otherUid,
+              user.username ||
+              user.email ||
+              "User"
+            );
+
+          };
+
+
+          div.innerHTML = `
+
+            <img
+              class="avatar"
+              src="${escapeHtml(
+                user.avatarUrl ||
+                "https://via.placeholder.com/100"
+              )}"
+              alt="Avatar">
+
+
+            <div class="user-info">
+
+              <div class="user-name">
+                ${escapeHtml(
+                  user.username ||
+                  user.email ||
+                  "User"
+                )}
+              </div>
+
+              <div class="user-email">
+                Tap to chat
+              </div>
+
+            </div>
+
+          `;
+
+
+          container.appendChild(div);
+
         }
 
-    } catch (error) {
+      } catch (error) {
 
-        console.error(
-            "Chat users error:",
-            error
-        );
-
+        console.error(error);
 
         container.innerHTML = `
 
-            <div class="empty-message">
-                Could not load connections.
-            </div>
+          <div class="empty">
+            Unable to load connections.
+          </div>
 
         `;
 
-    }
-
-}
-
-
-/* =====================================================
-   OPEN CHAT
-===================================================== */
-
-async function openChat(userId) {
-
-    currentChatUser =
-        userId;
-
-
-    const userDoc =
-        await db.collection(
-            "users"
-        )
-        .doc(userId)
-        .get();
-
-
-    const user =
-        userDoc.exists
-        ? userDoc.data()
-        : {};
-
-
-    document.getElementById(
-        "chatName"
-    ).textContent =
-        user.username ||
-        user.email?.split("@")[0] ||
-        "User";
-
-
-    document.getElementById(
-        "chatAvatar"
-    ).src =
-        user.avatar ||
-        defaultAvatar;
-
-
-    document.getElementById(
-        "chatUsers"
-    ).style.display =
-        "none";
-
-
-    document.getElementById(
-        "chatWindow"
-    ).classList.add("active");
-
-
-    loadMessages();
-
-}
-
-
-/* =====================================================
-   CLOSE CHAT
-===================================================== */
-
-function closeChat() {
-
-    currentChatUser =
-        null;
-
-
-    document.getElementById(
-        "chatWindow"
-    ).classList.remove("active");
-
-
-    document.getElementById(
-        "chatUsers"
-    ).style.display =
-        "block";
-
-
-    if (messagesListener) {
-
-        messagesListener();
-
-        messagesListener =
-            null;
-
-    }
-
-}
-
-
-/* =====================================================
-   LOAD MESSAGES
-===================================================== */
-
-function loadMessages() {
-
-    const messages =
-        document.getElementById(
-            "messages"
-        );
-
-
-    messages.innerHTML = "";
-
-
-    if (messagesListener) {
-
-        messagesListener();
+      }
 
     }
 
 
-    const conversationId =
-        [
-            currentUser.uid,
-            currentChatUser
-        ]
-        .sort()
-        .join("_");
+    /* ==========================================
+       OPEN CHAT
+    ========================================== */
+
+    function openChat(uid, name) {
+
+      currentChatUser = uid;
 
 
-    messagesListener =
-        db.collection("messages")
+      document
+        .getElementById("chatArea")
+        .style.display = "block";
+
+
+      document
+        .getElementById("chatWithName")
+        .textContent = name;
+
+
+      loadMessages();
+
+    }
+
+
+    /* ==========================================
+       MESSAGES
+    ========================================== */
+
+    async function loadMessages() {
+
+      if (!currentChatUser) {
+        return;
+      }
+
+
+      const messages =
+        document.getElementById("messages");
+
+
+      messages.innerHTML =
+        `<div class="loading">
+          Loading messages...
+        </div>`;
+
+
+      try {
+
+        const snapshot =
+          await db
+            .collection("messages")
             .where(
-                "conversationId",
-                "==",
-                conversationId
+              "participants",
+              "array-contains",
+              currentUser.uid
             )
-            .orderBy(
-                "createdAt",
-                "asc"
+            .orderBy("createdAt", "asc")
+            .limit(100)
+            .get();
+
+
+        messages.innerHTML = "";
+
+
+        snapshot.forEach(doc => {
+
+          const message =
+            doc.data();
+
+
+          if (
+            !message.participants ||
+            !message.participants.includes(
+              currentChatUser
             )
-            .onSnapshot(
-
-                snapshot => {
-
-                    messages.innerHTML = "";
+          ) {
+            return;
+          }
 
 
-                    snapshot.forEach(doc => {
-
-                        const message =
-                            doc.data();
+          const div =
+            document.createElement("div");
 
 
-                        const element =
-                            document.createElement(
-                                "div"
-                            );
-
-
-                        element.className =
-                            "message " +
-                            (
-                                message.senderId ===
-                                currentUser.uid
-                                ? "me"
-                                : "them"
-                            );
-
-
-                        element.textContent =
-                            message.text;
-
-
-                        messages.appendChild(
-                            element
-                        );
-
-                    });
-
-
-                    messages.scrollTop =
-                        messages.scrollHeight;
-
-                },
-
-                error => {
-
-                    console.error(
-                        "Messages error:",
-                        error
-                    );
-
-                }
-
+          div.className =
+            "message" +
+            (
+              message.senderId === currentUser.uid
+                ? " me"
+                : ""
             );
 
-}
+
+          div.textContent =
+            message.text || "";
 
 
-/* =====================================================
-   SEND MESSAGE
-===================================================== */
+          messages.appendChild(div);
 
-async function sendMessage() {
-
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
+        });
 
 
-    const text =
+        messages.scrollTop =
+          messages.scrollHeight;
+
+      } catch (error) {
+
+        console.error(error);
+
+        messages.innerHTML =
+          `<div class="loading">
+            No messages yet.
+          </div>`;
+
+      }
+
+    }
+
+
+    /* ==========================================
+       SEND MESSAGE
+    ========================================== */
+
+    async function sendMessage() {
+
+      if (
+        !currentUser ||
+        !currentChatUser
+      ) {
+        return;
+      }
+
+
+      const input =
+        document.getElementById("messageInput");
+
+
+      const text =
         input.value.trim();
 
 
-    if (
-        !text ||
-        !currentChatUser
-    ) {
+      if (!text) {
         return;
-    }
+      }
 
 
-    const conversationId =
-        [
-            currentUser.uid,
-            currentChatUser
-        ]
-        .sort()
-        .join("_");
+      try {
 
-
-    try {
-
-        await db.collection(
-            "messages"
-        )
-        .add({
-
-            conversationId:
-                conversationId,
+        await db
+          .collection("messages")
+          .add({
 
             senderId:
-                currentUser.uid,
+              currentUser.uid,
 
             receiverId:
-                currentChatUser,
+              currentChatUser,
 
-            text:
-                text,
+            participants: [
+              currentUser.uid,
+              currentChatUser
+            ],
+
+            text: text,
 
             createdAt:
-                firebase.firestore
-                    .FieldValue
-                    .serverTimestamp()
+              firebase.firestore.FieldValue.serverTimestamp()
 
-        });
+          });
 
 
         input.value = "";
 
 
-    } catch (error) {
+        await loadMessages();
 
-        console.error(
-            "Send message error:",
-            error
-        );
-
-        alert(
-            "Could not send message."
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   PROFILE
-===================================================== */
-
-async function loadProfile() {
-
-    try {
-
-        const snapshot =
-            await db.collection(
-                "posts"
-            )
-            .where(
-                "uid",
-                "==",
-                currentUser.uid
-            )
-            .get();
-
-
-        document.getElementById(
-            "postCount"
-        ).textContent =
-            snapshot.size;
-
-
-        const friendSnapshot =
-            await db.collection(
-                "friends"
-            )
-            .doc(currentUser.uid)
-            .collection("list")
-            .get();
-
-
-        document.getElementById(
-            "friendCount"
-        ).textContent =
-            friendSnapshot.size;
-
-
-        document.getElementById(
-            "followingCount"
-        ).textContent =
-            friendSnapshot.size;
-
-
-        const profilePosts =
-            document.getElementById(
-                "profilePosts"
-            );
-
-
-        if (snapshot.empty) {
-
-            profilePosts.innerHTML = `
-
-                <div class="no-posts">
-
-                    <h2>
-                        Create your first post
-                    </h2>
-
-                    <p>
-                        Give this space some love.
-                    </p>
-
-                    <button
-                        class="profile-btn primary"
-                        style="
-                            margin-top:20px;
-                            max-width:140px;
-                        "
-                        onclick="openPostModal()"
-                    >
-                        Create
-                    </button>
-
-                </div>
-
-            `;
-
-            return;
-
-        }
-
-
-        profilePosts.innerHTML = `
-
-            <div class="profile-post-grid"></div>
-
-        `;
-
-
-        const grid =
-            profilePosts.querySelector(
-                ".profile-post-grid"
-            );
-
-
-        snapshot.forEach(doc => {
-
-            const post =
-                doc.data();
-
-
-            if (!post.mediaUrl) {
-
-                const textPost =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                textPost.className =
-                    "profile-post";
-
-
-                textPost.style.display =
-                    "flex";
-
-
-                textPost.style.alignItems =
-                    "center";
-
-
-                textPost.style.justifyContent =
-                    "center";
-
-
-                textPost.style.padding =
-                    "10px";
-
-
-                textPost.textContent =
-                    post.text ||
-                    "Post";
-
-
-                grid.appendChild(
-                    textPost
-                );
-
-
-                return;
-
-            }
-
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-
-            item.className =
-                "profile-post";
-
-
-            if (
-                post.mediaType ===
-                "video"
-            ) {
-
-                item.innerHTML = `
-
-                    <video
-                        src="${escapeHtml(
-                            post.mediaUrl
-                        )}"
-                    ></video>
-
-                `;
-
-            } else {
-
-                item.innerHTML = `
-
-                    <img
-                        src="${escapeHtml(
-                            post.mediaUrl
-                        )}"
-                    >
-
-                `;
-
-            }
-
-
-            grid.appendChild(
-                item
-            );
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Profile error:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   EDIT PROFILE
-===================================================== */
-
-function openEditProfile() {
-
-    document.getElementById(
-        "editProfileModal"
-    ).classList.add("active");
-
-}
-
-
-function closeEditProfile() {
-
-    document.getElementById(
-        "editProfileModal"
-    ).classList.remove("active");
-
-}
-
-
-async function saveProfile() {
-
-    const username =
-        document.getElementById(
-            "editUsername"
-        ).value.trim();
-
-
-    if (!username) {
-
-        alert(
-            "Please enter a username."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        await db.collection(
-            "users"
-        )
-        .doc(currentUser.uid)
-        .set({
-
-            username:
-                username,
-
-            email:
-                currentUser.email
-
-        }, {
-
-            merge: true
-
-        });
-
-
-        document.getElementById(
-            "profileUsername"
-        ).textContent =
-            username;
-
-
-        closeEditProfile();
-
-
-        alert(
-            "Profile updated!"
-        );
-
-
-    } catch (error) {
+      } catch (error) {
 
         console.error(error);
 
         alert(
-            "Could not update profile."
+          "Message could not be sent."
         );
+
+      }
 
     }
 
-}
 
+    /* ==========================================
+       PROFILE
+    ========================================== */
 
-/* =====================================================
-   AVATAR UPLOAD
-===================================================== */
+    async function loadProfile() {
 
-async function uploadAvatar() {
-
-    const file =
-        document.getElementById(
-            "avatarFileInput"
-        ).files[0];
-
-
-    if (!file) {
+      if (!currentUser) {
         return;
-    }
+      }
 
 
-    try {
+      try {
 
-        const filename =
-            Date.now() +
-            "_" +
-            file.name.replace(
-                /[^a-zA-Z0-9._-]/g,
-                "_"
-            );
+        const userDoc =
+          await db
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
 
 
-        const ref =
-            storage.ref(
-                "avatars/" +
-                currentUser.uid +
-                "/" +
-                filename
-            );
+        const user =
+          userDoc.exists
+            ? userDoc.data()
+            : {};
 
 
-        const snapshot =
-            await ref.put(file);
+        const username =
+          user.username ||
+          currentUser.email.split("@")[0];
 
 
-        const url =
-            await snapshot.ref
-                .getDownloadURL();
-
-
-        await db.collection(
-            "users"
-        )
-        .doc(currentUser.uid)
-        .set({
-
-            avatar:
-                url
-
-        }, {
-
-            merge: true
-
-        });
+        window.currentUsername =
+          username;
 
 
         document.getElementById(
-            "profileAvatar"
-        ).src =
-            url;
+          "profileName"
+        ).textContent =
+          username;
 
 
         document.getElementById(
-            "homeAvatar"
-        ).src =
-            url;
+          "profileEmail"
+        ).textContent =
+          currentUser.email;
 
 
-        alert(
-            "Profile picture updated!"
-        );
+        const avatar =
+          user.avatarUrl ||
+          "https://via.placeholder.com/150";
 
-
-    } catch (error) {
-
-        console.error(
-            "Avatar error:",
-            error
-        );
-
-
-        alert(
-            "Could not update profile picture: " +
-            (error.code ||
-            error.message)
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   PROFILE TABS
-===================================================== */
-
-function switchProfileTab(
-    tab,
-    button
-) {
-
-    document.querySelectorAll(
-        ".profile-tab"
-    )
-    .forEach(btn => {
-
-        btn.classList.remove(
-            "active"
-        );
-
-    });
-
-
-    button.classList.add(
-        "active"
-    );
-
-
-    if (tab === "posts") {
 
         document.getElementById(
+          "profileAvatar"
+        ).src = avatar;
+
+
+        document.getElementById(
+          "topAvatar"
+        ).src = avatar;
+
+
+        document.getElementById(
+          "createPostAvatar"
+        ).src = avatar;
+
+
+        const postsSnapshot =
+          await db
+            .collection("posts")
+            .where(
+              "uid",
+              "==",
+              currentUser.uid
+            )
+            .get();
+
+
+        document.getElementById(
+          "postCount"
+        ).textContent =
+          postsSnapshot.size;
+
+
+        const friendsSnapshot =
+          await db
+            .collection("friends")
+            .where(
+              "members",
+              "array-contains",
+              currentUser.uid
+            )
+            .get();
+
+
+        document.getElementById(
+          "friendCount"
+        ).textContent =
+          friendsSnapshot.size;
+
+
+        document.getElementById(
+          "followingCount"
+        ).textContent =
+          friendsSnapshot.size;
+
+
+        const profilePosts =
+          document.getElementById(
             "profilePosts"
-        ).classList.remove(
-            "hidden"
-        );
+          );
 
 
-        document.getElementById(
-            "taggedPosts"
-        ).classList.add(
-            "hidden"
-        );
-
-    } else {
-
-        document.getElementById(
-            "profilePosts"
-        ).classList.add(
-            "hidden"
-        );
+        profilePosts.innerHTML = "";
 
 
-        document.getElementById(
-            "taggedPosts"
-        ).classList.remove(
-            "hidden"
-        );
+        if (postsSnapshot.empty) {
 
-    }
-
-}
+          profilePosts.style.display =
+            "block";
 
 
-/* =====================================================
-   SHARE PROFILE
-===================================================== */
+          profilePosts.innerHTML = `
 
-async function shareProfile() {
+            <div class="empty">
+              No posts yet.
+            </div>
 
-    const username =
-        document.getElementById(
-            "profileUsername"
-        ).textContent;
+          `;
 
-
-    const shareData = {
-
-        title:
-            "TexUs Profile",
-
-        text:
-            "Check out " +
-            username +
-            " on TexUs!",
-
-        url:
-            window.location.href
-
-    };
-
-
-    try {
-
-        if (
-            navigator.share
-        ) {
-
-            await navigator.share(
-                shareData
-            );
-
-        } else {
-
-            await navigator.clipboard.writeText(
-                window.location.href
-            );
-
-
-            alert(
-                "Profile link copied!"
-            );
+          return;
 
         }
 
-    } catch (error) {
 
-        console.log(error);
-
-    }
-
-}
+        profilePosts.style.display =
+          "grid";
 
 
-/* =====================================================
-   SHARE POST
-===================================================== */
+        postsSnapshot.forEach(doc => {
 
-function sharePost() {
+          const post =
+            doc.data();
 
-    if (
-        navigator.share
-    ) {
 
-        navigator.share({
+          if (!post.mediaUrl) {
+            return;
+          }
 
-            title:
-                "TexUs",
 
-            text:
-                "Check this out on TexUs!",
+          const item =
+            document.createElement("div");
 
-            url:
-                window.location.href
+
+          item.className =
+            "profile-post-item";
+
+
+          if (post.mediaType === "video") {
+
+            item.innerHTML = `
+
+              <video
+                src="${escapeHtml(post.mediaUrl)}"
+                muted
+                playsinline>
+              </video>
+
+            `;
+
+          } else {
+
+            item.innerHTML = `
+
+              <img
+                src="${escapeHtml(post.mediaUrl)}"
+                alt="Post">
+
+            `;
+
+          }
+
+
+          profilePosts.appendChild(item);
 
         });
 
-    } else {
+      } catch (error) {
 
-        navigator.clipboard.writeText(
-            window.location.href
+        console.error(
+          "Profile error:",
+          error
         );
 
-
-        alert(
-            "Link copied!"
-        );
+      }
 
     }
 
-}
 
+    /* ==========================================
+       PROFILE TABS
+    ========================================== */
 
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
-
-function escapeHtml(value) {
-
-    if (
-        value === null ||
-        value === undefined
+    function showProfileTab(
+      tab,
+      button
     ) {
+
+      document.querySelectorAll(
+        ".profile-tab"
+      ).forEach(btn => {
+
+        btn.classList.remove("active");
+
+      });
+
+
+      button.classList.add("active");
+
+
+      if (tab === "posts") {
+
+        document.getElementById(
+          "profilePosts"
+        ).style.display = "grid";
+
+
+        document.getElementById(
+          "profileSaved"
+        ).style.display = "none";
+
+      }
+
+
+      if (tab === "saved") {
+
+        document.getElementById(
+          "profilePosts"
+        ).style.display = "none";
+
+
+        document.getElementById(
+          "profileSaved"
+        ).style.display = "block";
+
+      }
+
+    }
+
+
+    /* ==========================================
+       EDIT PROFILE
+    ========================================== */
+
+    function openEditProfile() {
+
+      document
+        .getElementById("editProfileModal")
+        .classList.add("show");
+
+
+      document
+        .getElementById("editUsername")
+        .value =
+        window.currentUsername || "";
+
+    }
+
+
+    function closeEditProfile() {
+
+      document
+        .getElementById("editProfileModal")
+        .classList.remove("show");
+
+    }
+
+
+    async function saveProfile() {
+
+      const username =
+        document
+          .getElementById("editUsername")
+          .value
+          .trim();
+
+
+      const file =
+        document
+          .getElementById("avatarFileInput")
+          .files[0];
+
+
+      const status =
+        document.getElementById(
+          "profileStatus"
+        );
+
+
+      status.style.display =
+        "block";
+
+
+      try {
+
+        let avatarUrl = "";
+
+
+        if (file) {
+
+          status.textContent =
+            "Uploading profile picture...";
+
+
+          const filename =
+            Date.now() +
+            "_" +
+            file.name.replace(/\s+/g, "_");
+
+
+          const ref =
+            storage.ref(
+              "profiles/" +
+              currentUser.uid +
+              "/" +
+              filename
+            );
+
+
+          await ref.put(file);
+
+
+          avatarUrl =
+            await ref.getDownloadURL();
+
+        }
+
+
+        const updates = {};
+
+
+        if (username) {
+
+          updates.username =
+            username;
+
+        }
+
+
+        if (avatarUrl) {
+
+          updates.avatarUrl =
+            avatarUrl;
+
+        }
+
+
+        await db
+          .collection("users")
+          .doc(currentUser.uid)
+          .set(
+            updates,
+            { merge: true }
+          );
+
+
+        status.textContent =
+          "Profile updated!";
+
+
+        await loadCurrentUser();
+        await loadProfile();
+
+
+        setTimeout(() => {
+
+          closeEditProfile();
+
+        }, 1000);
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+          "Profile update failed: " +
+          (error.code || error.message);
+
+      }
+
+    }
+
+
+    /* ==========================================
+       SHARE PROFILE
+    ========================================== */
+
+    async function shareProfile() {
+
+      const username =
+        window.currentUsername ||
+        "TexUs user";
+
+
+      const profileUrl =
+        window.location.origin +
+        window.location.pathname +
+        "?user=" +
+        encodeURIComponent(
+          currentUser.uid
+        );
+
+
+      try {
+
+        if (
+          navigator.share
+        ) {
+
+          await navigator.share({
+
+            title:
+              username + " on TexUs",
+
+            text:
+              "Check out " +
+              username +
+              " on TexUs!",
+
+            url:
+              profileUrl
+
+          });
+
+        } else {
+
+          await navigator.clipboard.writeText(
+            profileUrl
+          );
+
+
+          alert(
+            "Profile link copied!"
+          );
+
+        }
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    }
+
+
+    /* ==========================================
+       ESCAPE HTML
+    ========================================== */
+
+    function escapeHtml(value) {
+
+      if (value === null ||
+          value === undefined) {
 
         return "";
 
+      }
+
+
+      return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
     }
 
 
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+    /* ==========================================
+       CLOSE MODALS WHEN CLICKING OUTSIDE
+    ========================================== */
 
-}
+    document
+      .getElementById("storyViewer")
+      .addEventListener(
+        "click",
+        function(event) {
 
-</script>
+          if (
+            event.target === this
+          ) {
+
+            closeStoryViewer();
+
+          }
+
+        }
+      );
+
+
+    document
+      .getElementById("editProfileModal")
+      .addEventListener(
+        "click",
+        function(event) {
+
+          if (
+            event.target === this
+          ) {
+
+            closeEditProfile();
+
+          }
+
+        }
+      );
+
+
+  </script>
 
 </body>
 </html>
