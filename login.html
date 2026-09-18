@@ -110,7 +110,6 @@
         }
     </style>
 
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
@@ -155,7 +154,7 @@
 <script>
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAvljhbt1_AmM14YbH4zqMASKCXZZjAmBE",
+    apiKey: "AIzaSyAvjHbt1_AmM14YbH4zqMASKCXZZjAmBE",
     authDomain: "texus-5c99e.firebaseapp.com",
     projectId: "texus-5c99e",
     storageBucket: "texus-5c99e.firebasestorage.app",
@@ -169,39 +168,50 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 /*
-   Keep the user signed in after refreshing the page.
+   Keep users signed in when they refresh.
 */
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(function() {
+auth.setPersistence(
+    firebase.auth.Auth.Persistence.LOCAL
+).catch(error => {
+    console.error("Persistence error:", error);
+});
 
-        auth.onAuthStateChanged(function(user) {
 
-            if (user) {
-                console.log("TexUs user logged in:", user.email);
+/*
+   If the user is already logged in,
+   send them to the dashboard.
 
-                window.location.replace("dashboard.html");
-            }
+   This listener does NOT interfere with
+   the actual login button.
+*/
+auth.onAuthStateChanged(user => {
 
-        });
+    if (user) {
 
-    })
-    .catch(function(error) {
-
-        console.error(
-            "Firebase persistence error:",
-            error
+        console.log(
+            "Existing TexUs session:",
+            user.email
         );
 
-    });
+        window.location.replace("dashboard.html");
+
+    }
+
+});
 
 
 async function loginUser() {
 
     const email =
-        document.getElementById("email").value.trim();
+        document
+            .getElementById("email")
+            .value
+            .trim();
 
     const password =
-        document.getElementById("password").value;
+        document
+            .getElementById("password")
+            .value;
 
     const message =
         document.getElementById("message");
@@ -227,6 +237,15 @@ async function loginUser() {
 
     try {
 
+        /*
+           Make absolutely sure persistence
+           is enabled before signing in.
+        */
+        await auth.setPersistence(
+            firebase.auth.Auth.Persistence.LOCAL
+        );
+
+
         const result =
             await auth.signInWithEmailAndPassword(
                 email,
@@ -240,9 +259,23 @@ async function loginUser() {
         );
 
 
-        window.location.replace(
-            "dashboard.html"
-        );
+        message.style.color = "#10b981";
+
+        message.textContent =
+            "Login successful! Opening TexUs...";
+
+
+        /*
+           Give Firebase a moment to save
+           the authentication session.
+        */
+        setTimeout(() => {
+
+            window.location.replace(
+                "dashboard.html"
+            );
+
+        }, 300);
 
 
     } catch (error) {
@@ -252,6 +285,13 @@ async function loginUser() {
             error
         );
 
+        console.error(
+            "Firebase error code:",
+            error.code
+        );
+
+
+        message.style.color = "#fda4af";
 
         message.textContent =
             getErrorMessage(error);
@@ -266,18 +306,12 @@ async function loginUser() {
 
 function getErrorMessage(error) {
 
-    console.error(
-        "Firebase error code:",
-        error.code
-    );
-
-
     if (
         error.code === "auth/invalid-api-key" ||
         error.code === "auth/api-key-not-valid"
     ) {
 
-        return "Firebase API key is still not being accepted. Please wait a few minutes and try again.";
+        return "Firebase API key is not being accepted.";
 
     }
 
@@ -292,42 +326,53 @@ function getErrorMessage(error) {
     }
 
 
-    if (error.code === "auth/user-not-found") {
+    if (
+        error.code === "auth/user-not-found"
+    ) {
 
         return "No account was found with this email.";
 
     }
 
 
-    if (error.code === "auth/invalid-email") {
+    if (
+        error.code === "auth/invalid-email"
+    ) {
 
         return "Please enter a valid email address.";
 
     }
 
 
-    if (error.code === "auth/too-many-requests") {
+    if (
+        error.code === "auth/too-many-requests"
+    ) {
 
         return "Too many attempts. Please try again later.";
 
     }
 
 
-    if (error.code === "auth/network-request-failed") {
+    if (
+        error.code === "auth/network-request-failed"
+    ) {
 
         return "Network error. Check your internet connection.";
 
     }
 
 
-    if (error.code === "auth/operation-not-allowed") {
+    if (
+        error.code === "auth/operation-not-allowed"
+    ) {
 
         return "Email and Password sign-in is not enabled in Firebase.";
 
     }
 
 
-    return error.message || "Login failed.";
+    return error.message ||
+        "Login failed.";
 
 }
 
