@@ -60,6 +60,10 @@
             font-size: 15px;
         }
 
+        input::placeholder {
+            color: #94a3b8;
+        }
+
         input:focus {
             outline: none;
             border-color: #10b981;
@@ -92,6 +96,7 @@
             margin-top: 14px;
             color: #fda4af;
             font-size: 14px;
+            line-height: 1.4;
         }
 
         p {
@@ -110,6 +115,7 @@
         }
     </style>
 
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
@@ -138,7 +144,7 @@
         autocomplete="current-password"
     >
 
-    <button id="loginBtn" onclick="loginUser()">
+    <button id="loginBtn" type="button">
         Log In
     </button>
 
@@ -153,8 +159,13 @@
 
 <script>
 
+/* =========================================================
+   TEXUS FIREBASE CONFIGURATION
+   This is the exact configuration from your Firebase Console.
+   ========================================================= */
+
 const firebaseConfig = {
-    apiKey: "AIzaSyAvjHbt1_AmM14YbH4zqMASKCXZZjAmBE",
+    apiKey: "AIzaSyAwGvF8YZ6wH6QVPTHLe0QzmTPewWQvrO0o",
     authDomain: "texus-5c99e.firebaseapp.com",
     projectId: "texus-5c99e",
     storageBucket: "texus-5c99e.firebasestorage.app",
@@ -163,73 +174,215 @@ const firebaseConfig = {
     measurementId: "G-KCF9J53BGH"
 };
 
-firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
+/* =========================================================
+   INITIALIZE FIREBASE
+   ========================================================= */
 
-/*
-   Keep users signed in when they refresh.
-*/
-auth.setPersistence(
-    firebase.auth.Auth.Persistence.LOCAL
-).catch(error => {
-    console.error("Persistence error:", error);
-});
+let auth = null;
 
+try {
 
-/*
-   If the user is already logged in,
-   send them to the dashboard.
+    firebase.initializeApp(firebaseConfig);
 
-   This listener does NOT interfere with
-   the actual login button.
-*/
-auth.onAuthStateChanged(user => {
+    auth = firebase.auth();
 
-    if (user) {
+    console.log("TexUs Firebase initialized successfully.");
 
-        console.log(
-            "Existing TexUs session:",
-            user.email
-        );
+} catch (error) {
 
-        window.location.replace("dashboard.html");
-
-    }
-
-});
-
-
-async function loginUser() {
-
-    const email =
-        document
-            .getElementById("email")
-            .value
-            .trim();
-
-    const password =
-        document
-            .getElementById("password")
-            .value;
+    console.error("Firebase initialization error:", error);
 
     const message =
         document.getElementById("message");
 
-    const button =
-        document.getElementById("loginBtn");
+    message.style.color = "#fda4af";
+
+    message.textContent =
+        "Firebase could not be initialized. Please refresh the page.";
+}
 
 
-    if (!email || !password) {
+/* =========================================================
+   LOGIN ELEMENTS
+   ========================================================= */
+
+const emailInput =
+    document.getElementById("email");
+
+const passwordInput =
+    document.getElementById("password");
+
+const loginBtn =
+    document.getElementById("loginBtn");
+
+const message =
+    document.getElementById("message");
+
+
+/* =========================================================
+   KEEP USER LOGGED IN
+   ========================================================= */
+
+if (auth) {
+
+    auth.setPersistence(
+        firebase.auth.Auth.Persistence.LOCAL
+    )
+    .then(() => {
+
+        console.log(
+            "TexUs authentication persistence enabled."
+        );
+
+    })
+    .catch(error => {
+
+        console.error(
+            "Firebase persistence error:",
+            error
+        );
+
+    });
+
+
+    /*
+       If Firebase already has a valid login session,
+       send the user directly to the dashboard.
+    */
+
+    auth.onAuthStateChanged(user => {
+
+        if (user) {
+
+            console.log(
+                "Existing TexUs session:",
+                user.email
+            );
+
+            /*
+               Don't redirect while the user is
+               actively trying to log in.
+            */
+
+            if (!loginBtn.disabled) {
+
+                window.location.replace(
+                    "dashboard.html"
+                );
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+loginBtn.addEventListener(
+    "click",
+    loginUser
+);
+
+
+/* =========================================================
+   ALLOW ENTER KEY TO LOGIN
+   ========================================================= */
+
+emailInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+
+            loginUser();
+
+        }
+
+    }
+);
+
+
+passwordInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+
+            loginUser();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LOGIN FUNCTION
+   ========================================================= */
+
+async function loginUser() {
+
+    if (!auth) {
+
+        message.style.color = "#fda4af";
 
         message.textContent =
-            "Please enter your email and password.";
+            "Firebase is not available. Please refresh the page.";
 
         return;
     }
 
 
-    button.disabled = true;
+    const email =
+        emailInput.value.trim();
+
+    const password =
+        passwordInput.value;
+
+
+    /* -----------------------------------------
+       CHECK INPUT
+       ----------------------------------------- */
+
+    if (!email) {
+
+        message.style.color = "#fda4af";
+
+        message.textContent =
+            "Please enter your email address.";
+
+        emailInput.focus();
+
+        return;
+    }
+
+
+    if (!password) {
+
+        message.style.color = "#fda4af";
+
+        message.textContent =
+            "Please enter your password.";
+
+        passwordInput.focus();
+
+        return;
+    }
+
+
+    /* -----------------------------------------
+       START LOGIN
+       ----------------------------------------- */
+
+    loginBtn.disabled = true;
+
+    message.style.color = "#94a3b8";
 
     message.textContent =
         "Logging in...";
@@ -238,13 +391,18 @@ async function loginUser() {
     try {
 
         /*
-           Make absolutely sure persistence
-           is enabled before signing in.
+           Make sure Firebase keeps the user
+           signed in after closing or refreshing.
         */
+
         await auth.setPersistence(
             firebase.auth.Auth.Persistence.LOCAL
         );
 
+
+        /*
+           Sign in using Firebase Email/Password.
+        */
 
         const result =
             await auth.signInWithEmailAndPassword(
@@ -254,7 +412,7 @@ async function loginUser() {
 
 
         console.log(
-            "Login successful:",
+            "TexUs login successful:",
             result.user.email
         );
 
@@ -266,22 +424,23 @@ async function loginUser() {
 
 
         /*
-           Give Firebase a moment to save
-           the authentication session.
+           Firebase has successfully authenticated
+           the user. Now open the dashboard.
         */
+
         setTimeout(() => {
 
             window.location.replace(
                 "dashboard.html"
             );
 
-        }, 300);
+        }, 500);
 
 
     } catch (error) {
 
         console.error(
-            "Firebase login error:",
+            "TexUs Firebase login error:",
             error
         );
 
@@ -297,82 +456,76 @@ async function loginUser() {
             getErrorMessage(error);
 
 
-        button.disabled = false;
+        loginBtn.disabled = false;
 
     }
 
 }
 
 
+/* =========================================================
+   FIREBASE ERROR MESSAGES
+   ========================================================= */
+
 function getErrorMessage(error) {
 
-    if (
-        error.code === "auth/invalid-api-key" ||
-        error.code === "auth/api-key-not-valid"
-    ) {
+    switch (error.code) {
 
-        return "Firebase API key is not being accepted.";
+        case "auth/invalid-api-key":
 
-    }
+        case "auth/api-key-not-valid":
 
-
-    if (
-        error.code === "auth/invalid-credential" ||
-        error.code === "auth/wrong-password"
-    ) {
-
-        return "Email or password is incorrect.";
-
-    }
+            return "Firebase API key is not being accepted. Please refresh and try again.";
 
 
-    if (
-        error.code === "auth/user-not-found"
-    ) {
+        case "auth/invalid-email":
 
-        return "No account was found with this email.";
-
-    }
+            return "Please enter a valid email address.";
 
 
-    if (
-        error.code === "auth/invalid-email"
-    ) {
+        case "auth/invalid-credential":
 
-        return "Please enter a valid email address.";
+        case "auth/wrong-password":
 
-    }
+            return "Email or password is incorrect.";
 
 
-    if (
-        error.code === "auth/too-many-requests"
-    ) {
+        case "auth/user-not-found":
 
-        return "Too many attempts. Please try again later.";
-
-    }
+            return "No account was found with this email.";
 
 
-    if (
-        error.code === "auth/network-request-failed"
-    ) {
+        case "auth/user-disabled":
 
-        return "Network error. Check your internet connection.";
-
-    }
+            return "This account has been disabled.";
 
 
-    if (
-        error.code === "auth/operation-not-allowed"
-    ) {
+        case "auth/too-many-requests":
 
-        return "Email and Password sign-in is not enabled in Firebase.";
+            return "Too many login attempts. Please try again later.";
+
+
+        case "auth/network-request-failed":
+
+            return "Network error. Please check your internet connection.";
+
+
+        case "auth/operation-not-allowed":
+
+            return "Email and Password sign-in is not enabled in Firebase.";
+
+
+        case "auth/internal-error":
+
+            return "Firebase encountered an internal error. Please try again.";
+
+
+        default:
+
+            return error.message ||
+                "Login failed. Please try again.";
 
     }
-
-
-    return error.message ||
-        "Login failed.";
 
 }
 
