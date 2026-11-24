@@ -1,38 +1,47 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Register - TexUs</title>
 
     <style>
 
         * {
+
             box-sizing: border-box;
+
         }
 
         body {
+
             margin: 0;
+
             min-height: 100vh;
 
             display: flex;
+
             justify-content: center;
+
             align-items: center;
 
             background: #0f172a;
+
             color: white;
 
             font-family: Arial, sans-serif;
+
         }
 
         .auth-card {
+
             width: 92%;
+
             max-width: 390px;
 
             background: #1e293b;
@@ -41,31 +50,42 @@
 
             border-radius: 18px;
 
-            box-shadow:
-                0 10px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.5);
 
             text-align: center;
+
         }
 
         .logo {
+
             font-family: "Brush Script MT", cursive;
+
             font-size: 48px;
+
             margin-bottom: 10px;
+
         }
 
         .tex {
+
             color: #ec4899;
+
         }
 
         .us {
+
             color: #10b981;
+
         }
 
         h2 {
+
             margin-bottom: 22px;
+
         }
 
         input {
+
             width: 100%;
 
             padding: 13px;
@@ -81,9 +101,25 @@
             color: white;
 
             font-size: 15px;
+
+        }
+
+        input::placeholder {
+
+            color: #94a3b8;
+
+        }
+
+        input:focus {
+
+            outline: none;
+
+            border-color: #10b981;
+
         }
 
         button {
+
             width: 100%;
 
             padding: 13px;
@@ -103,13 +139,19 @@
             font-size: 16px;
 
             cursor: pointer;
+
         }
 
         button:disabled {
+
             opacity: 0.6;
+
+            cursor: not-allowed;
+
         }
 
         .message {
+
             min-height: 22px;
 
             margin-top: 14px;
@@ -117,17 +159,33 @@
             color: #fda4af;
 
             font-size: 14px;
+
+            line-height: 1.4;
+
         }
 
         p {
+
             color: #94a3b8;
+
             font-size: 14px;
+
         }
 
         a {
+
             color: #10b981;
+
             text-decoration: none;
+
             font-weight: bold;
+
+        }
+
+        a:hover {
+
+            text-decoration: underline;
+
         }
 
     </style>
@@ -145,239 +203,301 @@
 <div class="auth-card">
 
     <div class="logo">
+
         <span class="tex">Tex</span>
+
         <span class="us">Us</span>
+
     </div>
 
     <h2>Create Account</h2>
 
     <input
+
         type="text"
+
         id="username"
+
         placeholder="Username"
+
         autocomplete="username"
+
     >
 
     <input
+
         type="email"
+
         id="email"
+
         placeholder="Email"
+
         autocomplete="email"
+
     >
 
     <input
+
         type="password"
+
         id="password"
+
         placeholder="Password (6+ characters)"
+
         autocomplete="new-password"
+
     >
 
-    <button
-        id="registerBtn"
-        onclick="registerUser()"
-    >
+    <button id="registerBtn" type="button" onclick="registerUser()">
+
         Sign Up
+
     </button>
 
     <div id="message" class="message"></div>
 
     <p>
+
         Already have an account?
+
         <a href="login.html">Log in</a>
+
     </p>
 
 </div>
 
 <script>
 
+/* =========================================
+
+   TEXUS FIREBASE CONFIGURATION
+
+   ========================================= */
+
 const firebaseConfig = {
 
     apiKey: "AIzaSyAwGvF8YZw6hQVPTHLe0QzmTPewWQvrO0o",
 
-    authDomain:
-        "texus-5c99e.firebaseapp.com",
+    authDomain: "texus-5c99e.firebaseapp.com",
 
-    projectId:
-        "texus-5c99e",
+    projectId: "texus-5c99e",
 
-    storageBucket:
-        "texus-5c99e.firebasestorage.app",
+    storageBucket: "texus-5c99e.firebasestorage.app",
 
-    messagingSenderId:
-        "1040040305137",
+    messagingSenderId: "1040040305137",
 
-    appId:
-        "1:1040040305137:web:86f4f717204378a22da450",
+    appId: "1:1040040305137:web:86f4f717204378a22da450",
 
-    measurementId:
-        "G-KCF9J53BGH"
+    measurementId: "G-KCF9J53BGH"
+
 };
 
-firebase.initializeApp(firebaseConfig);
+/* =========================================
 
-const db = firebase.firestore();
+   INITIALIZE FIREBASE
 
+   ========================================= */
 
-function registerUser() {
+let db = null;
 
-    const username =
-        document.getElementById("username")
-        .value
-        .trim();
+let auth = null;
 
-    const email =
-        document.getElementById("email")
-        .value
-        .trim();
+const message = document.getElementById("message");
 
-    const password =
-        document.getElementById("password")
-        .value;
+const button = document.getElementById("registerBtn");
 
-    const message =
-        document.getElementById("message");
+try {
 
-    const button =
-        document.getElementById("registerBtn");
+    if (!firebase.apps.length) {
 
+        firebase.initializeApp(firebaseConfig);
+
+    }
+
+    auth = firebase.auth();
+
+    db = firebase.firestore();
+
+    console.log("TexUs Firebase initialized successfully.");
+
+} catch (error) {
+
+    console.error("Firebase initialization error:", error);
+
+    message.textContent =
+
+        "Firebase could not initialize. Please refresh the page.";
+
+    button.disabled = true;
+
+}
+
+/* =========================================
+
+   REGISTRATION FUNCTION
+
+   ========================================= */
+
+async function registerUser() {
+
+    if (!auth || !db) {
+
+        message.textContent =
+
+            "Firebase is unavailable. Please refresh the page.";
+
+        return;
+
+    }
+
+    const username = document.getElementById("username").value.trim();
+
+    const email = document.getElementById("email").value.trim();
+
+    const password = document.getElementById("password").value;
 
     if (!username) {
 
-        message.textContent =
-            "Please enter a username.";
+        message.textContent = "Please enter a username.";
 
         return;
-    }
 
+    }
 
     if (!email) {
 
-        message.textContent =
-            "Please enter an email.";
+        message.textContent = "Please enter an email.";
 
         return;
-    }
 
+    }
 
     if (password.length < 6) {
 
         message.textContent =
+
             "Password must be at least 6 characters.";
 
         return;
-    }
 
+    }
 
     button.disabled = true;
 
-    message.textContent =
-        "Creating your account...";
+    message.style.color = "#94a3b8";
 
+    message.textContent = "Creating your account...";
 
-    firebase.auth()
-        .createUserWithEmailAndPassword(
+    try {
+
+        /* CREATE FIREBASE ACCOUNT */
+
+        const credential = await auth.createUserWithEmailAndPassword(
+
             email,
+
             password
-        )
 
-        .then(function(credential) {
+        );
 
-            const user =
-                credential.user;
+        const user = credential.user;
 
+        /* SAVE USER PROFILE IN FIRESTORE */
 
-            localStorage.setItem(
-                "texus_username",
-                username
-            );
+        await db.collection("users").doc(user.uid).set({
 
+            username: username,
 
-            localStorage.setItem(
-                "texus_user_id",
-                user.uid
-            );
+            email: email,
 
+            earningsBalance: 0,
 
-            return db
-                .collection("users")
-                .doc(user.uid)
-                .set({
+            payoutEmail: "",
 
-                    username: username,
-
-                    email: email,
-
-                    earningsBalance: 0,
-
-                    payoutEmail: "",
-
-                    createdAt:
-                        firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
-
-                });
-
-        })
-
-        .then(function() {
-
-            window.location.href =
-                "dashboard.html";
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-
-            if (
-                error.code ===
-                "auth/email-already-in-use"
-            ) {
-
-                message.textContent =
-                    "That email is already registered.";
-
-            }
-
-            else if (
-                error.code ===
-                "auth/invalid-email"
-            ) {
-
-                message.textContent =
-                    "Please enter a valid email address.";
-
-            }
-
-            else if (
-                error.code ===
-                "auth/weak-password"
-            ) {
-
-                message.textContent =
-                    "Please choose a stronger password.";
-
-            }
-
-            else {
-
-                message.textContent =
-                    error.message ||
-                    "Registration failed.";
-
-            }
-
-
-            button.disabled = false;
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
 
         });
+
+        /* SAVE BASIC USER DETAILS LOCALLY */
+
+        localStorage.setItem("texus_username", username);
+
+        localStorage.setItem("texus_user_id", user.uid);
+
+        message.style.color = "#10b981";
+
+        message.textContent =
+
+            "Account created successfully! Opening TexUs...";
+
+        window.location.replace("dashboard.html");
+
+    } catch (error) {
+
+        console.error("TexUs registration error:", error);
+
+        message.style.color = "#fda4af";
+
+        switch (error.code) {
+
+            case "auth/email-already-in-use":
+
+                message.textContent =
+
+                    "That email is already registered.";
+
+                break;
+
+            case "auth/invalid-email":
+
+                message.textContent =
+
+                    "Please enter a valid email address.";
+
+                break;
+
+            case "auth/weak-password":
+
+                message.textContent =
+
+                    "Please choose a stronger password.";
+
+                break;
+
+            case "auth/api-key-not-valid":
+
+            case "auth/invalid-api-key":
+
+                message.textContent =
+
+                    "Firebase API key is invalid. Check your configuration.";
+
+                break;
+
+            case "auth/network-request-failed":
+
+                message.textContent =
+
+                    "Network error. Please check your internet connection.";
+
+                break;
+
+            default:
+
+                message.textContent =
+
+                    error.message || "Registration failed.";
+
+        }
+
+        button.disabled = false;
+
+    }
 
 }
 
 </script>
 
 </body>
+
 </html>
