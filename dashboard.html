@@ -1029,7 +1029,7 @@
       <span class="tex">Tex</span><span class="us">Us</span>
     </div>
 
-    <p>Checking your account...</p>
+    <p>Loading TexUs...</p>
 
   </div>
 
@@ -1890,8 +1890,7 @@
 
 
     /* =========================================
-       AUTHENTICATION
-       FIXED LOGIN LOOP
+       AUTHENTICATION (GUEST / DIRECT ACCESS MODE)
     ========================================== */
 
     auth.setPersistence(
@@ -1901,52 +1900,7 @@
 
       auth.onAuthStateChanged(async user => {
 
-        /*
-          IMPORTANT:
-
-          We wait for Firebase to finish checking
-          the saved login session before showing
-          the dashboard.
-
-          This prevents the dashboard from appearing
-          and immediately sending the user back to
-          login.html.
-        */
-
-        if (!user) {
-
-          currentUser = null;
-
-          document.body.classList.remove(
-            "auth-ready"
-          );
-
-          document.body.classList.add(
-            "auth-waiting"
-          );
-
-          /*
-            Firebase has confirmed that there is
-            genuinely no logged-in user.
-          */
-
-          window.location.replace("login.html");
-
-          return;
-        }
-
-
-        /*
-          User is authenticated.
-        */
-
-        currentUser = user;
-
-
-        /*
-          Prevent the dashboard initialization
-          from running more than once.
-        */
+        currentUser = user || null;
 
         if (dashboardStarted) {
 
@@ -1963,12 +1917,6 @@
 
         dashboardStarted = true;
 
-
-        /*
-          Show dashboard only after Firebase
-          confirms the user.
-        */
-
         document.body.classList.remove(
           "auth-waiting"
         );
@@ -1977,81 +1925,79 @@
           "auth-ready"
         );
 
+        if (currentUser) {
 
-        console.log(
-          "TexUs login session confirmed:",
-          currentUser.email
-        );
-
-
-        /*
-          Load dashboard data.
-          Each function has its own error handling,
-          so one Firebase collection problem won't
-          force the user back to the login page.
-        */
-
-        try {
-          await loadProfile();
-        } catch (error) {
-          console.error(
-            "Profile loading error:",
-            error
+          console.log(
+            "TexUs user logged in:",
+            currentUser.email
           );
-        }
 
-        try {
-          await loadStories();
-        } catch (error) {
-          console.error(
-            "Stories loading error:",
-            error
-          );
-        }
+          try {
+            await loadProfile();
+          } catch (error) {
+            console.error("Profile loading error:", error);
+          }
 
-        try {
-          await loadFeed();
-        } catch (error) {
-          console.error(
-            "Feed loading error:",
-            error
-          );
-        }
+          try {
+            await loadStories();
+          } catch (error) {
+            console.error("Stories loading error:", error);
+          }
 
-        try {
-          await loadUsers();
-        } catch (error) {
-          console.error(
-            "Users loading error:",
-            error
-          );
-        }
+          try {
+            await loadFeed();
+          } catch (error) {
+            console.error("Feed loading error:", error);
+          }
 
-        try {
-          await loadRequests();
-        } catch (error) {
-          console.error(
-            "Requests loading error:",
-            error
-          );
-        }
+          try {
+            await loadUsers();
+          } catch (error) {
+            console.error("Users loading error:", error);
+          }
 
-        try {
-          await loadChatUsers();
-        } catch (error) {
-          console.error(
-            "Chat users loading error:",
-            error
-          );
-        }
+          try {
+            await loadRequests();
+          } catch (error) {
+            console.error("Requests loading error:", error);
+          }
 
-        try {
-          await loadReels();
-        } catch (error) {
-          console.error(
-            "Reels loading error:",
-            error
+          try {
+            await loadChatUsers();
+          } catch (error) {
+            console.error("Chat users loading error:", error);
+          }
+
+          try {
+            await loadReels();
+          } catch (error) {
+            console.error("Reels loading error:", error);
+          }
+
+        } else {
+
+          console.log(
+            "TexUs opened in direct mode (no login required yet)."
           );
+
+          document.getElementById(
+            "profileName"
+          ).textContent = "Guest User";
+
+          document.getElementById(
+            "profileEmail"
+          ).textContent = "Sign in later to sync profile";
+
+          document.getElementById(
+            "profileAvatar"
+          ).src = "icon.jpg";
+
+          document.getElementById(
+            "feed"
+          ).innerHTML = `
+            <div class="empty">Welcome to TexUs! Connect login later to post and load live feeds.</div>
+          `;
+
         }
 
       });
@@ -2064,34 +2010,13 @@
         error
       );
 
-      /*
-        Even if persistence configuration has a
-        problem, let Firebase's auth state listener
-        handle the actual account state.
-      */
+      document.body.classList.remove(
+        "auth-waiting"
+      );
 
-      auth.onAuthStateChanged(async user => {
-
-        if (!user) {
-
-          window.location.replace(
-            "login.html"
-          );
-
-          return;
-        }
-
-        currentUser = user;
-
-        document.body.classList.remove(
-          "auth-waiting"
-        );
-
-        document.body.classList.add(
-          "auth-ready"
-        );
-
-      });
+      document.body.classList.add(
+        "auth-ready"
+      );
 
     });
 

@@ -1,67 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to BeYou App</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-        }
-        .welcome-card {
-            background: rgba(30, 41, 59, 0.85);
-            padding: 50px 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-width: 400px;
-            width: 90%;
-        }
-        h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            color: #38ef7d;
-        }
-        p {
-            color: #94a3b8;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-        .btn {
-            display: inline-block;
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-            box-sizing: border-box;
-            transition: opacity 0.3s ease;
-        }
-        .btn:hover {
-            opacity: 0.9;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TexUs</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #000000;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .splash-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .app-icon {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 56px;
+      display: block;
+    }
+
+    /* Overlay mask to cover static dots and replace with bouncing ones */
+    .dots-overlay {
+      position: absolute;
+      top: 63.5%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #050004;
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+    }
+
+    .dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff85d8, #ff0099);
+      box-shadow: 0 0 10px #ff0099, 0 0 20px rgba(255, 0, 153, 0.7);
+      animation: bounceSequence 1.2s infinite ease-in-out;
+    }
+
+    .dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes bounceSequence {
+      0%, 60%, 100% {
+        transform: translateY(0) scale(1);
+      }
+      30% {
+        transform: translateY(-10px) scale(1.12);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="welcome-card">
-        <h1>BeYou App</h1>
-        <p>Connect, stream, and share with your friends.</p>
-        <a href="login.html" class="btn">Enter App / Login</a>
+  <div class="splash-container">
+    <img src="icon.jpg" alt="TexUs Logo" class="app-icon">
+
+    <!-- Three bouncing ellipses positioned below "TexUs" -->
+    <div class="dots-overlay">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
     </div>
+  </div>
+
+  <script>
+    // Automatically redirect to dashboard.html after 3 seconds
+    setTimeout(() => {
+      window.location.replace("dashboard.html");
+    }, 3000);
+  </script>
 
 </body>
 </html>
