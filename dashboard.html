@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TexUs</title>
 
-  <!-- Google Fonts -->
+  <!-- Clean, Bold Modern Font matching your design -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -24,12 +24,33 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(circle at 50% 0%, #ff66cc 0%, #cc0066 40%, #0f0514 100%);
-      color: white;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.55) 0%, transparent 35%),
+        radial-gradient(circle at 80% 25%, rgba(255, 180, 240, 0.65) 0%, transparent 45%),
+        radial-gradient(circle at 50% 60%, #ff33b8 0%, #e60099 55%, #b30077 100%);
+      background-attachment: fixed;
+      color: #240726;
       min-height: 100vh;
-      padding-bottom: 95px;
+      padding-bottom: 110px;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient floating glossy hearts & sparkles in background */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient-heart {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.35);
+      text-shadow: 0 0 18px rgba(255, 255, 255, 0.85);
+      user-select: none;
     }
 
     button, input, textarea {
@@ -48,37 +69,53 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(15, 5, 20, 0.45);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      height: 70px;
+      padding: 18px 20px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      background: linear-gradient(to bottom, rgba(255, 90, 195, 0.65), transparent);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
-    .logo-area {
-      display: flex;
+    .logo-wrap {
+      position: relative;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
+    }
+
+    /* Glowing oval ring behind TexUs logo */
+    .logo-ring {
+      position: absolute;
+      left: -8px;
+      right: -12px;
+      top: 50%;
+      height: 36px;
+      transform: translateY(-45%) rotate(-8deg);
+      border: 2px solid rgba(255, 255, 255, 0.75);
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.85), inset 0 0 10px rgba(255, 255, 255, 0.5);
+      pointer-events: none;
     }
 
     .logo {
-      font-family: "Pacifico", cursive;
-      font-size: 32px;
-      letter-spacing: 1px;
-      background: linear-gradient(135deg, #ffffff 40%, #ffb3f0 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.6));
+      font-family: 'Inter', sans-serif;
+      font-weight: 900;
+      font-size: 36px;
+      letter-spacing: -1px;
+      color: #ffffff;
+      text-shadow: 0 2px 14px rgba(255, 0, 140, 0.55), 0 0 25px rgba(255, 255, 255, 0.7);
+      position: relative;
+      z-index: 2;
     }
 
-    .sparkle-icon {
-      font-size: 18px;
-      color: #ff99ef;
-      filter: drop-shadow(0 0 6px #ff00aa);
+    .logo-sparkle {
+      font-size: 20px;
+      color: #ffffff;
+      margin-left: 2px;
+      margin-top: -18px;
+      text-shadow: 0 0 12px #ffffff;
+      z-index: 2;
     }
 
     .header-actions {
@@ -86,35 +123,47 @@
       gap: 12px;
     }
 
-    .header-btn {
-      width: 44px;
-      height: 44px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+    .glass-circle-btn {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(10px);
-      color: white;
-      font-size: 19px;
+      border: 1.5px solid rgba(255, 255, 255, 0.75);
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), rgba(255, 110, 205, 0.35));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(255, 0, 128, 0.3);
-      transition: all 0.2s ease;
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        0 6px 18px rgba(180, 0, 110, 0.35);
+      transition: transform 0.18s ease;
     }
 
-    .header-btn:active {
+    .glass-circle-btn:active {
       transform: scale(0.92);
     }
 
+    .glass-circle-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 2.3;
+      fill: none;
+      filter: drop-shadow(0 1px 4px rgba(180, 0, 110, 0.4));
+    }
+
     /* =========================
-       PAGES CONTAINER
+       MAIN CONTAINER
     ========================== */
 
     .page {
       display: none;
-      max-width: 600px;
-      margin: auto;
-      padding: 16px;
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 8px 16px 20px;
+      position: relative;
+      z-index: 10;
     }
 
     .page.active {
@@ -122,83 +171,105 @@
     }
 
     /* =========================
-       CHATS SUB-TABS (PILLS)
+       ENCLOSED SEGMENTED PILL BAR
     ========================== */
 
-    .chat-tabs {
-      display: flex;
-      gap: 10px;
-      margin: 6px 0 18px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .chat-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .chat-pill {
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      color: #fce7f3;
-      padding: 10px 18px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
+    .segmented-bar {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 225, 245, 0.45) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 40px;
+      padding: 5px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      justify-content: space-between;
+      margin-bottom: 16px;
+      box-shadow:
+        inset 0 2px 5px rgba(255, 255, 255, 0.9),
+        0 8px 24px rgba(175, 0, 105, 0.25);
+    }
+
+    .seg-tab {
+      flex: 1;
+      border: 1.5px solid transparent;
+      background: transparent;
+      color: #2b092d;
+      padding: 10px 8px;
+      border-radius: 34px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       transition: all 0.2s ease;
     }
 
-    .chat-pill.active {
-      background: linear-gradient(135deg, #ff1493, #ff69b4);
-      border-color: #ffb3f0;
-      color: white;
-      box-shadow: 0 0 20px rgba(255, 20, 147, 0.7);
+    .seg-tab svg {
+      width: 18px;
+      height: 18px;
+      fill: #881367;
+      transition: fill 0.2s ease;
     }
 
-    .badge-count {
-      background: #0f0514;
-      color: white;
+    .seg-tab.active {
+      background: radial-gradient(circle at 50% 20%, #ff55c8 0%, #e60099 75%, #c40082 100%);
+      border-color: rgba(255, 255, 255, 0.9);
+      color: #ffffff;
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.75),
+        0 4px 14px rgba(230, 0, 153, 0.55);
+    }
+
+    .seg-tab.active svg {
+      fill: #ffffff;
+    }
+
+    .seg-badge {
+      background: #420736;
+      color: #ffffff;
       font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 12px;
-      font-weight: bold;
+      font-weight: 800;
+      min-width: 21px;
+      height: 21px;
+      padding: 0 6px;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* =========================
-       CHAT LIST CARDS (LIQUID GLASS)
+       FROSTED LIQUID GLASS CHAT CARDS
     ========================== */
 
     .chat-list-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
     }
 
     .chat-card {
-      background: rgba(255, 255, 255, 0.11);
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 32px;
-      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 230, 247, 0.58) 50%, rgba(255, 255, 255, 0.72) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 42px;
+      padding: 10px 18px 10px 12px;
       display: flex;
       align-items: center;
       gap: 14px;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 8px 25px rgba(0, 0, 0, 0.25);
+      box-shadow:
+        inset 0 2px 6px rgba(255, 255, 255, 0.95),
+        inset 0 -2px 6px rgba(255, 105, 195, 0.25),
+        0 8px 20px rgba(165, 0, 95, 0.22);
       cursor: pointer;
-      position: relative;
-      transition: transform 0.15s ease, background 0.15s ease;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
 
     .chat-card:active {
-      transform: scale(0.98);
-      background: rgba(255, 255, 255, 0.16);
+      transform: scale(0.985);
     }
 
     .chat-avatar-wrap {
@@ -213,174 +284,365 @@
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      box-shadow: 0 0 12px rgba(255, 105, 180, 0.5);
-      background: #2a1b3d;
+      border: 2px solid #ffffff;
+      background: radial-gradient(circle at 30% 30%, #ff66cc, #b30077);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(180, 0, 110, 0.3);
     }
 
-    .online-indicator {
+    .online-dot {
       position: absolute;
-      bottom: 3px;
-      right: 3px;
-      width: 13px;
-      height: 13px;
-      background: #10b981;
-      border: 2px solid #1a0b25;
+      bottom: 1px;
+      right: 1px;
+      width: 15px;
+      height: 15px;
+      background: #00e640;
+      border: 2px solid #ffffff;
       border-radius: 50%;
-      box-shadow: 0 0 8px #10b981;
+      box-shadow: 0 0 8px rgba(0, 230, 64, 0.8);
     }
 
-    .chat-info {
+    .chat-content {
       flex: 1;
       min-width: 0;
     }
 
-    .chat-name-row {
+    .chat-top-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
-    .chat-username {
+    .chat-name {
       font-size: 17px;
-      font-weight: 700;
-      color: #ffffff;
+      font-weight: 800;
+      color: #1f0521;
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .verified-badge {
-      color: #ec4899;
-      font-size: 14px;
-      filter: drop-shadow(0 0 6px #ff00aa);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .chat-time {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.65);
-      font-weight: 500;
-    }
-
-    .chat-preview-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .chat-preview {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.82);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding-right: 10px;
-    }
-
-    .unread-badge {
-      background: #ff1493;
-      color: white;
-      font-size: 11px;
-      font-weight: bold;
-      min-width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 10px #ff1493;
+      font-weight: 600;
+      color: #592654;
       flex-shrink: 0;
     }
 
-    /* =========================
-       GENERIC OTHER PAGES
-    ========================== */
-
-    .generic-page-content {
-      text-align: center;
-      padding: 60px 20px;
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .generic-page-content h2 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: white;
-    }
-
-    /* =========================
-       BOTTOM NAVIGATION BAR
-    ========================== */
-
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 80px;
-      background: rgba(18, 5, 25, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    .chat-bottom-row {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       align-items: center;
-      z-index: 200;
-      padding-bottom: env(safe-area-inset-bottom);
+      gap: 8px;
     }
 
-    .nav-btn {
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.55);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
+    .chat-msg {
+      font-size: 14px;
       font-weight: 500;
-      transition: color 0.2s ease;
+      color: #3d123b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .nav-btn .icon {
-      font-size: 22px;
-    }
-
-    .nav-btn.active {
-      color: #ff1493;
-      filter: drop-shadow(0 0 8px rgba(255, 20, 147, 0.8));
-    }
-
-    /* Special Plus Action Button in Nav */
-    .nav-plus-btn {
-      width: 54px;
-      height: 54px;
-      background: linear-gradient(135deg, #ff1493, #ff69b4);
-      border: 2px solid rgba(255, 255, 255, 0.5);
+    .unread-pill {
+      background: linear-gradient(135deg, #ff1a9c, #d9007e);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
       border-radius: 50%;
-      color: white;
-      font-size: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(230, 0, 126, 0.5);
+      flex-shrink: 0;
+    }
+
+    .empty-glass-box {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 230, 247, 0.55));
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      border-radius: 32px;
+      padding: 36px 20px;
+      text-align: center;
+      color: #2b092d;
+      font-weight: 600;
+      font-size: 15px;
+      box-shadow: 0 8px 20px rgba(165, 0, 95, 0.18);
+    }
+
+    /* =========================
+       SEARCH MODAL / BAR
+    ========================== */
+
+    .search-bar-wrap {
+      display: none;
+      margin-bottom: 14px;
+    }
+
+    .search-bar-wrap.active {
+      display: block;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: 30px;
+      border: 1.5px solid #ffffff;
+      background: rgba(255, 255, 255, 0.85);
+      color: #1f0521;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+      box-shadow: 0 6px 18px rgba(180, 0, 110, 0.2);
+    }
+
+    .search-input::placeholder {
+      color: #7a3e74;
+    }
+
+    /* =========================
+       ACTIVE CHAT ROOM DRAWER
+    ========================== */
+
+    .chat-room-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: radial-gradient(circle at 50% 0%, #ff66cc 0%, #e60099 60%, #990066 100%);
+      display: none;
+      flex-direction: column;
+    }
+
+    .chat-room-modal.active {
+      display: flex;
+    }
+
+    .room-header {
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      border-bottom: 1.5px solid #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid #ffffff;
+      background: #ff1a9c;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 25px rgba(255, 20, 147, 0.8);
-      margin-top: -18px;
-      transition: transform 0.2s ease;
     }
 
-    .nav-plus-btn:active {
-      transform: scale(0.93);
+    .room-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg-bubble {
+      max-width: 78%;
+      padding: 12px 16px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.85);
+      color: #1f0521;
+      border: 1px solid #ffffff;
+      align-self: flex-start;
+      box-shadow: 0 4px 12px rgba(150, 0, 90, 0.15);
+    }
+
+    .msg-bubble.me {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #ff1a9c, #c4007a);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .room-input-bar {
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(18px);
+      border-top: 1.5px solid #ffffff;
+      display: flex;
+      gap: 10px;
+    }
+
+    .room-input-bar input {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: 1.5px solid #ffffff;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1f0521;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+    }
+
+    .send-pill-btn {
+      padding: 0 20px;
+      border-radius: 30px;
+      border: 1.5px solid #ffffff;
+      background: linear-gradient(135deg, #ff1a9c, #d9007e);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 15px;
     }
 
     /* =========================
-       AUTH LOADING SCREEN
+       UNIFIED SCULPTED BOTTOM DOCK
+    ========================== */
+
+    .bottom-dock-wrapper {
+      position: fixed;
+      bottom: 10px;
+      left: 12px;
+      right: 12px;
+      max-width: 520px;
+      margin: 0 auto;
+      z-index: 200;
+    }
+
+    .bottom-dock {
+      height: 76px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 225, 245, 0.68) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 8px;
+      box-shadow:
+        inset 0 2px 6px rgba(255, 255, 255, 0.95),
+        0 10px 28px rgba(155, 0, 90, 0.35);
+      position: relative;
+    }
+
+    .dock-item {
+      flex: 1;
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #4a1247;
+      font-size: 11px;
+      font-weight: 700;
+      position: relative;
+      padding: 6px 0;
+    }
+
+    .dock-item svg {
+      width: 24px;
+      height: 24px;
+      stroke: #881367;
+      fill: none;
+      stroke-width: 2.1;
+      transition: all 0.2s ease;
+    }
+
+    .dock-item.active {
+      color: #d90082;
+    }
+
+    .dock-item.active svg {
+      fill: #ff1a9c;
+      stroke: #ff1a9c;
+    }
+
+    .dock-item.active::after {
+      content: "";
+      width: 24px;
+      height: 3.5px;
+      background: #ff1a9c;
+      border-radius: 4px;
+      margin-top: 2px;
+      box-shadow: 0 0 8px #ff1a9c;
+    }
+
+    .dock-badge {
+      position: absolute;
+      top: 0;
+      right: 16%;
+      background: #ff1a9c;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 20px;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(230, 0, 126, 0.5);
+    }
+
+    /* Glowing Center Plus Orb */
+    .dock-center-orb {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 25%, #ff85d8 0%, #ff0099 65%, #b8006e 100%);
+      border: 2.5px solid #ffffff;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        inset 0 3px 6px rgba(255, 255, 255, 0.85),
+        0 0 22px rgba(255, 0, 153, 0.85),
+        0 6px 16px rgba(155, 0, 90, 0.45);
+      flex-shrink: 0;
+      margin: 0 4px;
+      transition: transform 0.18s ease;
+    }
+
+    .dock-center-orb:active {
+      transform: scale(0.92);
+    }
+
+    .dock-center-orb svg {
+      width: 30px;
+      height: 30px;
+      stroke: #ffffff;
+      stroke-width: 2.8;
+    }
+
+    /* =========================
+       AUTH LOADING OVERLAY
     ========================== */
 
     #authLoading {
       position: fixed;
       inset: 0;
-      background: #0f0514;
+      background: radial-gradient(circle at 50% 40%, #ff4dc4 0%, #b30077 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -388,16 +650,18 @@
       z-index: 9999;
     }
 
-    #authLoading .loading-logo {
-      font-family: "Pacifico", cursive;
-      font-size: 42px;
-      margin-bottom: 15px;
-      color: #ff1493;
-      filter: drop-shadow(0 0 15px rgba(255, 20, 147, 0.7));
+    #authLoading .loading-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 900;
+      font-size: 44px;
+      color: #ffffff;
+      text-shadow: 0 0 24px rgba(255, 255, 255, 0.8);
+      margin-bottom: 10px;
     }
 
     #authLoading p {
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
       font-size: 14px;
     }
 
@@ -408,224 +672,213 @@
 </head>
 <body class="auth-waiting">
 
-  <!-- =========================
-       AUTH LOADING
-  ========================== -->
+  <!-- Ambient Floating Hearts -->
+  <div class="ambient-bg">
+    <span class="ambient-heart" style="top:3%; left:6%; font-size:28px;">♡</span>
+    <span class="ambient-heart" style="top:5%; left:48%; font-size:44px;">♡</span>
+    <span class="ambient-heart" style="top:84%; right:6%; font-size:34px;">♡</span>
+    <span class="ambient-heart" style="bottom:2%; right:10%; font-size:38px;">♡</span>
+  </div>
+
+  <!-- Auth Loading Screen -->
   <div id="authLoading">
-    <div class="loading-logo">TexUs</div>
-    <p>Loading your experience...</p>
+    <div class="loading-title">TexUs</div>
+    <p>Connecting real people...</p>
   </div>
 
   <!-- =========================
        TOP HEADER
   ========================== -->
   <header class="top-header">
-    <div class="logo-area">
+    <div class="logo-wrap">
+      <div class="logo-ring"></div>
       <div class="logo">TexUs</div>
-      <span class="sparkle-icon">✨</span>
+      <span class="logo-sparkle">✦</span>
     </div>
+
     <div class="header-actions">
-      <button class="header-btn" onclick="alert('Search feature coming up!')">🔍</button>
-      <button class="header-btn" onclick="alert('Compose new message!')">📝</button>
+      <!-- Search Icon -->
+      <button class="glass-circle-btn" onclick="toggleSearchBar()" aria-label="Search">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+        </svg>
+      </button>
+
+      <!-- Compose / Edit Icon -->
+      <button class="glass-circle-btn" onclick="focusNewChat()" aria-label="New Message">
+        <svg viewBox="0 0 24 24">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+      </button>
     </div>
   </header>
 
   <!-- =========================
-       CHATS PAGE (DEFAULT ACTIVE)
+       CHATS PAGE (MAIN VIEW)
   ========================== -->
   <main id="chatsPage" class="page active">
 
-    <!-- Sub-Filter Pills -->
-    <div class="chat-tabs">
-      <button class="chat-pill active" onclick="switchChatTab(this)">
-        💬 Chats <span class="badge-count">12</span>
+    <!-- Optional Search Input -->
+    <div class="search-bar-wrap" id="searchBarWrap">
+      <input
+        type="text"
+        id="userSearchInput"
+        class="search-input"
+        placeholder="Search real registered users..."
+        oninput="filterRegisteredUsers()"
+      >
+    </div>
+
+    <!-- Enclosed Segmented Pill Bar -->
+    <div class="segmented-bar">
+      <button class="seg-tab active" onclick="switchSubTab('chats', this)">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 11H6V9h2v2zm5 0h-2V9h2v2zm5 0h-2V9h2v2z"/>
+        </svg>
+        <span>Chats</span>
+        <span class="seg-badge" id="chatsTabBadge">0</span>
       </button>
-      <button class="chat-pill" onclick="switchChatTab(this)">
-        👥 Groups
+
+      <button class="seg-tab" onclick="switchSubTab('groups', this)">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>
+        <span>Groups</span>
       </button>
-      <button class="chat-pill" onclick="switchChatTab(this)">
-        👤 Requests <span class="badge-count" style="background:#ff1493; color:white;">3</span>
+
+      <button class="seg-tab" onclick="switchSubTab('requests', this)">
+        <svg viewBox="0 0 24 24">
+          <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+        <span>Requests</span>
+        <span class="seg-badge" id="requestsTabBadge">0</span>
       </button>
     </div>
 
-    <!-- Chat List Cards -->
+    <!-- Real Registered Users List -->
     <div class="chat-list-container" id="chatListContainer">
-
-      <!-- Zee Chat -->
-      <div class="chat-card" onclick="openChatRoom('Zee', 'See you later! 💜')">
-        <div class="chat-avatar-wrap">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Zee" class="chat-avatar">
-          <span class="online-indicator"></span>
-        </div>
-        <div class="chat-info">
-          <div class="chat-name-row">
-            <span class="chat-username">Zee 💜</span>
-            <span class="chat-time">9:24 PM</span>
-          </div>
-          <div class="chat-preview-row">
-            <span class="chat-preview">See you later! 💜</span>
-            <span class="unread-badge">2</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Thabo Chat -->
-      <div class="chat-card" onclick="openChatRoom('Thabo', 'Bet, sounds good 👍')">
-        <div class="chat-avatar-wrap">
-          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="Thabo" class="chat-avatar">
-          <span class="online-indicator"></span>
-        </div>
-        <div class="chat-info">
-          <div class="chat-name-row">
-            <span class="chat-username">Thabo</span>
-            <span class="chat-time">8:50 PM</span>
-          </div>
-          <div class="chat-preview-row">
-            <span class="chat-preview">Bet, sounds good 👍</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- TexUs Community Group -->
-      <div class="chat-card" onclick="openChatRoom('TexUs Community', 'New message in the group...')">
-        <div class="chat-avatar-wrap">
-          <div class="chat-avatar" style="background:linear-gradient(135deg,#ff1493,#9333ea);display:flex;align-items:center;justify-content:center;font-size:24px;">👥</div>
-        </div>
-        <div class="chat-info">
-          <div class="chat-name-row">
-            <span class="chat-username">TexUs Community <span class="verified-badge">✔</span></span>
-            <span class="chat-time">7:32 PM</span>
-          </div>
-          <div class="chat-preview-row">
-            <span class="chat-preview">New message in the group...</span>
-            <span class="unread-badge">5</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lerato Chat -->
-      <div class="chat-card" onclick="openChatRoom('Lerato', 'You\'re amazing! ✨')">
-        <div class="chat-avatar-wrap">
-          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150" alt="Lerato" class="chat-avatar">
-          <span class="online-indicator"></span>
-        </div>
-        <div class="chat-info">
-          <div class="chat-name-row">
-            <span class="chat-username">Lerato 🤍</span>
-            <span class="chat-time">6:47 PM</span>
-          </div>
-          <div class="chat-preview-row">
-            <span class="chat-preview">You're amazing! ✨</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- DreamBig Chat -->
-      <div class="chat-card" onclick="openChatRoom('DreamBig', 'Let\'s plan this soon 💜')">
-        <div class="chat-avatar-wrap">
-          <div class="chat-avatar" style="background:linear-gradient(135deg,#000,#ff1493);display:flex;align-items:center;justify-content:center;font-size:22px;">🦋</div>
-        </div>
-        <div class="chat-info">
-          <div class="chat-name-row">
-            <span class="chat-username">DreamBig</span>
-            <span class="chat-time">5:20 PM</span>
-          </div>
-          <div class="chat-preview-row">
-            <span class="chat-preview">Let's plan this soon 💜</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Neo Chat -->
-      <div class="chat-card" onclick="openChatRoom('Neo', 'Sounds perfect 👌')">
-        <div class="chat-avatar-wrap">
-          <div class="chat-avatar" style="background:#000;display:flex;align-items:center;justify-content:center;font-size:20px;">👤</div>
-        </div>
-        <div class="chat-info">
-          <div class="chat-name-row">
-            <span class="chat-username">Neo</span>
-            <span class="chat-time">4:15 PM</span>
-          </div>
-          <div class="chat-preview-row">
-            <span class="chat-preview">Sounds perfect 👌</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Kayla Chat -->
-      <div class="chat-card" onclick="openChatRoom('Kayla', 'Okay, got it 👌')">
-        <div class="chat-avatar-wrap">
-          <div class="chat-avatar" style="background:linear-gradient(135deg,#990033,#ff3366);display:flex;align-items:center;justify-content:center;font-size:22px;">🌹</div>
-        </div>
-        <div class="chat-info">
-          <div class="chat-name-row">
-            <span class="chat-username">Kayla</span>
-            <span class="chat-time">2:50 PM</span>
-          </div>
-          <div class="chat-preview-row">
-            <span class="chat-preview">Okay, got it 👌</span>
-          </div>
-        </div>
-      </div>
-
+      <div class="empty-glass-box">Loading real registered users...</div>
     </div>
+
+    <!-- Groups Sub-view -->
+    <div class="chat-list-container" id="groupsListContainer" style="display:none;">
+      <div class="empty-glass-box">No groups created yet.</div>
+    </div>
+
+    <!-- Requests Sub-view -->
+    <div class="chat-list-container" id="requestsListContainer" style="display:none;">
+      <div class="empty-glass-box">No pending friend requests.</div>
+    </div>
+
   </main>
 
   <!-- =========================
-       OTHER PAGES (PLACEHOLDERS)
+       HOME PAGE
   ========================== -->
   <main id="homePage" class="page">
-    <div class="generic-page-content">
-      <h2>🏠 Home Feed</h2>
-      <p>Stories, posts, reels & music feeds live here.</p>
-    </div>
-  </main>
-
-  <main id="discoverPage" class="page">
-    <div class="generic-page-content">
-      <h2>🧭 Discover</h2>
-      <p>Explore trending content and new friends across TexUs.</p>
-    </div>
-  </main>
-
-  <main id="profilePage" class="page">
-    <div class="generic-page-content">
-      <h2>👤 Profile</h2>
-      <p>Manage your account, posts, and settings.</p>
+    <div class="empty-glass-box">
+      <h2 style="margin-bottom:8px; font-weight:900;">Home Feed</h2>
+      <p>Real posts & updates from signed-up members will appear here.</p>
     </div>
   </main>
 
   <!-- =========================
-       BOTTOM NAVIGATION BAR
+       DISCOVER PAGE
   ========================== -->
-  <nav class="bottom-nav">
-    <button class="nav-btn" onclick="switchNavPage('homePage', this)">
-      <span class="icon">🏠</span>
-      <span>Home</span>
-    </button>
-
-    <button class="nav-btn active" onclick="switchNavPage('chatsPage', this)">
-      <span class="icon">💬</span>
-      <span>Chats</span>
-    </button>
-
-    <button class="nav-plus-btn" onclick="alert('Create new post / reel / story!')">
-      +
-    </button>
-
-    <button class="nav-btn" onclick="switchNavPage('discoverPage', this)">
-      <span class="icon">🧭</span>
-      <span>Discover</span>
-    </button>
-
-    <button class="nav-btn" onclick="switchNavPage('profilePage', this)">
-      <span class="icon">👤</span>
-      <span>Profile</span>
-    </button>
-  </nav>
+  <main id="discoverPage" class="page">
+    <div class="empty-glass-box">
+      <h2 style="margin-bottom:8px; font-weight:900;">Discover Real People</h2>
+      <p>Find and connect with verified members on TexUs.</p>
+    </div>
+  </main>
 
   <!-- =========================
-       JAVASCRIPT
+       PROFILE PAGE
+  ========================== -->
+  <main id="profilePage" class="page">
+    <div class="empty-glass-box">
+      <h2 id="profileUserTitle" style="margin-bottom:6px; font-weight:900;">My Profile</h2>
+      <p id="profileUserEmail" style="margin-bottom:16px;">Not signed in</p>
+      <button class="send-pill-btn" style="padding:12px 24px;" onclick="window.location.href='login.html'">
+        Account Sign In / Switch
+      </button>
+    </div>
+  </main>
+
+  <!-- =========================
+       LIVE 1-ON-1 CHAT ROOM MODAL
+  ========================== -->
+  <div class="chat-room-modal" id="chatRoomModal">
+    <div class="room-header">
+      <button class="back-btn" onclick="closeChatRoom()">←</button>
+      <div>
+        <div id="roomPartnerName" style="font-weight:800; font-size:18px; color:#1f0521;">User</div>
+        <div style="font-size:12px; font-weight:600; color:#592654;">TexUs Direct Chat</div>
+      </div>
+    </div>
+
+    <div class="room-messages" id="roomMessages"></div>
+
+    <div class="room-input-bar">
+      <input
+        type="text"
+        id="roomMsgInput"
+        placeholder="Type a message..."
+        onkeydown="if(event.key==='Enter') sendDirectMessage()"
+      >
+      <button class="send-pill-btn" onclick="sendDirectMessage()">Send</button>
+    </div>
+  </div>
+
+  <!-- =========================
+       UNIFIED SCULPTED BOTTOM DOCK
+  ========================== -->
+  <div class="bottom-dock-wrapper">
+    <nav class="bottom-dock">
+      <button class="dock-item" onclick="switchDockPage('homePage', this)">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/>
+        </svg>
+        <span>Home</span>
+      </button>
+
+      <button class="dock-item active" onclick="switchDockPage('chatsPage', this)">
+        <span class="dock-badge" id="dockChatsBadge">0</span>
+        <svg viewBox="0 0 24 24">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <span>Chats</span>
+      </button>
+
+      <button class="dock-center-orb" onclick="focusNewChat()" aria-label="Create">
+        <svg viewBox="0 0 24 24">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+
+      <button class="dock-item" onclick="switchDockPage('discoverPage', this)">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+        <span>Discover</span>
+      </button>
+
+      <button class="dock-item" onclick="switchDockPage('profilePage', this)">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- =========================
+       FIREBASE REAL USERS & CHAT LOGIC
   ========================== -->
   <script>
     const firebaseConfig = {
@@ -640,31 +893,295 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    window.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        document.body.classList.add("auth-ready");
-      }, 500);
+    let currentUser = null;
+    let allRegisteredUsers = [];
+    let activeChatPartner = null;
+    let unsubscribeMessages = null;
+
+    auth.onAuthStateChanged(async user => {
+      currentUser = user || null;
+      document.body.classList.add("auth-ready");
+
+      if (currentUser) {
+        document.getElementById("profileUserTitle").textContent =
+          currentUser.displayName || localStorage.getItem("texus_username") || "Registered Member";
+        document.getElementById("profileUserEmail").textContent = currentUser.email || "";
+      }
+
+      await loadRealUsers();
+      if (currentUser) {
+        await loadFriendRequests();
+      }
     });
 
-    function switchNavPage(pageId, btnElement) {
+    // Fetch ONLY real signed-up users from Firestore "users" collection
+    async function loadRealUsers() {
+      const container = document.getElementById("chatListContainer");
+
+      try {
+        const snapshot = await db.collection("users").get();
+        allRegisteredUsers = [];
+
+        snapshot.forEach(doc => {
+          // Exclude currently logged-in user from their own chat list
+          if (currentUser && doc.id === currentUser.uid) return;
+
+          const data = doc.data();
+          if (data && (data.username || data.email)) {
+            allRegisteredUsers.push({
+              uid: doc.id,
+              username: data.username || data.email.split("@")[0],
+              email: data.email || "",
+              photoURL: data.photoURL || ""
+            });
+          }
+        });
+
+        updateCounters(allRegisteredUsers.length);
+        renderUserCards(allRegisteredUsers);
+      } catch (error) {
+        console.error("Error loading real users:", error);
+        container.innerHTML = `<div class="empty-glass-box">Unable to load members right now.</div>`;
+      }
+    }
+
+    function updateCounters(count) {
+      document.getElementById("chatsTabBadge").textContent = count;
+      document.getElementById("dockChatsBadge").textContent = count;
+    }
+
+    function renderUserCards(usersList) {
+      const container = document.getElementById("chatListContainer");
+      container.innerHTML = "";
+
+      if (usersList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-glass-box">
+            No other real users have signed up yet.<br>
+            Once real members register, they will appear right here!
+          </div>
+        `;
+        return;
+      }
+
+      usersList.forEach(u => {
+        const initial = escapeHtml(u.username.charAt(0).toUpperCase());
+        const avatarHtml = u.photoURL
+          ? `<img src="${escapeHtml(u.photoURL)}" alt="${escapeHtml(u.username)}" class="chat-avatar">`
+          : `<div class="chat-avatar">${initial}</div>`;
+
+        const card = document.createElement("div");
+        card.className = "chat-card";
+        card.onclick = () => openChatRoom(u);
+
+        card.innerHTML = `
+          <div class="chat-avatar-wrap">
+            ${avatarHtml}
+            <span class="online-dot"></span>
+          </div>
+          <div class="chat-content">
+            <div class="chat-top-row">
+              <span class="chat-name">${escapeHtml(u.username)}</span>
+              <span class="chat-time">Member</span>
+            </div>
+            <div class="chat-bottom-row">
+              <span class="chat-msg">Tap to send a message</span>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function filterRegisteredUsers() {
+      const term = document.getElementById("userSearchInput").value.trim().toLowerCase();
+      const filtered = allRegisteredUsers.filter(u =>
+        u.username.toLowerCase().includes(term) || u.email.toLowerCase().includes(term)
+      );
+      renderUserCards(filtered);
+    }
+
+    async function loadFriendRequests() {
+      const reqContainer = document.getElementById("requestsListContainer");
+      const reqBadge = document.getElementById("requestsTabBadge");
+
+      try {
+        const snap = await db
+          .collection("friendRequests")
+          .where("toUid", "==", currentUser.uid)
+          .where("status", "==", "pending")
+          .get();
+
+        reqBadge.textContent = snap.size;
+
+        if (snap.empty) {
+          reqContainer.innerHTML = `<div class="empty-glass-box">No pending friend requests.</div>`;
+          return;
+        }
+
+        reqContainer.innerHTML = "";
+        for (const doc of snap.docs) {
+          const req = doc.data();
+          let senderName = "TexUs Member";
+          const userDoc = await db.collection("users").doc(req.fromUid).get();
+          if (userDoc.exists && userDoc.data().username) {
+            senderName = userDoc.data().username;
+          }
+
+          const card = document.createElement("div");
+          card.className = "chat-card";
+          card.innerHTML = `
+            <div class="chat-avatar-wrap">
+              <div class="chat-avatar">${escapeHtml(senderName.charAt(0).toUpperCase())}</div>
+            </div>
+            <div class="chat-content">
+              <div class="chat-top-row">
+                <span class="chat-name">${escapeHtml(senderName)}</span>
+              </div>
+              <div class="chat-bottom-row">
+                <span class="chat-msg">Sent you a friend request</span>
+              </div>
+            </div>
+          `;
+          reqContainer.appendChild(card);
+        }
+      } catch (err) {
+        console.error("Requests load error:", err);
+      }
+    }
+
+    /* =========================
+       NAVIGATION & TABS
+    ========================== */
+
+    function switchDockPage(pageId, btn) {
       document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
       document.getElementById(pageId).classList.add("active");
 
-      document.querySelectorAll(".bottom-nav .nav-btn").forEach(b => b.classList.remove("active"));
-      if (btnElement) {
-        btnElement.classList.add("active");
-      }
+      document.querySelectorAll(".dock-item").forEach(item => item.classList.remove("active"));
+      if (btn) btn.classList.add("active");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function switchChatTab(pillElement) {
-      document.querySelectorAll(".chat-pill").forEach(p => p.classList.remove("active"));
-      pillElement.classList.add("active");
+    function switchSubTab(tabName, tabBtn) {
+      document.querySelectorAll(".seg-tab").forEach(t => t.classList.remove("active"));
+      tabBtn.classList.add("active");
+
+      document.getElementById("chatListContainer").style.display = tabName === "chats" ? "flex" : "none";
+      document.getElementById("groupsListContainer").style.display = tabName === "groups" ? "flex" : "none";
+      document.getElementById("requestsListContainer").style.display = tabName === "requests" ? "flex" : "none";
     }
 
-    function openChatRoom(username, lastMsg) {
-      alert("Opening chat with " + username + "\nLast message: " + lastMsg);
+    function toggleSearchBar() {
+      const wrap = document.getElementById("searchBarWrap");
+      wrap.classList.toggle("active");
+      if (wrap.classList.contains("active")) {
+        document.getElementById("userSearchInput").focus();
+      }
+    }
+
+    function focusNewChat() {
+      const chatsBtn = document.querySelectorAll(".dock-item")[1];
+      switchDockPage("chatsPage", chatsBtn);
+      const wrap = document.getElementById("searchBarWrap");
+      wrap.classList.add("active");
+      document.getElementById("userSearchInput").focus();
+    }
+
+    /* =========================
+       REAL 1-ON-1 CHAT ROOM
+    ========================== */
+
+    function openChatRoom(partner) {
+      activeChatPartner = partner;
+      document.getElementById("roomPartnerName").textContent = partner.username;
+      document.getElementById("chatRoomModal").classList.add("active");
+
+      const msgBox = document.getElementById("roomMessages");
+      msgBox.innerHTML = "";
+
+      if (!currentUser) {
+        msgBox.innerHTML = `<div class="empty-glass-box">Sign in to send live messages to ${escapeHtml(partner.username)}.</div>`;
+        return;
+      }
+
+      const chatId = [currentUser.uid, partner.uid].sort().join("_");
+
+      if (unsubscribeMessages) unsubscribeMessages();
+
+      unsubscribeMessages = db
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .orderBy("createdAt", "asc")
+        .onSnapshot(snapshot => {
+          msgBox.innerHTML = "";
+          if (snapshot.empty) {
+            msgBox.innerHTML = `<div class="empty-glass-box">Say hi to ${escapeHtml(partner.username)}!</div>`;
+            return;
+          }
+          snapshot.forEach(doc => {
+            const m = doc.data();
+            const bubble = document.createElement("div");
+            bubble.className = "msg-bubble" + (m.senderId === currentUser.uid ? " me" : "");
+            bubble.textContent = m.text || "";
+            msgBox.appendChild(bubble);
+          });
+          msgBox.scrollTop = msgBox.scrollHeight;
+        });
+    }
+
+    function closeChatRoom() {
+      document.getElementById("chatRoomModal").classList.remove("active");
+      if (unsubscribeMessages) {
+        unsubscribeMessages();
+        unsubscribeMessages = null;
+      }
+      activeChatPartner = null;
+    }
+
+    async function sendDirectMessage() {
+      const input = document.getElementById("roomMsgInput");
+      const text = input.value.trim();
+
+      if (!text || !activeChatPartner) return;
+
+      if (!currentUser) {
+        alert("Please sign in first to send messages.");
+        return;
+      }
+
+      const chatId = [currentUser.uid, activeChatPartner.uid].sort().join("_");
+      input.value = "";
+
+      try {
+        await db
+          .collection("chats")
+          .doc(chatId)
+          .collection("messages")
+          .add({
+            senderId: currentUser.uid,
+            receiverId: activeChatPartner.uid,
+            text: text,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+      } catch (err) {
+        console.error("Send error:", err);
+        alert("Could not send message.");
+      }
+    }
+
+    function escapeHtml(val) {
+      if (val === null || val === undefined) return "";
+      return String(val)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
   </script>
 
