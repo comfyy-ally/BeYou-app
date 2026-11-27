@@ -741,12 +741,12 @@
 
     <!-- Real Registered Users Chat List -->
     <div class="chat-list-container" id="chatListContainer">
-      <div class="empty-glass-box">Loading real registered users...</div>
+      <div class="empty-glass-box">No chats yet.</div>
     </div>
 
-    <!-- Suggestions Sub-view (Matched by followers or activity) -->
+    <!-- Suggestions Sub-view -->
     <div class="chat-list-container" id="suggestionsListContainer" style="display:none;">
-      <div class="empty-glass-box">Loading suggested friends...</div>
+      <div class="empty-glass-box">No suggested friends available right now.</div>
     </div>
 
     <!-- Requests Sub-view -->
@@ -877,6 +877,9 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // Cutoff timestamp: only users who register AFTER this moment will appear
+    const FRESH_START_TIMESTAMP = new Date("2026-11-27T14:05:00Z").getTime();
+
     let currentUser = null;
     let allRegisteredUsers = [];
     let activeChatPartner = null;
@@ -898,7 +901,7 @@
       }
     });
 
-    // Fetch ONLY real signed-up users from Firestore "users" collection
+    // Fetch ONLY brand-new real signed-up users created after the wipe cutoff
     async function loadRealUsers() {
       const container = document.getElementById("chatListContainer");
 
@@ -910,13 +913,20 @@
           if (currentUser && doc.id === currentUser.uid) return;
 
           const data = doc.data();
+          const createdMillis = data && data.createdAt && typeof data.createdAt.toMillis === "function"
+            ? data.createdAt.toMillis()
+            : 0;
+
+          // Exclude all older/existing accounts from before the wipe
+          if (createdMillis < FRESH_START_TIMESTAMP) return;
+
           if (data && (data.username || data.email)) {
             allRegisteredUsers.push({
               uid: doc.id,
               username: data.username || data.email.split("@")[0],
               email: data.email || "",
               photoURL: data.photoURL || "",
-              followersCount: data.followersCount || Math.floor(Math.random() * 25) // simulated follower count for matching
+              followersCount: data.followersCount || 0
             });
           }
         });
@@ -942,8 +952,8 @@
       if (usersList.length === 0) {
         container.innerHTML = `
           <div class="empty-glass-box">
-            No other real users have signed up yet.<br>
-            Once real members register, they will appear right here!
+            No chats yet.<br>
+            New real members who sign up will appear here!
           </div>
         `;
         return;
@@ -979,7 +989,7 @@
       });
     }
 
-    // Suggestions Section: suggest users with similar follower counts or activity
+    // Suggestions Section: suggest new users with similar follower counts or activity
     function renderSuggestions(usersList) {
       const container = document.getElementById("suggestionsListContainer");
       const badge = document.getElementById("suggestionsTabBadge");
@@ -988,7 +998,7 @@
       badge.textContent = usersList.length;
 
       if (usersList.length === 0) {
-        container.innerHTML = `<div class="empty-glass-box">No suggested users available right now.</div>`;
+        container.innerHTML = `<div class="empty-glass-box">No suggested friends available right now.</div>`;
         return;
       }
 
